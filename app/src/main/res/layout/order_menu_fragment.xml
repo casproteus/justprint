@@ -1,0 +1,40 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/activity_horizontal_margin"
+    tools:context="com.just.print.ui.fragment.OrderMenuFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <EditText
+        android:id="@+id/odMnTableNumEt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Please Input Table Number:" />
+
+    <ListView
+        android:id="@+id/orderMenuList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/odMnTableNumEt"
+        android:layout_centerHorizontal="true" />
+
+
+    <Button
+        android:id="@+id/printBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:text="打印" />
+
+    <TextView
+        android:id="@+id/noDataShowMe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="请添加菜品"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+</RelativeLayout>

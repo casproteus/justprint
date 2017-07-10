@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="3dp"
+            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+            android:textColor="#0091c1"
+            android:textStyle="normal|bold"
+            android:textSize="18sp"
+            android:id="@+id/odmId" />
+        <TextView
+            android:id="@+id/odmname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="3dp"
+            android:text="abcdef"
+            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+            android:textColor="#0091c1"
+            android:textStyle="normal|bold"
+            android:textSize="18sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/odmnreduce"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" - " />
+
+        <TextView
+            android:id="@+id/odmnnum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:maxEms="1"
+            android:minEms="1"
+            android:text="0" />
+
+        <Button
+            android:id="@+id/odmnadd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/oddelDish"
+            android:text=" + " />
+
+        <Button
+            android:id="@+id/oddelDish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="删除" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/odMnLoutMarkTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="3dp"
+            android:textColor="#9c9a9a" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/odMnLoutMarkBtn"
+            android:layout_alignParentRight="true"
+            android:text="修改"
+            />
+    </RelativeLayout>
+
+
+</LinearLayout>

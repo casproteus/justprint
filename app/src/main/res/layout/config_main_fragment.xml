@@ -1,0 +1,51 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.just.print.ui.fragment.ConfigMainFragment">
+
+    <LinearLayout
+        android:id="@+id/configList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/configMenuManager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="菜单管理" />
+
+        <TextView
+            android:id="@+id/configPrintManager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="打印管理" />
+
+        <TextView
+            android:id="@+id/configUserManager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="员工管理"
+            android:visibility="gone" />
+
+        <TextView
+        android:id="@+id/configTagManager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="标签管理" />
+
+        <TextView
+            android:id="@+id/configPrinterStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="打印机状态" />
+    </LinearLayout>
+
+
+</FrameLayout>

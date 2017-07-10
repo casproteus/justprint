@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">JustPrint</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_silding_menu_list_view_demo">SildingMenuListViewDemo</string>
+    <string name="title_activity_activate">Activate</string>
+</resources>

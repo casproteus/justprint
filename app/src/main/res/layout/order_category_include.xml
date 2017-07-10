@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/addMenuCtrl"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_horizontal_margin"
+    android:paddingTop="5dp"
+    android:visibility="gone">
+
+    <com.stupid.method.widget.flowlayout.FlowListView
+        android:id="@+id/showMarks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:horizontalSpacing="2dp"
+        android:numColumns="4"
+        android:verticalSpacing="2dp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonOK"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="确认" />
+
+        <TextView
+            android:id="@+id/showTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="TextView" />
+
+        <Button
+            android:id="@+id/buttonCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="取消" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=" + " />
+
+        <TextView
+            android:id="@+id/showCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="123" />
+
+        <Button
+            android:id="@+id/buttonReduce"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" - " />
+    </LinearLayout>
+
+
+
+</LinearLayout>
