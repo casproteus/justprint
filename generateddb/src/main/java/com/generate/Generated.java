@@ -85,8 +85,7 @@ public class Generated {
         category.addToMany(menu, cid.getProperty());
 
         /**
-         * 打印机与菜 是多对多关系,增加一个菜品表
-         *
+         * printer and dish are multi to multi, add a dish table.
          *
          * **/
         Entity menuPrint = schema.addEntity("M2M_MenuPrint");
@@ -121,7 +120,7 @@ public class Generated {
 //        user.addStringProperty("phoneID");
 //        user.addStringProperty("alias");//别名
 //        user.addStringProperty("pwd");
-//        user.addIntProperty("permissions");//权限 1 最大
+//        user.addIntProperty("permissions");// 1 is the biggest
         //Property.PropertyBuilder shopId = user.addStringProperty("shopId").columnName("SHOP_ID");
         //  user.addDateProperty("createTime");
 //        Entity shop = schema.addEntity("Shop");
@@ -129,7 +128,7 @@ public class Generated {
 //        shop.addStringProperty("shopId").primaryKey().unique();
 //        shop.addStringProperty("shopGroup");
 //        shop.addDateProperty("createTime");
-//        shop.addToMany(user, shopId.getProperty(), "workers");// 该店铺下的员工
+//        shop.addToMany(user, shopId.getProperty(), "workers");//  employtees belongs to the store.
 
         //-------------添加,state,version---------------
         for (Entity en : schema.getEntities()) {
