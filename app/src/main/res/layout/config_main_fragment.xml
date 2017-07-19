@@ -33,11 +33,18 @@
             android:visibility="gone" />
 
         <TextView
-        android:id="@+id/configTagManager"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:text="标签管理" />
+            android:id="@+id/configTagManager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="标签管理" />
+
+        <TextView
+            android:id="@+id/configPrintReport"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="打印报告" />
 
         <TextView
             android:id="@+id/configPrinterStatus"
@@ -45,6 +52,7 @@
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:text="打印机状态" />
+
     </LinearLayout>
 
 

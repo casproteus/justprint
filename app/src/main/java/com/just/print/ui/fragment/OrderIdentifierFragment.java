@@ -45,7 +45,7 @@ import java.util.Comparator;
 import java.util.List;
 
 
-public class OrderIdentifierFragment extends BaseFragment implements View.OnClickListener, OnClickItemListener,EventBus.EventHandler,WifiPrintService.PrinterState{
+public class OrderIdentifierFragment extends BaseFragment implements View.OnClickListener, OnClickItemListener, EventBus.EventHandler, WifiPrintService.PrinterState {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String EVENT_ADD_MENU = "EVENT_ADD_MENU=";
@@ -74,11 +74,15 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     List<String> itemList;
     int curmarkitem;
     List<Mark> markselect;
-    @XClick({R.id.odIdConfigBtn, R.id.odIdSndBtn, R.id.odIdDelBtn, R.id.odIdOkBtn})
-    private void exeControlCommand(View v){
-        switch (v.getId()){
+
+    @XClick({R.id.odIdConfigBtn, R.id.odIdDeliveryBtn, R.id.odIdSndBtn, R.id.odIdDelBtn, R.id.odIdOkBtn})
+    private void exeControlCommand(View v) {
+        switch (v.getId()) {
             case R.id.odIdConfigBtn:
                 startActivity(new Intent(getContext(), ConfigActivity.class));
+                break;
+            case R.id.odIdDeliveryBtn:
+                odIdTableTbtn.setText("Delivery");
                 break;
             case R.id.odIdSndBtn:
                 WifiPrintService.getInstance().exePrintCommand();
@@ -88,7 +92,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 DelOneText();
                 break;
             case R.id.odIdOkBtn:
-                if(odIdTableTbtn.isChecked() == false){
+                if (odIdTableTbtn.isChecked() == false) {
                     if (null != storedMenu) {
                         addDish();
                         odIdInput.setText("");
@@ -97,12 +101,11 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                             loadOrderMenu();
                         }
                     }
+                } else {
+                    odIdTableTbtn.setChecked(false);
+                    MenuService.getInstance().setTableNum(odIdTableTbtn.getText().toString());
                 }
-                else{
-                odIdTableTbtn.setChecked(false);
-                MenuService.getInstance().setTableNum(odIdTableTbtn.getText().toString());
-            }
-            break;
+                break;
         }
 
     }
@@ -159,9 +162,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         markselect.add(m);
                     }
                     Log.d(TAG, String.valueOf(m.select));
-                    if(MenuService.getInstance().getMenu() !=null && MenuService.getInstance().getMenu().size() > 0){
+                    if (MenuService.getInstance().getMenu() != null && MenuService.getInstance().getMenu().size() > 0) {
                         int size = MenuService.getInstance().getMenu().size();
-                        MenuService.getInstance().getMenu().get(size - 1 ).setMarkList(markselect);
+                        MenuService.getInstance().getMenu().get(size - 1).setMarkList(markselect);
                         loadOrderMenu();
                     }
 
@@ -237,7 +240,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         switch (v.getId()) {
             case R.id.odIdTableTbtn:
                 Log.d(TAG, "ClickTableButton");
-                if(odIdTableTbtn.isChecked()){
+                if (odIdTableTbtn.isChecked()) {
                     odIdTableTbtn.setText("");
                 }
                 break;
@@ -256,18 +259,18 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     private void InputText(String str) {
         if (odIdTableTbtn.isChecked()) {
             odIdTableTbtn.append(str);
-        }else{
+        } else {
             odIdInput.append(str);
         }
 
     }
 
     private void DelOneText() {
-        if(odIdTableTbtn.isChecked()){
-            if(odIdTableTbtn.length() > 0){
-                odIdTableTbtn.setText(odIdTableTbtn.getText().subSequence(0,odIdTableTbtn.length() - 1));
+        if (odIdTableTbtn.isChecked()) {
+            if (odIdTableTbtn.length() > 0) {
+                odIdTableTbtn.setText(odIdTableTbtn.getText().subSequence(0, odIdTableTbtn.length() - 1));
             }
-        }else{
+        } else {
             if (odIdInput.length() > 0) {
                 odIdInput.setText(odIdInput.getText().subSequence(0, odIdInput.length() - 1));
             }
@@ -289,7 +292,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             storedMenu = mnlist.get(0);
             return mnlist.get(0);
         }
-        if(context.length() == 0){
+        if (context.length() == 0) {
             return null;
         }
         return null;
@@ -307,9 +310,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 break;
             case R.id.odMnLoutMarkBtn:
                 curmarkitem = i;
-                showMarksDialog(dishesXAdapter.get(i).getMarkList(),new onChoiceMarks(){
+                showMarksDialog(dishesXAdapter.get(i).getMarkList(), new onChoiceMarks() {
                     @Override
-                    public void onChoiceMarks(List<Mark> result){
+                    public void onChoiceMarks(List<Mark> result) {
                         Log.d(TAG, result.toString());
                         dishesXAdapter.get(curmarkitem).setMarkList(result);
                         loadOrderMenu();
@@ -340,7 +343,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         dishesXAdapter.setData(MenuService.getInstance().getMenu());
         dishesXAdapter.notifyDataSetChanged();
     }
-    private void resetConvenienceMarkArea(){
+
+    private void resetConvenienceMarkArea() {
         List<Mark> markList = DaoExpand.queryNotDeleteAll(getDaoMaster().newSession().getMarkDao());
         List<Mark> marks = new ArrayList<Mark>();
         //添加Mark列表
@@ -349,16 +353,18 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         markXAdapter.setData(marks);
         markXAdapter.notifyDataSetChanged();
     }
-    private void clearOrderMenu(){
+
+    private void clearOrderMenu() {
         Log.d(TAG, "clearOrderMenu start...");
         MenuService.getInstance().clearMenu();
         odIdTableTbtn.setText("");
         loadOrderMenu();
     }
-    public void ckPrinterState(String src,int i){
-        switch (i){
+
+    public void ckPrinterState(String src, int i) {
+        switch (i) {
             case 2:     //WFPRINTER_CONNECTEDERR
-                showToast("打印机:" + src +" 连接错误");
+                showToast("打印机:" + src + " 连接错误");
                 break;
             case 4:     //COMMON
                 showToast(src);

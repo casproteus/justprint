@@ -282,7 +282,7 @@ public class WifiPrintService implements Runnable{
 
 
             for(Mark str:dd.getMarkList()){
-                out += spaceFormat(5) + "** " + str.getName() + " **\n";
+                out += spaceFormat(5) + "* " + str.getName() + " *\n";
             }
         }
         out +="\n\n\n\n\n";

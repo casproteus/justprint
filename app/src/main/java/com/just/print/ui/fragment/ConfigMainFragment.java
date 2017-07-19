@@ -24,7 +24,7 @@ public class ConfigMainFragment extends BaseFragment {
         new StupidReflect(this, getView()).init();
     }
 
-    @XClick({R.id.configMenuManager, R.id.configPrintManager, R.id.configTagManager, R.id.configUserManager})
+    @XClick({R.id.configMenuManager, R.id.configPrintManager, R.id.configTagManager, R.id.configUserManager, R.id.configPrintReport})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.configMenuManager:
@@ -38,6 +38,10 @@ public class ConfigMainFragment extends BaseFragment {
                 break;
             case R.id.configPrintManager:
                 getEventBus().post(ConfigActivity.CHANGE_PAGE, ConfigPrinterFragment.class);
+                break;
+
+            case R.id.configPrintReport:
+                //getEventBus().post(ConfigActivity.CHANGE_PAGE, ConfigReportFragment.class);
                 break;
         }
     }
