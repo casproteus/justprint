@@ -5,11 +5,14 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.just.print.db.dao.DaoMaster;
 import com.just.print.net.UDPService;
 
 import java.io.File;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by wangx on 2016/10/28.
@@ -30,7 +33,7 @@ public class Applic extends Application {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-
+            Log.i(TAG, "service disconnected!");
         }
     };
 

@@ -45,7 +45,7 @@ import java.util.Comparator;
 import java.util.List;
 
 
-public class OrderIdentifierFragment extends BaseFragment implements View.OnClickListener, OnClickItemListener,EventBus.EventHandler,WifiPrintService.printerState{
+public class OrderIdentifierFragment extends BaseFragment implements View.OnClickListener, OnClickItemListener,EventBus.EventHandler,WifiPrintService.PrinterState{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String EVENT_ADD_MENU = "EVENT_ADD_MENU=";
@@ -99,13 +99,14 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                     }
                 }
                 else{
-                    odIdTableTbtn.setChecked(false);
-                    MenuService.getInstance().setTableNum(odIdTableTbtn.getText().toString());
-                }
-                break;
+                odIdTableTbtn.setChecked(false);
+                MenuService.getInstance().setTableNum(odIdTableTbtn.getText().toString());
+            }
+            break;
         }
 
     }
+
     IXOnItemClickListener itemXAdapterClick = new IXOnItemClickListener() {
         @Override
         public void onClickItem(View view, int i) {

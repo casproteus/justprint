@@ -50,10 +50,10 @@ public class WifiPrintService implements Runnable{
             { 0x1b, 0x42, 0x02, 0x03 },//蜂鸣指令
     };
 
-    public interface printerState {
+    public interface PrinterState {
         void ckPrinterState(String src,int i);
     }
-    private printerState m_ckPrinterState = null;
+    private PrinterState m_ckPrinterState = null;
     public static WifiPrintService getInstance(){
         if(instance == null){
             instance = new WifiPrintService();
@@ -79,7 +79,7 @@ public class WifiPrintService implements Runnable{
         printOut = "";
         Log.d(TAG,"Create Service Successful");
     }
-    public int registPrintState(final printerState ckPrinterState){
+    public int registPrintState(final PrinterState ckPrinterState){
         m_ckPrinterState = ckPrinterState;
         return 0;
     }
