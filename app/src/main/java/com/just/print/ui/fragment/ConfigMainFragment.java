@@ -41,7 +41,7 @@ public class ConfigMainFragment extends BaseFragment {
                 break;
 
             case R.id.configPrintReport:
-                //getEventBus().post(ConfigActivity.CHANGE_PAGE, ConfigReportFragment.class);
+                getEventBus().post(ConfigActivity.CHANGE_PAGE, ConfigPrintReportFragment.class);
                 break;
         }
     }

@@ -13,6 +13,19 @@ import com.stupid.method.reflect.annotation.XClick;
 import com.stupid.method.reflect.annotation.XGetValueByView;
 
 public class Activate extends BaseActivity {
+    String[] SerialNumbers = new String[]{
+            "asdfas",
+            "AFJAIU",
+            "RQWEIU",
+            "ZXVZXV",
+            "IASYDU",
+            "WLEJKR",
+            "WMENRT",
+            "QWKJER",
+            "UADSYF",
+            "YUSDJF",
+            "HJHKQE"
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,13 +38,17 @@ public class Activate extends BaseActivity {
     void submit(@XGetValueByView(fromId = R.id.license) TextView textView) {
 
         if (textView.getText().length() == 6) {
-            AppData.setLicense(this, textView.getText().toString());
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-        } else {
-            showToast("请输入正确的license");
+            String inputedSN = textView.getText().toString().trim();
+            for (String sn : SerialNumbers) {
+                if (sn.trim().equals(inputedSN)) {
+                    AppData.setLicense(this, inputedSN);
+                    startActivity(new Intent(this, LoginActivity.class));
+                    finish();
+                    return;
+                }
+            }
         }
-
+        showToast("请输入正确的license");
     }
 
 }
