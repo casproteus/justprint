@@ -83,6 +83,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 break;
             case R.id.odIdDeliveryBtn:
                 odIdTableTbtn.setText("Delivery");
+                MenuService.getInstance().setTableNum(odIdTableTbtn.getText().toString());
                 break;
             case R.id.odIdSndBtn:
                 WifiPrintService.getInstance().exePrintCommand();

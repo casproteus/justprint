@@ -27,6 +27,8 @@ public class Activate extends BaseActivity {
             "HJHKQE"
     };
 
+    public static String currentSN;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

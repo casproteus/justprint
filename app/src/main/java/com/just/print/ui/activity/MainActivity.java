@@ -20,7 +20,6 @@ import java.util.Arrays;
 
 public class MainActivity extends BaseActivity {
 
-
     //    ServiceConnection serviceConnection;
 //    UDPService udp;
     boolean debug = !true;
@@ -32,6 +31,7 @@ public class MainActivity extends BaseActivity {
         new StupidReflect(this).init();
         ListView listView = (ListView) findViewById(R.id.listView);
         if (!debug) {
+            Activate.currentSN = AppData.getLicense(this);
             if (AppData.getLicense(this).length() > 0)
                 startActivity(new Intent(this, LoginActivity.class));
             else

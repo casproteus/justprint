@@ -5,7 +5,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 
+import com.just.print.Activate;
 import com.just.print.R;
+import com.just.print.app.AppData;
 import com.just.print.app.BaseFragment;
 import com.just.print.db.bean.Mark;
 import com.just.print.db.expand.DaoExpand;
@@ -42,48 +44,23 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
         markXAdapter = new XAdapter2<Mark>(getContext(), ConfigPrintReportViewHolder.class);
         gridView.setAdapter(markXAdapter);
         markXAdapter.setClickItemListener(this);
-        loadMark();
     }
-
-    private void loadMark() {
-        List<Mark> list = DaoExpand.queryNotDeleteAll(getDaoMaster().newSession().getMarkDao());
-        markXAdapter.setData(list);
-        markXAdapter.notifyDataSetChanged();
-    }
-
 
     @XClick({R.id.verifyPassword})
-    private void addMark(@XGetValueByView(fromId = R.id.etMark) String mark) {
+    private void verifyPassword(@XGetValueByView(fromId = R.id.etMark) String mark) {
+        showToast("调试：输入值为"+mark+"!");
+        if(Activate.currentSN.equals(mark)){
 
-        Mark mark1 = new Mark();
-        mark1.setState(State.def);
-        mark1.setName(mark);
-        getDaoMaster().newSession().getMarkDao().insertOrReplace(mark1);
-        mark1.updateAndUpgrade();
-        loadMark();
+            showToast("验证通过，即将打印销售报表");
+
+        }else{
+            showToast("请输入正确的密码!");
+        }
     }
 
 
     @Override
     public void onClickItem(View view, int i) {
-        final
-        Mark mark = markXAdapter.getItem(i);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage("是否删除\"" + mark.getName() + "\"?");
-        builder.setTitle("提示").setNegativeButton("删除", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                mark.logicDelete();
-                loadMark();
-            }
-        });
-        builder.setPositiveButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        builder.show();
+
     }
 }
