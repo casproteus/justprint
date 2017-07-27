@@ -20,16 +20,16 @@ import java.util.Arrays;
 
 public class MainActivity extends BaseActivity {
 
-    //    ServiceConnection serviceConnection;
+//    ServiceConnection serviceConnection;
 //    UDPService udp;
-    boolean debug = !true;
+    boolean debug = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         new StupidReflect(this).init();
-        ListView listView = (ListView) findViewById(R.id.listView);
+
         if (!debug) {
             Activate.currentSN = AppData.getLicense(this);
             if (AppData.getLicense(this).length() > 0)
@@ -39,15 +39,18 @@ public class MainActivity extends BaseActivity {
             finish();
             return;
         }
-        XAdapter2<ActivityInfo> adapter = new XAdapter2<ActivityInfo>(this, ActivityViewHolder.class);
-        try {
-            PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_ACTIVITIES);
-            adapter.addAll(Arrays.asList(info.activities));
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        listView.setAdapter(adapter);
 
+        if(debug) {
+            ListView listView = (ListView) findViewById(R.id.listView);
+            XAdapter2<ActivityInfo> adapter = new XAdapter2<ActivityInfo>(this, ActivityViewHolder.class);
+            try {
+                PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_ACTIVITIES);
+                adapter.addAll(Arrays.asList(info.activities));
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+            listView.setAdapter(adapter);
+        }
 //        bindService(new Intent(this, UDPService.class), serviceConnection = new ServiceConnection() {
 //            @Override
 //            public void onServiceConnected(ComponentName name, IBinder service) {

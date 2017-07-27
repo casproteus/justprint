@@ -174,6 +174,9 @@ public class WifiPrintService implements Runnable{
     }
     public void run(){
         while(true){
+            if(false){
+                return;
+            }
             //打印机遍历打印机
             if(isConn != true && isInit != true) {
                 Iterator iter = printMap.entrySet().iterator();
@@ -282,7 +285,7 @@ public class WifiPrintService implements Runnable{
 
 
             for(Mark str:dd.getMarkList()){
-                out += spaceFormat(5) + "* " + str.getName() + " *\n";
+                out += spaceFormat(5) + "** " + str.getName() + " **\n";
             }
         }
         out +="\n\n\n\n\n";

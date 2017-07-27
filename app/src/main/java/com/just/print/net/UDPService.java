@@ -46,7 +46,7 @@ public class UDPService extends Service implements TCPSever.TcpServerReadOver {
     private static final int HTTP_PORT = 8182;
     ExecutorService timeoutExecutor = Executors.newSingleThreadExecutor();
     protected final EventLoopGroup group = new NioEventLoopGroup(10);
-    Channel ch;
+    Channel channel;
     WeakHashMap<Context, String> l;
     String deviceID;
     IXHttp http = new XAsyncIXHttp();
@@ -97,7 +97,7 @@ public class UDPService extends Service implements TCPSever.TcpServerReadOver {
     }
 
     private void send(String data, InetSocketAddress address) throws InterruptedException {
-        ch.writeAndFlush(
+        channel.writeAndFlush(
                 new DatagramPacket(Unpooled.copiedBuffer(data.toString(),
                         CharsetUtil.UTF_8), address)).sync();
     }
@@ -143,12 +143,12 @@ public class UDPService extends Service implements TCPSever.TcpServerReadOver {
             @Override
             public void run() {
                 tcpSever.start();
-                Bootstrap b = new Bootstrap();
-                b.group(group).channel(NioDatagramChannel.class)
+                Bootstrap bootstrap = new Bootstrap();
+                bootstrap.group(group).channel(NioDatagramChannel.class)
                         .option(ChannelOption.SO_BROADCAST, true).handler(new ChHandler());
                 try {
-                    ch = b.bind(PORT).sync().channel();
-                    ch.closeFuture().await();
+                    channel = bootstrap.bind(PORT).sync().channel();
+                    channel.closeFuture().await();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
