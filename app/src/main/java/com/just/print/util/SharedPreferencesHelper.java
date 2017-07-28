@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.util.Base64;
-import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 
@@ -140,7 +139,7 @@ public class SharedPreferencesHelper {
         try {
             return JSON.parseObject(getString((key)), clazz);
         } catch (Exception e) {
-            Log.w(tag, "getJSON", e);
+            L.w(tag, "getJSON", e);
             return null;
         }
 

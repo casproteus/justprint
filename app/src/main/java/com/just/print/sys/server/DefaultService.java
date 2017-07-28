@@ -1,13 +1,12 @@
 package com.just.print.sys.server;
 
-import android.util.Log;
-
 import com.just.print.app.Applic;
 import com.just.print.net.UDPService;
 import com.just.print.sys.model.AbsModel;
 import com.just.print.sys.model.QueryShopRequest;
 import com.just.print.sys.model.QueryShopResult;
 import com.just.print.util.Base64Util;
+import com.just.print.util.L;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,7 +34,7 @@ public class DefaultService extends AbsService {
     }
 
     private void queryShop(QueryShopRequest queryShop, UDPService udpService, InetSocketAddress ch) {
-        Log.d(tag, "queryShop");
+        L.d(tag, "queryShop");
         QueryShopResult result = new QueryShopResult();
 
         File dbfile = Applic.getApp().getDBPath(queryShop.getShopName());

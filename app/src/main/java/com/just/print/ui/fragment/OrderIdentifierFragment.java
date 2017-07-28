@@ -3,7 +3,6 @@ package com.just.print.ui.fragment;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -31,6 +30,7 @@ import com.just.print.ui.holder.OrderIdentifierItemViewHolder;
 import com.just.print.ui.holder.OrderIdentifierMarkViewHolder;
 import com.just.print.ui.holder.OrderIdentifierViewHolder;
 import com.just.print.ui.holder.OrderMenuViewHolder;
+import com.just.print.util.L;
 import com.stupid.method.adapter.IXOnItemClickListener;
 import com.stupid.method.adapter.OnClickItemListener;
 import com.stupid.method.adapter.XAdapter2;
@@ -114,9 +114,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     IXOnItemClickListener itemXAdapterClick = new IXOnItemClickListener() {
         @Override
         public void onClickItem(View view, int i) {
-            Log.d(TAG, "onClickItem1");
+            L.d(TAG, "onClickItem1");
             Menu tmpMenu;
-            Log.d(TAG, String.valueOf(view.getId()) + String.valueOf(i));
+            L.d(TAG, String.valueOf(view.getId()) + String.valueOf(i));
             switch (view.getId()) {
                 case R.id.buttonholder:
                     switch (i) {
@@ -151,10 +151,10 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                     }
                     break;
                 case R.id.tagid:
-                    Log.d(TAG, "case tag");
+                    L.d(TAG, "case tag");
                     //Mark Press
                     Mark m = markXAdapter.getItem(i);
-                    Log.d(TAG, String.valueOf(m.select));
+                    L.d(TAG, String.valueOf(m.select));
                     if (m.select) {
                         m.select = false;
                         markselect.remove(m);
@@ -162,7 +162,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         m.select = true;
                         markselect.add(m);
                     }
-                    Log.d(TAG, String.valueOf(m.select));
+                    L.d(TAG, String.valueOf(m.select));
                     if (MenuService.getInstance().getMenu() != null && MenuService.getInstance().getMenu().size() > 0) {
                         int size = MenuService.getInstance().getMenu().size();
                         MenuService.getInstance().getMenu().get(size - 1).setMarkList(markselect);
@@ -193,7 +193,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
     @Override
     public void onCreated(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreated");
+        L.d(TAG, "onCreated");
         getEventBus().register(EVENT_ADD_MENU, this);
         new StupidReflect(this, getView()).init();
         //设置餐桌号用
@@ -240,7 +240,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         int num;
         switch (v.getId()) {
             case R.id.odIdTableTbtn:
-                Log.d(TAG, "ClickTableButton");
+                L.d(TAG, "ClickTableButton");
                 if (odIdTableTbtn.isChecked()) {
                     odIdTableTbtn.setText("");
                 }
@@ -301,7 +301,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
     @Override
     public void onClickItem(View view, int i) {
-        Log.d(TAG, "onClickItem");
+        L.d(TAG, "onClickItem");
         switch (view.getId()) {
             case R.id.oddelDish:
                 DishesDetailModel a = dishesXAdapter.get(i);
@@ -314,7 +314,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 showMarksDialog(dishesXAdapter.get(i).getMarkList(), new onChoiceMarks() {
                     @Override
                     public void onChoiceMarks(List<Mark> result) {
-                        Log.d(TAG, result.toString());
+                        L.d(TAG, result.toString());
                         dishesXAdapter.get(curmarkitem).setMarkList(result);
                         loadOrderMenu();
                     }
@@ -328,7 +328,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         DishesDetailModel ddm = new DishesDetailModel();
         ddm.setDish(storedMenu);
         ddm.setMarkList(new ArrayList<Mark>());
-        Log.d(TAG, markselect.toString());
+        L.d(TAG, markselect.toString());
         ddm.setDishNum(1);
         MenuService.getInstance().addMenu(ddm);
         storedMenu = null;
@@ -356,7 +356,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     }
 
     private void clearOrderMenu() {
-        Log.d(TAG, "clearOrderMenu start...");
+        L.d(TAG, "clearOrderMenu start...");
         MenuService.getInstance().clearMenu();
         odIdTableTbtn.setText("");
         loadOrderMenu();

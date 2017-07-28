@@ -1,6 +1,5 @@
 package com.just.print.util;
 
-import android.util.Log;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -26,7 +25,7 @@ public class StringUtils {
             res = Integer.parseInt(string);
         } catch (NumberFormatException e) {
 
-            Log.e("StringUtils", string + " 转 long 失败  ", e);
+            L.e("StringUtils", string + " 转 long 失败  ", e);
 
         }
         return res;
@@ -38,7 +37,7 @@ public class StringUtils {
             res = Integer.valueOf(string);
         } catch (NumberFormatException e) {
 
-            Log.e("StringUtils", string + " 转 int 失败  ", e);
+            L.e("StringUtils", string + " 转 int 失败  ", e);
 
         }
         return res;

@@ -46,7 +46,7 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
             findViewById(R.id.shopShow).setVisibility(View.VISIBLE);
         }
         if (!StringUtils.isEmpty(shopName)) {
-            showToast(shopName);
+            //showToast(shopName);
             AppData.createShopDB(getContext(), shopName);
             startActivity(new Intent(getContext(), OrderActivity.class));
             getActivity().finish();

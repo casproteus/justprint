@@ -1,6 +1,8 @@
 package com.just.print.sys.server;
 
 import android.annotation.SuppressLint;
+import android.os.Handler;
+import android.os.Message;
 
 import com.just.print.Thread.PrintThreadPool;
 import com.just.print.app.Applic;
@@ -11,12 +13,15 @@ import com.just.print.db.bean.Printer;
 import com.just.print.db.expand.DaoExpand;
 import com.just.print.sys.model.DishesDetailModel;
 import com.just.print.util.Command;
+import com.just.print.util.L;
 import com.zj.wfsdk.WifiCommunication;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
-import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,13 +33,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-
-/**
- * Created by neusoft on 2016/10/31.
- */
 public class WifiPrintService implements Runnable{
     private final String TAG = "WifiPrintService";
-    private static WifiPrintService instance = null;
     private HashMap<String,Printer> ipMap;
     private List<DishesDetailModel> detailList;
     private HashMap<String,List<String>> printMap;
@@ -54,18 +54,21 @@ public class WifiPrintService implements Runnable{
         void ckPrinterState(String src,int i);
     }
     private PrinterState m_ckPrinterState = null;
+
+    private static WifiPrintService instance = null;
     public static WifiPrintService getInstance(){
         if(instance == null){
             instance = new WifiPrintService();
         }
         return instance;
     }
+
     public WifiPrintService(){
-        Log.d(TAG,"WifiPrintService");
+        L.d(TAG,"WifiPrintService");
         isConn = false;
         isInit = false;
         len_80mm = 24;
-        wfComm = new WifiCommunication(mHandler);
+        wfComm = new WifiCommunication(handler);
         curPrintIp = "";
         n = 1;
         //读取打印机位置
@@ -74,36 +77,41 @@ public class WifiPrintService implements Runnable{
         printMap = new HashMap<String,List<String>>();
         queueMap = new HashMap<String,List<DishesDetailModel>>();
         List<Printer> printerList = DaoExpand.queryNotDeleteAll(Applic.getApp().getDaoMaster().newSession().getPrinterDao());
-        refreshPrintList(printerList);
+        reInitPrintRelatedMaps(printerList);
         PrintThreadPool.getInstance().getPrintThreadPool().execute(this);
         printOut = "";
-        Log.d(TAG,"Create Service Successful");
+        L.d(TAG,"Create Service Successful");
     }
+
     public int registPrintState(final PrinterState ckPrinterState){
         m_ckPrinterState = ckPrinterState;
         return 0;
     }
+
     public int exePrintCommand(List<DishesDetailModel> ddList){
-        Log.d(TAG,"exePrintCommand");
+        L.d(TAG,"exePrintCommand");
         printOut = printFormat(ddList);
 
         //map.put("192.168.1.100",printOut);
 
         return 0;
     }
-    public void refreshPrintList(List<Printer> list){
+
+    public void reInitPrintRelatedMaps(List<Printer> list){
         ipMap = new HashMap<String,Printer>();
         printMap = new HashMap<String,List<String>>();
-        for(Printer tmp:list){
-            ipMap.put(tmp.getIp(),tmp);
-            printMap.put(tmp.getIp(),new ArrayList<String>());
-            queueMap.put(tmp.getIp(),new ArrayList<DishesDetailModel>());
+        for(Printer printer:list){
+            ipMap.put(printer.getIp(),printer);
+            printMap.put(printer.getIp(),new ArrayList<String>());
+            queueMap.put(printer.getIp(),new ArrayList<DishesDetailModel>());
         }
     }
+
     public String exePrintCommand(){
-        Log.d(TAG,"exePrintCommand");
+        L.d(TAG,"exePrintCommand");
         String tmpAllmenuContents;
-        if(!isPrintListEmpty()){
+        if(!isListInPrintMapEmpty()){
+            m_ckPrinterState.ckPrinterState("current print job not finished yet!",4);
             return "2";                     //未打印完毕
         }
         //添加菜品信息至打印队列
@@ -117,7 +125,7 @@ public class WifiPrintService implements Runnable{
                 }
                 String ip = m2m.getPrint().getIp();
                 Integer type = m2m.getPrint().getFirstPrint();
-                Log.d(TAG,"ip#" + ip + " type:" + type);
+                L.d(TAG,"ip#" + ip + " type:" + type);
                 queueMap.get(ip).add(ddm);
             }
         }
@@ -130,7 +138,7 @@ public class WifiPrintService implements Runnable{
             Map.Entry entry = (Map.Entry)sortiter.next();
             String key = (String)entry.getKey();
             List<DishesDetailModel> value = (List<DishesDetailModel>) entry.getValue();
-            Log.d(TAG,"ip#" + key + "list size#" + value.size());
+            L.d(TAG,"ip#" + key + "list size#" + value.size());
             if(ipMap.get(key).getType() == 0 && value.size() > 0){
                 //订单排序
                 Collections.sort(queueMap.get(key), new Comparator<DishesDetailModel>() {
@@ -151,7 +159,7 @@ public class WifiPrintService implements Runnable{
             Map.Entry entry = (Map.Entry)pntiter.next();
             String key = (String)entry.getKey();
             List<DishesDetailModel> value = (List<DishesDetailModel>) entry.getValue();
-            Log.d(TAG,"ip#" + key + "list size#" + value.size());
+            L.d(TAG,"ip#" + key + "list size#" + value.size());
             if(value.size() > 0){
                 if(ipMap.get(key).getFirstPrint() == 1){
                     //全单封装
@@ -172,11 +180,13 @@ public class WifiPrintService implements Runnable{
         m_ckPrinterState.ckPrinterState("打印订单已生成",4);
         return "0";
     }
+
     public void run(){
         while(true){
-            if(false){
+            if(true){
                 return;
             }
+
             //打印机遍历打印机
             if(isConn != true && isInit != true) {
                 Iterator iter = printMap.entrySet().iterator();
@@ -186,43 +196,46 @@ public class WifiPrintService implements Runnable{
                     String key = (String)entry.getKey();
                     List<String> value = (List<String>)entry.getValue();
                     if(value.size() > 0){
-                        Log.d(TAG,"ip#" + key + "list size#" + value.size());
-                        Log.d(TAG,"initSocket");
+                        L.d(TAG,"ip#" + key + "list size#" + value.size());
+                        L.d(TAG,"initSocket");
                         curPrintIp = key;
                         wfComm.initSocket(key,9100);
                         isInit = true;
                     }
                 }
             }
+
             //执行打印处理
             if(isInit == true && isConn == true){
 
                 if(printMap!=null && printMap.get(curPrintIp) != null) {
-                    Log.d(TAG,"Start print");
+                    L.d(TAG,"Start print");
                     List<String> tmplist = printMap.get(curPrintIp);
                     for (String out : tmplist) {
-                        Log.d(TAG,"out#");
-                        Log.d(TAG,out);
+                        L.d(TAG,"out#");
+                        L.d(TAG,out);
                         SendDataByte(byteCommands[0]);
                         SendDataString(out);
                         SendDataByte(Command.GS_V_m_n);
                     }
                     printMap.get(curPrintIp).clear();
 
-                //打印完毕后切断连接
-                wfComm.close();
-                isConn = false;
+                    //打印完毕后切断连接
+                    wfComm.close();
+                    isConn = false;
                 }
             }
             sleep(1000);
         }
     }
-    @SuppressLint("HandlerLeak") private final Handler mHandler = new Handler() {
+
+    @SuppressLint("HandlerLeak")
+    private final Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg){
             switch (msg.what){
                 case WifiCommunication.WFPRINTER_CONNECTED:
-                    Log.d(TAG,"Connected ip#" + WifiPrintService.curPrintIp);
+                    L.d(TAG,"Connected ip#" + WifiPrintService.curPrintIp);
                     isConn = true;
                     Command.GS_ExclamationMark[2] = 0x11;
                     SendDataByte(Command.GS_ExclamationMark);
@@ -230,13 +243,13 @@ public class WifiPrintService implements Runnable{
                     break;
                 case WifiCommunication.WFPRINTER_DISCONNECTED:
                     //isConn = false;
-                    Log.d(TAG,"Disconnected");
+                    L.d(TAG,"Disconnected");
                     isInit = false;
                     isConn = false;
                     curPrintIp = "";
                     break;
                 case WifiCommunication.WFPRINTER_CONNECTEDERR:
-                    Log.d(TAG,"Connectederr");
+                    L.d(TAG,"Connectederr");
                     if(m_ckPrinterState != null){
                         m_ckPrinterState.ckPrinterState(curPrintIp,2);
                     }
@@ -251,19 +264,22 @@ public class WifiPrintService implements Runnable{
             }
         }
     };
+
     private void SendDataString(String data){
         if(data.length()>0)
             wfComm.sendMsg(data, "GBK");
             //wfComm2.sendMsg("no2" + data, "GBK");
     }
+
     public void closeWifiService(){
-        Log.d(TAG,"closeService");
+        L.d(TAG,"closeService");
         if(wfComm!=null) {
             wfComm.close();
         }
     }
+
     public String printFormat(List<DishesDetailModel> list){
-        Log.d(TAG,"printFormat");
+        L.d(TAG,"printFormat");
         String out = "\n\n";
         DateFormat df = new SimpleDateFormat("HH:mm");
         Date d = new Date();
@@ -276,7 +292,7 @@ public class WifiPrintService implements Runnable{
             out += spaceFormat(5 - dd.getDish().getID().length());
             out += dd.getDish().getMname();
             if(dd.getDishNum() > 1){
-                Log.d(TAG,Integer.toString(dd.getDish().getMname().getBytes().length));
+                L.d(TAG,Integer.toString(dd.getDish().getMname().getBytes().length));
                 out += spaceFormat(14 - (dd.getDish().getMname().getBytes().length)/3*2) + "X" + Integer.toString(dd.getDishNum()) + "\n";
             }
             else{
@@ -291,6 +307,7 @@ public class WifiPrintService implements Runnable{
         out +="\n\n\n\n\n";
         return out;
     }
+
     public String spaceFormat(int l){
         String sp = "";
         for (int i = 0;i<l;i++){
@@ -298,23 +315,25 @@ public class WifiPrintService implements Runnable{
         }
         return sp;
     }
+
     private void SendDataByte(byte[] data){
         if(data.length>0){
             wfComm.sndByte(data);
         }
     }
-    private boolean isPrintListEmpty(){
+
+    private boolean isListInPrintMapEmpty(){
         Iterator iter = printMap.entrySet().iterator();
         while(iter.hasNext()){
             Map.Entry entry = (Map.Entry)iter.next();
-            String key = (String)entry.getKey();
-            List<String> value = (List<String>)entry.getValue();
-            if(value.size() > 0){
+            List<String> listTypeValue = (List<String>)entry.getValue();
+            if(listTypeValue.size() > 0){
                 return false;
             }
         }
         return true;
     }
+
     private void sleep(int time){
         try{
             Thread.sleep(1000);

@@ -3,7 +3,6 @@ package com.just.print.ui.fragment;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +15,7 @@ import com.just.print.sys.model.DishesDetailModel;
 import com.just.print.sys.server.MenuService;
 import com.just.print.sys.server.WifiPrintService;
 import com.just.print.ui.holder.OrderMenuViewHolder;
+import com.just.print.util.L;
 import com.stupid.method.adapter.IXDataListener;
 import com.stupid.method.adapter.OnClickItemListener;
 import com.stupid.method.adapter.XAdapter2;
@@ -146,7 +146,7 @@ public class OrderMenuFragment extends BaseFragment implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.printBtn:
-                Log.d(TAG, "print Start");
+                L.d(TAG, "print Start");
                 printMenuTask();
                 break;
         }

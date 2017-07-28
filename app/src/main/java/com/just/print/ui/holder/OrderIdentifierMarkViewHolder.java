@@ -1,11 +1,11 @@
 package com.just.print.ui.holder;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.ToggleButton;
 
 import com.just.print.R;
 import com.just.print.db.bean.Mark;
+import com.just.print.util.L;
 import com.stupid.method.adapter.XViewHolder;
 
 /**
@@ -44,9 +44,9 @@ public class OrderIdentifierMarkViewHolder extends XViewHolder<Mark>{
 
     @Override
     public void onResetView(Mark mark, int i) {
-        Log.d(TAG,"onResetView");
-        Log.d(TAG,"hashcode: " + String.valueOf(mark.hashCode()));
-        Log.d(TAG,"item: " + String.valueOf(i) + "select: " + String.valueOf(mark.select));
+        L.d(TAG,"onResetView");
+        L.d(TAG,"hashcode: " + String.valueOf(mark.hashCode()));
+        L.d(TAG,"item: " + String.valueOf(i) + "select: " + String.valueOf(mark.select));
         textView.setText(mark.getName());
         textView.setChecked(mark.select);
     }

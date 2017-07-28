@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
 import android.util.SparseArray;
 
 import com.alibaba.fastjson.JSON;
@@ -15,6 +14,7 @@ import com.just.print.sys.model.AbsModel;
 import com.just.print.sys.model.AbsRequest;
 import com.just.print.sys.model.AbsResult;
 import com.just.print.util.AppUtils;
+import com.just.print.util.L;
 import com.stupid.method.http.IXHttp;
 import com.stupid.method.http.impl.asyncHttp.XAsyncIXHttp;
 
@@ -116,7 +116,7 @@ public class UDPService extends Service implements TCPSever.TcpServerReadOver {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    Log.d(tag, "请求超时");
+                    L.d(tag, "请求超时");
                     synchronized (sparseArray) {
                         UDPCallback callback = sparseArray.get(msg.getRequestID());
                         if (callback != null) {
@@ -171,14 +171,14 @@ public class UDPService extends Service implements TCPSever.TcpServerReadOver {
         protected void channelRead0(ChannelHandlerContext ch, DatagramPacket msg) throws Exception {
 
             String response = msg.content().toString(CharsetUtil.UTF_8);
-            Log.d(tag, response);
+            L.d(tag, response);
             try {
                 // byte[] res = Base64.decode(response.getBytes(), Base64.NO_PADDING);//数据转码
                 //response = new String(res);
                 JSONObject json = JSONObject.parseObject(response);
                 if (json.getString("deviceID") == null
                         || (json.getString("deviceID") != null && json.getString("deviceID").equals(deviceID))) {
-                    Log.d(tag, "自己发的,无视..");
+                    L.d(tag, "自己发的,无视..");
                     return;
                 }
                 Class<? extends AbsModel> clz =

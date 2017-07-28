@@ -24,29 +24,15 @@ public class ToastUtil {
         showToast(context, text, Toast.LENGTH_SHORT);
     }
 
-    public static void showToast(Context context, CharSequence text,
-                                 int duration) {
+    public static void showToast(Context context, CharSequence text, int duration) {
         showToast(context, text, duration, Gravity.BOTTOM);
     }
 
-    public static void showToast(Context context, CharSequence text,
-                                 int duration, int gravity) {
-        if (Looper.getMainLooper().getThread().getId() == Thread
-                .currentThread().getId()) {
-            Toast toast = getToast();
-
-            if (toast != null)
-                toast.cancel();
-            toast = Toast.makeText(context, text, duration);
-            toast.setGravity(gravity, toast.getXOffset(), toast.getYOffset());
-            toast.show();
-            refToast = new WeakReference<Toast>(toast);
-        } else
-            showToastOnUiThread(context, text, null,
-                    duration, gravity);
-
+    public static void showToast(Context context, CharSequence text, int duration, int gravity) {
+        showToast(context, text, null, duration, gravity);
     }
 
+    //---------------------------------------------------------
     public static void showToast(Context context, int resId) {
         showToast(context, resId, Toast.LENGTH_SHORT);
     }
@@ -66,12 +52,26 @@ public class ToastUtil {
         showToast(context, view, duration, Gravity.BOTTOM);
     }
 
-    public static void showToast(Context context, View view, int duration,
-                                 int gravity) {
+    public static void showToast(Context context, View view, int duration, int gravity) {
+        showToast(context, null, view, duration, gravity);
+    }
 
+    private static void showToast(Context context, CharSequence text, View view, int duration, int gravity) {
+        //如果处于UI线程里,则直接显示,否则 放到ＵＩ线程里显示
+        if (Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId()) {
+            Toast toast = getToast();
+            if (toast != null)
+                toast.cancel();
 
-        if (Looper.getMainLooper().getThread().getId() == Thread
-                .currentThread().getId()) {
+            toast = text != null ? Toast.makeText(context, text, duration) : new Toast(context);
+            toast.setGravity(gravity, toast.getXOffset(), toast.getYOffset());
+            toast.show();
+            refToast = new WeakReference<Toast>(toast);
+        } else
+            showToastOnUiThread(context, text, null, duration, gravity);
+
+        /*
+        if (Looper.getMainLooper().getThread().getId() == Thread.currentThread().getId()) {
             Toast toast = getToast();
             if (toast != null)
                 toast.cancel();
@@ -81,8 +81,8 @@ public class ToastUtil {
             toast.setView(view);
             toast.show();
         } else
-            showToastOnUiThread(context, null, view, duration,
-                    gravity);
+            showToastOnUiThread(context, null, view, duration, gravity);
+         */
     }
 
     private static void showToastOnUiThread(final Context context, final CharSequence text, final View view, final int duration, final int gravity) {
@@ -113,9 +113,4 @@ public class ToastUtil {
             }
         });
     }
-
-    /**
-     * 如果处于UI线程里,则直接显示,否则 放到ＵＩ线程里显示
-     */
-
 }

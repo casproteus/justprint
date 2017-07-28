@@ -1,12 +1,12 @@
 package com.just.print.ui.holder;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import com.just.print.R;
 import com.just.print.sys.model.DishesDetailModel;
+import com.just.print.util.L;
 import com.stupid.method.adapter.XViewHolder;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XViewByID;
@@ -69,7 +69,7 @@ public class OrderMenuViewHolder extends XViewHolder<DishesDetailModel> {
         this.menu = menu;
         odMId.setText(menu.getDish().getID());
         odMName.setText(menu.getDish().getMname());
-        Log.d(TAG, Integer.toString(menu.getDishNum()));
+        L.d(TAG, Integer.toString(menu.getDishNum()));
         odMNNum.setText(Integer.toString(menu.getDishNum()));
         odMnLoutMarkTv.setText("");
         if (menu.getMarkList() != null) {

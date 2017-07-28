@@ -19,9 +19,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.os.Looper;
-import android.util.Log;
 
 import com.alibaba.fastjson.JSONObject;
+import com.just.print.util.L;
 
 @SuppressLint("SimpleDateFormat")
 public class XCrashHandler implements UncaughtExceptionHandler {
@@ -118,7 +118,7 @@ public class XCrashHandler implements UncaughtExceptionHandler {
 	 * @param msg
 	 */
 	private void saveLog(final Thread thread, final Throwable ex, String msg) {
-		Log.e("xLog", msg, ex);
+		L.e("xLog", msg, ex);
 		JSONObject json = devInfo();
 		json.put("throw_class", ex.getClass());
 		json.put("throw_msg", msg);

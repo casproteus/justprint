@@ -1,7 +1,6 @@
 package com.just.print.ui.fragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
@@ -15,6 +14,7 @@ import com.just.print.db.dao.MenuDao;
 import com.just.print.db.expand.DaoExpand;
 import com.just.print.db.expand.State;
 import com.just.print.ui.holder.ConfigCategoryViewHolder;
+import com.just.print.util.L;
 import com.stupid.method.adapter.OnClickItemListener;
 import com.stupid.method.adapter.XAdapter2;
 import com.stupid.method.reflect.StupidReflect;
@@ -76,7 +76,7 @@ public class ConfigCategoryFragment extends BaseFragment implements OnClickItemL
 
     @Override
     public void onClickItem(View view, int i) {
-        Log.d(TAG,"onClickItem");
+        L.d(TAG,"onClickItem");
         switch (view.getId()) {
 
             case android.R.id.content:

@@ -1,6 +1,7 @@
 package com.just.print.app;
 
-import android.util.Log;
+
+import com.just.print.util.L;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +23,7 @@ public interface EventBus {
             if (handler != null)
                 handler.handleEvent(eventName, argument);
             else {
-                Log.d(tag, "no search eventName" + eventName);
+                L.d(tag, "no search eventName" + eventName);
             }
         }
 
