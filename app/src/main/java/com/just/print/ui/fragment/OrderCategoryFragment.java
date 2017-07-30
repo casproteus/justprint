@@ -1,16 +1,9 @@
 package com.just.print.ui.fragment;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ExpandableListView;
-import android.widget.GridView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.just.print.R;
@@ -21,13 +14,12 @@ import com.just.print.db.bean.Menu;
 import com.just.print.db.dao.CategoryDao;
 import com.just.print.db.dao.MenuDao;
 import com.just.print.db.expand.DaoExpand;
-import com.just.print.sys.model.DishesDetailModel;
-import com.just.print.sys.server.MenuService;
+import com.just.print.sys.model.SelectionDetail;
+import com.just.print.sys.server.CustomerSelection;
 import com.just.print.ui.holder.MarkViewHolder;
 import com.just.print.ui.holder.SubTitleMenuExpandViewHolder;
 import com.just.print.ui.holder.TtitleCategoryViewHolder;
 import com.stupid.method.adapter.OnClickItemListener;
-import com.stupid.method.adapter.XAdapter;
 import com.stupid.method.adapter.XAdapter2;
 import com.stupid.method.adapter.expand.OnXItemClickListener;
 import com.stupid.method.adapter.expand.XExpadnAdapter;
@@ -36,7 +28,6 @@ import com.stupid.method.reflect.annotation.XViewByID;
 import com.stupid.method.widget.flowlayout.FlowListView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,12 +80,12 @@ public class OrderCategoryFragment extends BaseFragment {
     private void addMenu(Menu menu, int count, List<Mark> marks) {
         //使用MenuService封装的静态对象List保存菜单。菜单只由该对象管理
         //List对象为DishesDetailModel
-        DishesDetailModel ddm = new DishesDetailModel();
+        SelectionDetail ddm = new SelectionDetail();
         ddm.setDish(menu);
         ddm.setDishNum(count);
         List<String> list = new ArrayList<String>();
         ddm.setMarkList(marks);
-        MenuService.getInstance().addMenu(ddm);
+        CustomerSelection.getInstance().addSelectedDish(ddm);
         getEventBus().post(OrderIdentifierFragment.EVENT_ADD_MENU);
         showToast("添加成功");
     }

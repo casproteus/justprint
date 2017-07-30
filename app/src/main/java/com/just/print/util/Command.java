@@ -1,9 +1,5 @@
 package com.just.print.util;
 
-/**
- * Created by qiqi on 2016/11/10.
- */
-
 public class Command {
 
     //打印机初始化
@@ -23,8 +19,9 @@ public class Command {
     public static byte[] US_vt_eot = new byte[] {0x1f, 0x11, 0x04 };
 
     //蜂鸣指令
+    public static byte[] BEEP =  { 0x1b, 0x42, 0x02, 0x03 };
+    //蜂鸣指令
     public static byte[] ESC_B_m_n = new byte[] {0x1b, 0x42, 0x00, 0x00 };
-
     //切刀指令
     public static byte[] GS_V_n = new byte[] {0x1d, 0x56, 0x00 };
     public static byte[] GS_V_m_n = new byte[] {0x1d, 0x56, 0x42, 0x00 };

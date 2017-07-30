@@ -87,7 +87,7 @@ public class ConfigPrinterFragment extends BaseFragment implements
 
     private void loadPrinter() {
         List<Printer> list = DaoExpand.queryNotDeleteAll(getDaoMaster().newSession().getPrinterDao());
-        WifiPrintService.getInstance().reInitPrintRelatedMaps(list);
+        WifiPrintService.getInstance().reInitPrintRelatedMaps();
         printerXAdapter.setData(list);
     }
 

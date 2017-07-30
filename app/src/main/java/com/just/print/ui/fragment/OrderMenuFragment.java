@@ -11,8 +11,8 @@ import android.widget.ListView;
 import com.just.print.R;
 import com.just.print.app.BaseFragment;
 import com.just.print.app.EventBus;
-import com.just.print.sys.model.DishesDetailModel;
-import com.just.print.sys.server.MenuService;
+import com.just.print.sys.model.SelectionDetail;
+import com.just.print.sys.server.CustomerSelection;
 import com.just.print.sys.server.WifiPrintService;
 import com.just.print.ui.holder.OrderMenuViewHolder;
 import com.just.print.util.L;
@@ -39,8 +39,8 @@ public class OrderMenuFragment extends BaseFragment implements View.OnClickListe
     private EditText odMnTableNumEt;
 
 
-    private XAdapter2<DishesDetailModel> menuXAdapter;
-    private List<DishesDetailModel> menuList;
+    private XAdapter2<SelectionDetail> menuXAdapter;
+    private List<SelectionDetail> menuList;
 
     @Override
     public void handleEvent(String eventName, Object... argument) {
@@ -59,12 +59,12 @@ public class OrderMenuFragment extends BaseFragment implements View.OnClickListe
     public void onCreated(Bundle savedInstanceState) {
 
         getEventBus().register(EVENT_ADD_MENU, this);
-        menuList = new ArrayList<DishesDetailModel>();
+        menuList = new ArrayList<SelectionDetail>();
 
-//        DishesDetailModel testMenu = new DishesDetailModel();
+//        SelectionDetail testMenu = new SelectionDetail();
 //        List<String> tmpList = new ArrayList<String>();
 //        tmpList.add("多麻");
-//        testMenu = new DishesDetailModel();
+//        testMenu = new SelectionDetail();
 //        testMenu.setDishID("B03");
 //        testMenu.setDishName("陈氏红烧肉");
 //        testMenu.setDishNum(1);
@@ -88,10 +88,10 @@ public class OrderMenuFragment extends BaseFragment implements View.OnClickListe
 
             @Override
             public void afterTextChanged(Editable s) {
-                MenuService.getInstance().setTableNum(odMnTableNumEt.getText().toString());
+                CustomerSelection.getInstance().setTableNumber(odMnTableNumEt.getText().toString());
             }
         });
-        menuXAdapter = new XAdapter2<DishesDetailModel>(getContext(), OrderMenuViewHolder.class);
+        menuXAdapter = new XAdapter2<SelectionDetail>(getContext(), OrderMenuViewHolder.class);
         menuXAdapter.setClickItemListener(this);
         menuXAdapter.setData(menuList);
         menuXAdapter.setOnDataChang(new IXDataListener() {
@@ -114,7 +114,7 @@ public class OrderMenuFragment extends BaseFragment implements View.OnClickListe
 
 
     private void loadOrderMenu() {
-        menuXAdapter.setData(MenuService.getInstance().getMenu());
+        menuXAdapter.setData(CustomerSelection.getInstance().getSelectedDishes());
         menuXAdapter.notifyDataSetChanged();
     }
 
@@ -137,7 +137,7 @@ public class OrderMenuFragment extends BaseFragment implements View.OnClickListe
                 break;
             case R.id.oddelDish:
 
-                MenuService.getInstance().delMenu(i);
+                CustomerSelection.getInstance().deleteSelectedDish(i);
                 loadOrderMenu();
         }
     }
@@ -146,17 +146,11 @@ public class OrderMenuFragment extends BaseFragment implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.printBtn:
+                System.out.println("Unexpected code executed!!!!!!");
+                Thread.dumpStack();
                 L.d(TAG, "print Start");
-                printMenuTask();
+                //WifiPrintService.getInstance().exePrintCommand(CustomerSelection.getInstance().getSelectedDishes());
                 break;
         }
-    }
-
-    private void printMenuTask() {
-        WifiPrintService.getInstance().exePrintCommand(MenuService.getInstance().getMenu());
-        //List<DishesDetailModel> ddmList = MenuService.getInstance().getMenu();
-        //for (DishesDetailModel mn:ddmList){
-
-        //}
     }
 }

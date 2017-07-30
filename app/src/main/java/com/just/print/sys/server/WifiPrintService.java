@@ -4,24 +4,18 @@ import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
 
-import com.just.print.Thread.PrintThreadPool;
 import com.just.print.app.Applic;
 import com.just.print.db.bean.Category;
 import com.just.print.db.bean.M2M_MenuPrint;
 import com.just.print.db.bean.Mark;
 import com.just.print.db.bean.Printer;
 import com.just.print.db.expand.DaoExpand;
-import com.just.print.sys.model.DishesDetailModel;
+import com.just.print.sys.model.SelectionDetail;
+import com.just.print.util.AppUtils;
 import com.just.print.util.Command;
 import com.just.print.util.L;
 import com.zj.wfsdk.WifiCommunication;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,202 +26,27 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class WifiPrintService implements Runnable{
     private final String TAG = "WifiPrintService";
+
     private HashMap<String,Printer> ipMap;
-    private List<DishesDetailModel> detailList;
-    private HashMap<String,List<String>> printMap;
-    private HashMap<String,List<DishesDetailModel>> queueMap;
-    private static String curPrintIp;
-    private String printOut;
-    private int n;
-    private int len_80mm;
-    private WifiCommunication wfComm;
-    private boolean isConn;
-    private boolean isInit;
-    private final byte[][] byteCommands = {
-            { 0x1b, 0x42, 0x02, 0x03 },//蜂鸣指令
-    };
+    private HashMap<String,List<SelectionDetail>> tmpralQueueMap;
+    private HashMap<String,List<String>> contentForPrintMap;
 
-    public interface PrinterState {
-        void ckPrinterState(String src,int i);
+    private static String curPrintIp = "";
+    private int len_80mm = 24;
+
+    private WifiCommunication wifiCommunication;
+    private boolean isConnected;
+    private boolean nonEmptyListFound;
+
+    public interface StatusDisplayer {
+        void showStatus(String src,int i);
     }
-    private PrinterState m_ckPrinterState = null;
-
-    private static WifiPrintService instance = null;
-    public static WifiPrintService getInstance(){
-        if(instance == null){
-            instance = new WifiPrintService();
-        }
-        return instance;
-    }
-
-    public WifiPrintService(){
-        L.d(TAG,"WifiPrintService");
-        isConn = false;
-        isInit = false;
-        len_80mm = 24;
-        wfComm = new WifiCommunication(handler);
-        curPrintIp = "";
-        n = 1;
-        //读取打印机位置
-        //map = new HashMap<String,String>();
-        ipMap = new HashMap<String,Printer>();
-        printMap = new HashMap<String,List<String>>();
-        queueMap = new HashMap<String,List<DishesDetailModel>>();
-        List<Printer> printerList = DaoExpand.queryNotDeleteAll(Applic.getApp().getDaoMaster().newSession().getPrinterDao());
-        reInitPrintRelatedMaps(printerList);
-        PrintThreadPool.getInstance().getPrintThreadPool().execute(this);
-        printOut = "";
-        L.d(TAG,"Create Service Successful");
-    }
-
-    public int registPrintState(final PrinterState ckPrinterState){
-        m_ckPrinterState = ckPrinterState;
-        return 0;
-    }
-
-    public int exePrintCommand(List<DishesDetailModel> ddList){
-        L.d(TAG,"exePrintCommand");
-        printOut = printFormat(ddList);
-
-        //map.put("192.168.1.100",printOut);
-
-        return 0;
-    }
-
-    public void reInitPrintRelatedMaps(List<Printer> list){
-        ipMap = new HashMap<String,Printer>();
-        printMap = new HashMap<String,List<String>>();
-        for(Printer printer:list){
-            ipMap.put(printer.getIp(),printer);
-            printMap.put(printer.getIp(),new ArrayList<String>());
-            queueMap.put(printer.getIp(),new ArrayList<DishesDetailModel>());
-        }
-    }
-
-    public String exePrintCommand(){
-        L.d(TAG,"exePrintCommand");
-        String tmpAllmenuContents;
-        if(!isListInPrintMapEmpty()){
-            m_ckPrinterState.ckPrinterState("current print job not finished yet!",4);
-            return "2";                     //未打印完毕
-        }
-        //添加菜品信息至打印队列
-        for(DishesDetailModel ddm : MenuService.getInstance().getMenu()){
-            //1、添加菜单至打印队列
-
-            for(M2M_MenuPrint m2m:ddm.getDish().getM2M_MenuPrintList()) {
-                if(m2m.getPrint() == null) {
-                    m_ckPrinterState.ckPrinterState("选择菜品未绑定打印机",4);
-                    return "2";
-                }
-                String ip = m2m.getPrint().getIp();
-                Integer type = m2m.getPrint().getFirstPrint();
-                L.d(TAG,"ip#" + ip + " type:" + type);
-                queueMap.get(ip).add(ddm);
-            }
-        }
-        //2、遍历打印机，对打印机按照打印种类进行排序
-        //初始化打印队列
-
-        Iterator sortiter = queueMap.entrySet().iterator();
-        while(sortiter.hasNext()){
-
-            Map.Entry entry = (Map.Entry)sortiter.next();
-            String key = (String)entry.getKey();
-            List<DishesDetailModel> value = (List<DishesDetailModel>) entry.getValue();
-            L.d(TAG,"ip#" + key + "list size#" + value.size());
-            if(ipMap.get(key).getType() == 0 && value.size() > 0){
-                //订单排序
-                Collections.sort(queueMap.get(key), new Comparator<DishesDetailModel>() {
-                    @Override
-                    public int compare(DishesDetailModel dishesDetailModel, DishesDetailModel t1) {
-
-                        Category c1 = Applic.getApp().getDaoMaster().newSession().getCategoryDao().load(dishesDetailModel.getDish().getCid());
-                        Category c2 = Applic.getApp().getDaoMaster().newSession().getCategoryDao().load(t1.getDish().getCid());
-                        return c1.getCname().compareTo(c2.getCname());
-                    }
-                });
-            }
-        }
-        //3、封装打印信息
-        Iterator pntiter = queueMap.entrySet().iterator();
-        while(pntiter.hasNext()){
-
-            Map.Entry entry = (Map.Entry)pntiter.next();
-            String key = (String)entry.getKey();
-            List<DishesDetailModel> value = (List<DishesDetailModel>) entry.getValue();
-            L.d(TAG,"ip#" + key + "list size#" + value.size());
-            if(value.size() > 0){
-                if(ipMap.get(key).getFirstPrint() == 1){
-                    //全单封装
-                    printMap.get(key).add(printFormat(queueMap.get(key)));
-                }
-                else{
-                    //分单封装
-                    for(int i = 0;i < queueMap.get(key).size();i++){
-                        List<DishesDetailModel> tlist = new ArrayList<DishesDetailModel>();
-                        tlist.add(queueMap.get(key).get(i));
-                        printMap.get(key).add(printFormat(tlist));
-                    }
-                }
-            }
-            //清空打印队列
-            queueMap.get(key).clear();
-        }
-        m_ckPrinterState.ckPrinterState("打印订单已生成",4);
-        return "0";
-    }
-
-    public void run(){
-        while(true){
-            if(true){
-                return;
-            }
-
-            //打印机遍历打印机
-            if(isConn != true && isInit != true) {
-                Iterator iter = printMap.entrySet().iterator();
-                while(iter.hasNext()){
-
-                    Map.Entry entry = (Map.Entry)iter.next();
-                    String key = (String)entry.getKey();
-                    List<String> value = (List<String>)entry.getValue();
-                    if(value.size() > 0){
-                        L.d(TAG,"ip#" + key + "list size#" + value.size());
-                        L.d(TAG,"initSocket");
-                        curPrintIp = key;
-                        wfComm.initSocket(key,9100);
-                        isInit = true;
-                    }
-                }
-            }
-
-            //执行打印处理
-            if(isInit == true && isConn == true){
-
-                if(printMap!=null && printMap.get(curPrintIp) != null) {
-                    L.d(TAG,"Start print");
-                    List<String> tmplist = printMap.get(curPrintIp);
-                    for (String out : tmplist) {
-                        L.d(TAG,"out#");
-                        L.d(TAG,out);
-                        SendDataByte(byteCommands[0]);
-                        SendDataString(out);
-                        SendDataByte(Command.GS_V_m_n);
-                    }
-                    printMap.get(curPrintIp).clear();
-
-                    //打印完毕后切断连接
-                    wfComm.close();
-                    isConn = false;
-                }
-            }
-            sleep(1000);
-        }
-    }
+    private StatusDisplayer statusDisplayer = null;
 
     @SuppressLint("HandlerLeak")
     private final Handler handler = new Handler() {
@@ -236,96 +55,247 @@ public class WifiPrintService implements Runnable{
             switch (msg.what){
                 case WifiCommunication.WFPRINTER_CONNECTED:
                     L.d(TAG,"Connected ip#" + WifiPrintService.curPrintIp);
-                    isConn = true;
+                    //@TODO are we sure the connected IP is not an other ip????? shouldn't we save the connected ip into this.currentIP?
                     Command.GS_ExclamationMark[2] = 0x11;
-                    SendDataByte(Command.GS_ExclamationMark);
-
+                    wifiCommunication.sndByte(Command.GS_ExclamationMark);
+                    isConnected = true;
                     break;
                 case WifiCommunication.WFPRINTER_DISCONNECTED:
-                    //isConn = false;
                     L.d(TAG,"Disconnected");
-                    isInit = false;
-                    isConn = false;
+                    nonEmptyListFound = false;
+                    isConnected = false;
                     curPrintIp = "";
                     break;
                 case WifiCommunication.WFPRINTER_CONNECTEDERR:
                     L.d(TAG,"Connectederr");
-                    if(m_ckPrinterState != null){
-                        m_ckPrinterState.ckPrinterState(curPrintIp,2);
+                    if(statusDisplayer != null){
+                        statusDisplayer.showStatus(curPrintIp,2);
                     }
-                    sleep(1000);
-                    isInit = false;
+                    AppUtils.sleep(1000);
+                    nonEmptyListFound = false;
+                    isConnected = false;
                     break;
                 case WifiCommunication.SEND_FAILED:
-
-
+                    L.d(TAG, "printer message send_failed");
+                    nonEmptyListFound = false;
+                    isConnected = false;
                     //发送失败对策暂无
                     break;
             }
         }
     };
 
-    private void SendDataString(String data){
-        if(data.length()>0)
-            wfComm.sendMsg(data, "GBK");
-            //wfComm2.sendMsg("no2" + data, "GBK");
+    private ExecutorService pool = Executors.newSingleThreadExecutor();
+
+    private static WifiPrintService instance = null;
+    public static WifiPrintService getInstance(){
+        if(instance == null){
+            instance = new WifiPrintService();
+        }
+        return instance;
+    }
+    private WifiPrintService(){
+        wifiCommunication = new WifiCommunication(handler);
+
+        reInitPrintRelatedMaps();
+
+        pool.execute(this);
+        L.d(TAG,"Create Service Successful");
     }
 
-    public void closeWifiService(){
-        L.d(TAG,"closeService");
-        if(wfComm!=null) {
-            wfComm.close();
+    public int registPrintState(final StatusDisplayer ckStatusDisplayer){
+        statusDisplayer = ckStatusDisplayer;
+        return 0;
+    }
+
+    public void reInitPrintRelatedMaps(){
+        ipMap = new HashMap<String,Printer>();
+        contentForPrintMap = new HashMap<String,List<String>>();
+        tmpralQueueMap = new HashMap<String,List<SelectionDetail>>();
+
+        List<Printer> printerList = DaoExpand.queryNotDeleteAll(Applic.getApp().getDaoMaster().newSession().getPrinterDao());//读取打印机位置
+        for(Printer printer:printerList){
+            ipMap.put(printer.getIp(),printer);
+            contentForPrintMap.put(printer.getIp(),new ArrayList<String>());
+            tmpralQueueMap.put(printer.getIp(),new ArrayList<SelectionDetail>());
         }
     }
 
-    public String printFormat(List<DishesDetailModel> list){
-        L.d(TAG,"printFormat");
-        String out = "\n\n";
+    public String exePrintCommand(){
+        L.d(TAG,"exePrintCommand");
+        if(!isContentForPrintMapEmpty()){
+            statusDisplayer.showStatus("current print job not finished yet!",4);
+            return "2";                     //未打印完毕
+        }
+
+        //1、遍历每个选中的菜，并分别遍历加在其上的打印机。并在queueMap上对应IP后面增加菜品
+        for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
+            List<M2M_MenuPrint> printerList = selectionDetail.getDish().getM2M_MenuPrintList();
+            for(M2M_MenuPrint m2m: printerList) {
+                //should never happen, jist in case someone changed db.
+                Printer printer = m2m.getPrint();
+                if(printer == null) {
+                    statusDisplayer.showStatus("选择菜品未绑定打印机",4);
+                    return "2";
+                }
+
+                String ip = printer.getIp();
+                L.d(TAG,"ip#" + ip + " type:" + printer.getFirstPrint());
+                tmpralQueueMap.get(ip).add(selectionDetail);
+            }
+        }
+
+        //2、遍历queueMap，如对应打印机type为0, 则对其后的value(dishes)按照类别进行排序
+        Iterator sortiter = tmpralQueueMap.entrySet().iterator();
+        while(sortiter.hasNext()){
+            Map.Entry entry = (Map.Entry)sortiter.next();
+            String key = (String)entry.getKey();
+            List<SelectionDetail> value = (List<SelectionDetail>) entry.getValue();
+
+            L.d(TAG,"ip#" + key + "list size#" + value.size());
+            if(ipMap.get(key).getType() == 0 && value.size() > 0){
+                //订单排序
+                Collections.sort(tmpralQueueMap.get(key), new Comparator<SelectionDetail>() {
+                    @Override
+                    public int compare(SelectionDetail dishesDetailModel, SelectionDetail t1) {
+                        Category c1 = Applic.getApp().getDaoMaster().newSession().getCategoryDao().load(dishesDetailModel.getDish().getCid());
+                        Category c2 = Applic.getApp().getDaoMaster().newSession().getCategoryDao().load(t1.getDish().getCid());
+                        return c1.getCname().compareTo(c2.getCname());
+                    }
+                });
+            }
+        }
+
+        //3、再次遍历queueMap, 封装打印信息
+        Iterator iterator = tmpralQueueMap.entrySet().iterator();
+        while(iterator.hasNext()){
+            Map.Entry entry = (Map.Entry)iterator.next();
+            String printerIP = (String)entry.getKey();
+            List<SelectionDetail> dishList = (List<SelectionDetail>) entry.getValue();
+
+            L.d(TAG,"ip#" + printerIP + "list size#" + dishList.size());
+            if(dishList.size() > 0){
+                if(tmpralQueueMap.get(printerIP) != dishList){
+                    System.out.println("Attenttion! the dishList are different from tmpralQueueMap.get(printerIP)!!!!");
+                }
+                if(ipMap.get(printerIP).getFirstPrint() == 1){  //全单封装
+                    contentForPrintMap.get(printerIP).add(formatContentForPrint(dishList));
+                }else{                                          //分单封装
+                    for(SelectionDetail selectionDetail : dishList){
+                        List<SelectionDetail> tlist = new ArrayList<SelectionDetail>();
+                        tlist.add(selectionDetail);
+                        contentForPrintMap.get(printerIP).add(formatContentForPrint(tlist));
+                    }
+                }
+            }
+            //clear the queueMap immediately
+            tmpralQueueMap.get(printerIP).clear();
+        }
+
+        statusDisplayer.showStatus("SelectionDetail has been send to printer",4);
+        return "0";
+    }
+
+    public void run(){
+        while(true){
+            if(false){
+                return;
+            }
+
+            //do initSocket for the first non-empty entry, (non-empty means the values hidden in this printerIp is non-empty.)
+            //@TODO: did we think about the case that user define two printer with one ip?
+            if(isConnected == false && nonEmptyListFound == false) {
+                Iterator iterator = contentForPrintMap.entrySet().iterator();
+                while(iterator.hasNext()){
+
+                    Map.Entry entry = (Map.Entry)iterator.next();
+                    String printerIP = (String)entry.getKey();
+                    List<String> contentList = (List<String>)entry.getValue();
+                    if(contentList.size() > 0){
+                        nonEmptyListFound = true;
+
+                        L.d(TAG,"ip#" + printerIP + "list size#" + contentList.size());
+                        L.d(TAG,"initSocket");
+                        wifiCommunication.initSocket(printerIP,9100);
+                        curPrintIp = printerIP;
+                        break;
+                    }
+                }
+            }
+
+            //if find some "non-empty" value behind any printerIp in the map, and the isConnected is happened set to true then execute print.
+            if(nonEmptyListFound == true && isConnected == true){
+                if(contentForPrintMap !=null && contentForPrintMap.get(curPrintIp) != null) {
+                    L.d(TAG,"Start print");
+                    List<String> contentList = contentForPrintMap.get(curPrintIp);
+                    for (String content : contentList) {
+                        L.d(TAG,"out#");
+                        L.d(TAG,content);
+
+                        if(content.length()>0) {
+                            wifiCommunication.sndByte(Command.BEEP);
+                            wifiCommunication.sendMsg(content, "GBK");
+                            wifiCommunication.sndByte(Command.GS_V_m_n);
+                        }
+                    }
+                    contentForPrintMap.get(curPrintIp).clear();
+
+                    //close the connectoion afer each print task.
+                    wifiCommunication.close();
+                    isConnected = false;
+                }
+            }
+            AppUtils.sleep(1000);
+        }
+    }
+
+//    public void closeWifiService(){
+//        L.d(TAG,"closeService");
+//        if(wifiCommunication !=null) {
+//            wifiCommunication.close();
+//        }
+//    }
+
+    private String formatContentForPrint(List<SelectionDetail> list){
+        L.d(TAG,"formatContentForPrint");
+        StringBuilder content = new StringBuilder("\n\n");
         DateFormat df = new SimpleDateFormat("HH:mm");
         Date d = new Date();
         String dateStr = df.format(d);
-        String spaceStr = spaceFormat(len_80mm - (MenuService.getInstance().getTableNum().length() + dateStr.length()));
-        out += MenuService.getInstance().getTableNum() + spaceStr + dateStr;
-        out +="------------------------";
-        for(DishesDetailModel dd:list){
-            out += dd.getDish().getID();
-            out += spaceFormat(5 - dd.getDish().getID().length());
-            out += dd.getDish().getMname();
+        String spaceStr = generateSpaceString(len_80mm - (CustomerSelection.getInstance().getTableNumber().length() + dateStr.length()));
+        content.append(CustomerSelection.getInstance().getTableNumber()).append(spaceStr).append(dateStr);
+        content.append("------------------------");
+        for(SelectionDetail dd:list){
+            content.append(dd.getDish().getID());
+            content.append(generateSpaceString(5 - dd.getDish().getID().length()));
+            content.append(dd.getDish().getMname());
             if(dd.getDishNum() > 1){
                 L.d(TAG,Integer.toString(dd.getDish().getMname().getBytes().length));
-                out += spaceFormat(14 - (dd.getDish().getMname().getBytes().length)/3*2) + "X" + Integer.toString(dd.getDishNum()) + "\n";
-            }
-            else{
-                out += "\n";
+                content.append(generateSpaceString(14 - (dd.getDish().getMname().getBytes().length)/3*2)).append("X").append(Integer.toString(dd.getDishNum()));
             }
 
+            content.append("\n");
 
             for(Mark str:dd.getMarkList()){
-                out += spaceFormat(5) + "** " + str.getName() + " **\n";
+                content.append(generateSpaceString(5)).append("* ").append(str.getName()).append(" *\n");
             }
         }
-        out +="\n\n\n\n\n";
-        return out;
+        content.append("\n\n\n\n\n");
+        return content.toString();
     }
 
-    public String spaceFormat(int l){
-        String sp = "";
+    private String generateSpaceString(int l){
+        StringBuilder sb = new StringBuilder("");
         for (int i = 0;i<l;i++){
-            sp +=" ";
+            sb.append(" ");
         }
-        return sp;
+        return sb.toString();
     }
 
-    private void SendDataByte(byte[] data){
-        if(data.length>0){
-            wfComm.sndByte(data);
-        }
-    }
-
-    private boolean isListInPrintMapEmpty(){
-        Iterator iter = printMap.entrySet().iterator();
-        while(iter.hasNext()){
-            Map.Entry entry = (Map.Entry)iter.next();
+    private boolean isContentForPrintMapEmpty(){
+        Iterator iterator = contentForPrintMap.entrySet().iterator();
+        while(iterator.hasNext()){
+            Map.Entry entry = (Map.Entry)iterator.next();
             List<String> listTypeValue = (List<String>)entry.getValue();
             if(listTypeValue.size() > 0){
                 return false;
@@ -334,11 +304,4 @@ public class WifiPrintService implements Runnable{
         return true;
     }
 
-    private void sleep(int time){
-        try{
-            Thread.sleep(1000);
-        }catch(InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
 }

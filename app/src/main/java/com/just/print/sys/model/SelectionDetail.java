@@ -5,16 +5,13 @@ import com.just.print.db.bean.Menu;
 
 import java.util.List;
 
-public class DishesDetailModel {
+public class SelectionDetail {
+
 	private Menu dish;
 	private int dishNum;
-
-
-
 	private String pIP;
-	List<Mark> markList;
-	public DishesDetailModel() {
-	}
+	private List<Mark> markList;
+
 	public List<Mark> getMarkList() {
 		return markList;
 	}
@@ -34,6 +31,7 @@ public class DishesDetailModel {
 	public int getDishNum() {
 		return dishNum;
 	}
+
 	public void setDishNum(int dishNum) {
 		this.dishNum = dishNum;
 	}

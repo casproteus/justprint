@@ -1,12 +1,7 @@
 package com.just.print.ui.fragment;
 
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -14,18 +9,15 @@ import android.widget.ToggleButton;
 import android.content.Intent;
 
 import com.just.print.R;
-import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
 import com.just.print.app.EventBus;
-import com.just.print.db.bean.Category;
 import com.just.print.db.bean.Mark;
 import com.just.print.db.bean.Menu;
 import com.just.print.db.expand.DaoExpand;
-import com.just.print.sys.model.DishesDetailModel;
-import com.just.print.sys.server.MenuService;
+import com.just.print.sys.model.SelectionDetail;
+import com.just.print.sys.server.CustomerSelection;
 import com.just.print.sys.server.WifiPrintService;
 import com.just.print.ui.activity.ConfigActivity;
-import com.just.print.ui.activity.LoginActivity;
 import com.just.print.ui.holder.OrderIdentifierItemViewHolder;
 import com.just.print.ui.holder.OrderIdentifierMarkViewHolder;
 import com.just.print.ui.holder.OrderIdentifierViewHolder;
@@ -45,7 +37,7 @@ import java.util.Comparator;
 import java.util.List;
 
 
-public class OrderIdentifierFragment extends BaseFragment implements View.OnClickListener, OnClickItemListener, EventBus.EventHandler, WifiPrintService.PrinterState {
+public class OrderIdentifierFragment extends BaseFragment implements View.OnClickListener, OnClickItemListener, EventBus.EventHandler, WifiPrintService.StatusDisplayer {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String EVENT_ADD_MENU = "EVENT_ADD_MENU=";
@@ -69,11 +61,13 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     private Menu storedMenu;
     XAdapter2<Mark> markXAdapter;
     XAdapter2<Menu> menuXAdapter;
-    private XAdapter2<DishesDetailModel> dishesXAdapter;
+    private XAdapter2<SelectionDetail> dishesXAdapter;
     XAdapter2<String> itemXAdapter;
     List<String> itemList;
     int curmarkitem;
     List<Mark> markselect;
+
+    static int times = 0;
 
     @XClick({R.id.odIdConfigBtn, R.id.odIdDeliveryBtn, R.id.odIdSndBtn, R.id.odIdDelBtn, R.id.odIdOkBtn})
     private void exeControlCommand(View v) {
@@ -83,11 +77,28 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 break;
             case R.id.odIdDeliveryBtn:
                 odIdTableTbtn.setText("Delivery");
-                MenuService.getInstance().setTableNum(odIdTableTbtn.getText().toString());
+                CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
                 break;
             case R.id.odIdSndBtn:
-                WifiPrintService.getInstance().exePrintCommand();
-                clearOrderMenu();
+                String result = WifiPrintService.getInstance().exePrintCommand();
+                if("2".equals(result)){
+                    times++;
+                    if(times < 1) {
+                        showToast("The content of last time is not printed yet. please wait and try again.");
+                    }else if(times < 2){
+                        showToast("Please restart the device which blocked the printer, then try again!");
+                    }else{
+                        WifiPrintService.getInstance().reInitPrintRelatedMaps();
+                        if("0".equals(WifiPrintService.getInstance().exePrintCommand())){
+                            times = 0;
+                            clearOrderMenu();
+                        }
+                        showToast("Please check and make sure last order is printed out!");
+                    }
+                }else {
+                    times = 0;
+                    clearOrderMenu();
+                }
                 break;
             case R.id.odIdDelBtn:
                 DelOneText();
@@ -104,7 +115,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                     }
                 } else {
                     odIdTableTbtn.setChecked(false);
-                    MenuService.getInstance().setTableNum(odIdTableTbtn.getText().toString());
+                    CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
                 }
                 break;
         }
@@ -132,8 +143,12 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                             }
                             break;
                         case 20:
-                            WifiPrintService.getInstance().exePrintCommand();
-                            clearOrderMenu();
+                            String result = WifiPrintService.getInstance().exePrintCommand();
+                            if ("2".equals(result)) {
+                                showToast("The content of last time is not printed yet. please wait and try again.");
+                            } else{
+                                clearOrderMenu();
+                            }
                             break;
                         default:
                             if (i < 10) {
@@ -163,9 +178,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         markselect.add(m);
                     }
                     L.d(TAG, String.valueOf(m.select));
-                    if (MenuService.getInstance().getMenu() != null && MenuService.getInstance().getMenu().size() > 0) {
-                        int size = MenuService.getInstance().getMenu().size();
-                        MenuService.getInstance().getMenu().get(size - 1).setMarkList(markselect);
+                    if (CustomerSelection.getInstance().getSelectedDishes() != null && CustomerSelection.getInstance().getSelectedDishes().size() > 0) {
+                        int size = CustomerSelection.getInstance().getSelectedDishes().size();
+                        CustomerSelection.getInstance().getSelectedDishes().get(size - 1).setMarkList(markselect);
                         loadOrderMenu();
                     }
 
@@ -197,7 +212,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         getEventBus().register(EVENT_ADD_MENU, this);
         new StupidReflect(this, getView()).init();
         //设置餐桌号用
-        //MenuService.getInstance().setTableNum(odIdTableNumEt.getText().toString());
+        //CustomerSelection.getInstance().setTableNumber(odIdTableNumEt.getText().toString());
         storedMenu = null;
         String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F"};
         itemList = new ArrayList<String>(Arrays.asList(items));
@@ -214,9 +229,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
         menuXAdapter = new XAdapter2<Menu>(getContext(), OrderIdentifierViewHolder.class);
         //menuXAdapter.setClickItemListener(menuAdapterClick);
-        dishesXAdapter = new XAdapter2<DishesDetailModel>(getContext(), OrderMenuViewHolder.class);
+        dishesXAdapter = new XAdapter2<SelectionDetail>(getContext(), OrderMenuViewHolder.class);
         dishesXAdapter.setClickItemListener(this);
-        dishesXAdapter.setData(MenuService.getInstance().getMenu());
+        dishesXAdapter.setData(CustomerSelection.getInstance().getSelectedDishes());
 
         odIdFrLoutMenuList.setAdapter(dishesXAdapter);
         markselect = new ArrayList<Mark>(3);
@@ -304,9 +319,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         L.d(TAG, "onClickItem");
         switch (view.getId()) {
             case R.id.oddelDish:
-                DishesDetailModel a = dishesXAdapter.get(i);
+                SelectionDetail a = dishesXAdapter.get(i);
                 dishesXAdapter.remove(a);
-                MenuService.getInstance().delMenu(a);
+                CustomerSelection.getInstance().deleteSelectedDish(a);
                 loadOrderMenu();
                 break;
             case R.id.odMnLoutMarkBtn:
@@ -325,12 +340,12 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     }
 
     private void addDish() {
-        DishesDetailModel ddm = new DishesDetailModel();
+        SelectionDetail ddm = new SelectionDetail();
         ddm.setDish(storedMenu);
         ddm.setMarkList(new ArrayList<Mark>());
         L.d(TAG, markselect.toString());
         ddm.setDishNum(1);
-        MenuService.getInstance().addMenu(ddm);
+        CustomerSelection.getInstance().addSelectedDish(ddm);
         storedMenu = null;
         //markselect.clear();
         markselect = new ArrayList<Mark>();
@@ -341,7 +356,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     }
 
     private void loadOrderMenu() {
-        dishesXAdapter.setData(MenuService.getInstance().getMenu());
+        dishesXAdapter.setData(CustomerSelection.getInstance().getSelectedDishes());
         dishesXAdapter.notifyDataSetChanged();
     }
 
@@ -357,12 +372,12 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
     private void clearOrderMenu() {
         L.d(TAG, "clearOrderMenu start...");
-        MenuService.getInstance().clearMenu();
+        CustomerSelection.getInstance().clearMenu();
         odIdTableTbtn.setText("");
         loadOrderMenu();
     }
 
-    public void ckPrinterState(String src, int i) {
+    public void showStatus(String src, int i) {
         switch (i) {
             case 2:     //WFPRINTER_CONNECTEDERR
                 showToast("打印机:" + src + " 连接错误");

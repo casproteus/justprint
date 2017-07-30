@@ -34,6 +34,14 @@ public class AppUtils {
 
     public static final String NETWORK_TYPE_WIFI = "wifi";
 
+    public static void sleep(int time){
+        try{
+            Thread.sleep(1000);
+        }catch(InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
     /**
      * @return 返回唯一的设备ID，用于GSM和CDMA手机，MEID或ESN的IMEI。如果设备标识不可用，则返回空。
      */

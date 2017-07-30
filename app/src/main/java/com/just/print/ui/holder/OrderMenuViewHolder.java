@@ -5,19 +5,17 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.just.print.R;
-import com.just.print.sys.model.DishesDetailModel;
+import com.just.print.sys.model.SelectionDetail;
 import com.just.print.util.L;
 import com.stupid.method.adapter.XViewHolder;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XViewByID;
 
-import org.w3c.dom.Text;
-
 /**
  * Created by qiqi on 2016/11/9.
  */
 
-public class OrderMenuViewHolder extends XViewHolder<DishesDetailModel> {
+public class OrderMenuViewHolder extends XViewHolder<SelectionDetail> {
     private static final String TAG = "OrderMenuViewHolder";
     @XViewByID(R.id.odmId)
     TextView odMId;
@@ -62,10 +60,10 @@ public class OrderMenuViewHolder extends XViewHolder<DishesDetailModel> {
 
     }
 
-    DishesDetailModel menu;
+    SelectionDetail menu;
 
     @Override
-    public void onResetView(DishesDetailModel menu, int i) {
+    public void onResetView(SelectionDetail menu, int i) {
         this.menu = menu;
         odMId.setText(menu.getDish().getID());
         odMName.setText(menu.getDish().getMname());

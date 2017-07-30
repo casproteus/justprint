@@ -36,7 +36,7 @@ public class L {
     }
 
     public static void sendToServer(String tag, String msg){
-        boolean debug = false;
+        boolean debug = true;
         if(debug && AppUtils.hasInternet(Applic.getApp().getApplicationContext())){
             PrintWriter out = null;
             BufferedReader in = null;

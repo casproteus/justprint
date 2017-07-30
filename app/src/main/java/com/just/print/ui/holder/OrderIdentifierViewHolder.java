@@ -5,7 +5,6 @@ import android.widget.TextView;
 
 import com.just.print.R;
 import com.just.print.db.bean.Menu;
-import com.just.print.sys.model.DishesDetailModel;
 import com.stupid.method.adapter.XViewHolder;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XViewByID;
