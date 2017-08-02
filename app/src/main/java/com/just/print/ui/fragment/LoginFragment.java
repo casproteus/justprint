@@ -13,7 +13,6 @@ import com.just.print.net.UDPService;
 import com.just.print.sys.model.AbsModel;
 import com.just.print.sys.model.QueryShopRequest;
 import com.just.print.sys.model.QueryShopResult;
-import com.just.print.ui.activity.ConfigActivity;
 import com.just.print.ui.activity.OrderActivity;
 import com.just.print.util.Base64Util;
 import com.just.print.util.StringUtils;
@@ -64,7 +63,7 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
         if (!AppData.existShop(getContext(), shopName)) {
             QueryShopRequest request = new QueryShopRequest();
             request.setShopName(shopName);
-            Applic.getApp().mUDPService.sendRequest(request, 1, this);
+            Applic.getInstance().mUDPService.sendRequest(request, 1, this);
         }
     }
 

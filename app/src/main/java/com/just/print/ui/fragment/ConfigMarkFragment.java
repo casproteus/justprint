@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.just.print.R;
+import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
 import com.just.print.db.bean.Mark;
 import com.just.print.db.expand.DaoExpand;
@@ -45,7 +46,7 @@ public class ConfigMarkFragment extends BaseFragment implements OnClickItemListe
     }
 
     private void loadMark() {
-        List<Mark> list = DaoExpand.queryNotDeleteAll(getDaoMaster().newSession().getMarkDao());
+        List<Mark> list = DaoExpand.queryNotDeleteAll(Applic.getInstance().getDaoMaster().newSession().getMarkDao());
         markXAdapter.setData(list);
         markXAdapter.notifyDataSetChanged();
     }
@@ -56,7 +57,7 @@ public class ConfigMarkFragment extends BaseFragment implements OnClickItemListe
         Mark mark1 = new Mark();
         mark1.setState(State.def);
         mark1.setName(mark);
-        getDaoMaster().newSession().getMarkDao().insertOrReplace(mark1);
+        Applic.getInstance().getDaoMaster().newSession().getMarkDao().insertOrReplace(mark1);
         mark1.updateAndUpgrade();
         loadMark();
     }

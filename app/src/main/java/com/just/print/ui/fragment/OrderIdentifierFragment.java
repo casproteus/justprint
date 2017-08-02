@@ -9,6 +9,7 @@ import android.widget.ToggleButton;
 import android.content.Intent;
 
 import com.just.print.R;
+import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
 import com.just.print.app.EventBus;
 import com.just.print.db.bean.Mark;
@@ -222,28 +223,28 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         odIdTableTbtn.setTextOff(null);
         odIdTableTbtn.setText("TB");
         odIdTableTbtn.setOnClickListener(this);
-        //odIdDefaultTbtn.setTextOn(null);
-        //odIdDefaultTbtn.setTextOff(null);
-        //odIdDefaultTbtn.setText("MDF");
-        //odIdDefaultTbtn.setOnClickListener(this);
 
-        menuXAdapter = new XAdapter2<Menu>(getContext(), OrderIdentifierViewHolder.class);
-        //menuXAdapter.setClickItemListener(menuAdapterClick);
+
+
+
+
+
+        //initSelected dishes part.
         dishesXAdapter = new XAdapter2<SelectionDetail>(getContext(), OrderMenuViewHolder.class);
         dishesXAdapter.setClickItemListener(this);
         dishesXAdapter.setData(CustomerSelection.getInstance().getSelectedDishes());
-
         odIdFrLoutMenuList.setAdapter(dishesXAdapter);
-        markselect = new ArrayList<Mark>(3);
-        List<Mark> markList = DaoExpand.queryNotDeleteAll(getDaoMaster().newSession().getMarkDao());
-        List<Mark> marks = new ArrayList<Mark>();
+
         //添加Mark列表
+        markselect = new ArrayList<Mark>(3);
+        List<Mark> markList = DaoExpand.queryNotDeleteAll(Applic.getInstance().getDaoMaster().newSession().getMarkDao());
+        List<Mark> marks = new ArrayList<Mark>();
         marks.add(markList.size() > 0 ? markList.get(0) : new Mark("M1"));
         marks.add(markList.size() > 1 ? markList.get(1) : new Mark("M2"));
         markXAdapter = new XAdapter2<Mark>(getActivity(), marks, OrderIdentifierMarkViewHolder.class);
         markXAdapter.setClickItemListener(this.itemXAdapterClick);
-        //odIdLoutMarksGv.setAdapter(markXAdapter);
         odIdMarksGrid.setAdapter(markXAdapter);
+        //why not move it up together with the itemXAdapter code?
         odIdLoutItemsGv.setAdapter(itemXAdapter);
         //注册打印机消息监听
         WifiPrintService.getInstance().registPrintState(this);
@@ -296,7 +297,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     }
 
     private Menu SearchMenuFromDB(String context) {
-        List<Menu> mnlist = DaoExpand.queryFuzzyMenu(getDaoMaster().newSession().getMenuDao(), context);
+        List<Menu> mnlist = DaoExpand.queryFuzzyMenu(Applic.getInstance().getDaoMaster().newSession().getMenuDao(), context);
         if (mnlist.size() >= 1) {
             //对列表进行排序
             Collections.sort(mnlist, new Comparator<Menu>() {
@@ -361,7 +362,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     }
 
     private void resetConvenienceMarkArea() {
-        List<Mark> markList = DaoExpand.queryNotDeleteAll(getDaoMaster().newSession().getMarkDao());
+        List<Mark> markList = DaoExpand.queryNotDeleteAll(Applic.getInstance().getDaoMaster().newSession().getMarkDao());
         List<Mark> marks = new ArrayList<Mark>();
         //添加Mark列表
         marks.add(markList.size() > 0 ? markList.get(0) : new Mark("M1"));

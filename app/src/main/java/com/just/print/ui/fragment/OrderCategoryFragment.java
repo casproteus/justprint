@@ -7,6 +7,7 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import com.just.print.R;
+import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
 import com.just.print.db.bean.Category;
 import com.just.print.db.bean.Mark;
@@ -53,8 +54,8 @@ public class OrderCategoryFragment extends BaseFragment {
                 SubTitleMenuExpandViewHolder.class);
         odExCategory.setAdapter(categoryExXAdapter);
         Map<Category, List<Menu>> mdata = new LinkedHashMap<>();
-        List<Category> list = DaoExpand.queryNotDeleteAllQuery(getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.Cname).list();
-        MenuDao dao = getDaoMaster().newSession().getMenuDao();
+        List<Category> list = DaoExpand.queryNotDeleteAllQuery(Applic.getInstance().getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.Cname).list();
+        MenuDao dao = Applic.getInstance().getDaoMaster().newSession().getMenuDao();
         for (Category ca : list) {
             mdata.put(ca, DaoExpand.queryMenuByCategory(ca, dao));
         }
@@ -116,7 +117,7 @@ public class OrderCategoryFragment extends BaseFragment {
 
         addMenuCtrl(Menu men) {
             mMenu = men;
-            markAdapter = new XAdapter2<Mark>(getActivity(), DaoExpand.queryNotDeleteAll(getDaoMaster().newSession().getMarkDao()), MarkViewHolder.class);
+            markAdapter = new XAdapter2<Mark>(getActivity(), DaoExpand.queryNotDeleteAll(Applic.getInstance().getDaoMaster().newSession().getMarkDao()), MarkViewHolder.class);
             markAdapter.setClickItemListener(new OnClickItemListener() {
                 @Override
                 public void onClickItem(View view, int i) {

@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.just.print.R;
+import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
 import com.just.print.db.bean.Printer;
 import com.just.print.db.expand.DaoExpand;
@@ -80,13 +81,13 @@ public class ConfigPrinterFragment extends BaseFragment implements
         name.setText("");
         checkBox.setChecked(false);
         printer.setState(State.def);
-        getDaoMaster().newSession().getPrinterDao().insert(printer);
+        Applic.getInstance().getDaoMaster().newSession().getPrinterDao().insert(printer);
         printer.updateAndUpgrade();
         loadPrinter();
     }
 
     private void loadPrinter() {
-        List<Printer> list = DaoExpand.queryNotDeleteAll(getDaoMaster().newSession().getPrinterDao());
+        List<Printer> list = DaoExpand.queryNotDeleteAll(Applic.getInstance().getDaoMaster().newSession().getPrinterDao());
         WifiPrintService.getInstance().reInitPrintRelatedMaps();
         printerXAdapter.setData(list);
     }

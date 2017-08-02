@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.ListView;
 
 import com.just.print.R;
+import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
 import com.just.print.db.bean.Category;
 import com.just.print.db.bean.M2M_MenuPrint;
@@ -54,7 +55,7 @@ public class ConfigCategoryFragment extends BaseFragment implements OnClickItemL
 
     private void loadCategory() {
 
-        List<Category> list = DaoExpand.queryNotDeleteAllQuery(getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.Cname).list();
+        List<Category> list = DaoExpand.queryNotDeleteAllQuery(Applic.getInstance().getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.Cname).list();
         categoryXAdapter.setData(list);
 
         categoryXAdapter.notifyDataSetChanged();
@@ -69,7 +70,7 @@ public class ConfigCategoryFragment extends BaseFragment implements OnClickItemL
         Category cat = new Category();
         cat.setCname(cname);
         cat.setState(State.def);
-        getDaoMaster().newSession().getCategoryDao().insert(cat);
+        Applic.getInstance().getDaoMaster().newSession().getCategoryDao().insert(cat);
         cat.updateAndUpgrade();
         loadCategory();
     }
@@ -87,7 +88,7 @@ public class ConfigCategoryFragment extends BaseFragment implements OnClickItemL
              */
             case R.id.delCategory:
                 Category cag = categoryXAdapter.get(i);
-                MenuDao menuDao = getDaoMaster().newSession().getMenuDao();
+                MenuDao menuDao = Applic.getInstance().getDaoMaster().newSession().getMenuDao();
                 long cid = cag.getId();
                 List<Menu> mList = menuDao._queryCategory_MenuList(cid);
                 for(Menu menu:mList) {

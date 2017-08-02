@@ -9,6 +9,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.just.print.R;
+import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
 import com.just.print.db.bean.Category;
 import com.just.print.db.bean.M2M_MenuPrint;
@@ -96,7 +97,7 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
                         m2m.delete();
                     }
                     */
-                    M2M_MenuPrintDao m2mDao = getDaoMaster().newSession().getM2M_MenuPrintDao();
+                    M2M_MenuPrintDao m2mDao = Applic.getInstance().getDaoMaster().newSession().getM2M_MenuPrintDao();
                     List<M2M_MenuPrint> m2mList = menuXAdapter.get(i).getM2M_MenuPrintList();
 
                     for(M2M_MenuPrint m2m:m2mList) {
@@ -134,7 +135,7 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
         menuXAdapter = new XAdapter2<Menu>(getContext(), ConfigMenuViewHolder.class);
         menuXAdapter.setClickItemListener(categoryAdapterClick);
         lvMenu.setAdapter(menuXAdapter);
-        menuDao = getDaoMaster().newSession().getMenuDao();
+        menuDao = Applic.getInstance().getDaoMaster().newSession().getMenuDao();
         loadCategory();
         loadMenu();
     }
@@ -209,7 +210,7 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
         menu.setCid(mCategory.getId());
         menuDao.insert(menu);
         menu.updateAndUpgrade();
-        M2M_MenuPrintDao m2mDao = getDaoMaster().newSession().getM2M_MenuPrintDao();
+        M2M_MenuPrintDao m2mDao = Applic.getInstance().getDaoMaster().newSession().getM2M_MenuPrintDao();
         for (Printer p : addPrints) {
             M2M_MenuPrint m2m = new M2M_MenuPrint();
             m2m.setMenu(menu);
@@ -237,7 +238,7 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
         else cat = mModifyCategoryTemp;
         cat.setCname(cname.getText().toString().trim());
         cat.setState(State.def);
-        getDaoMaster().newSession().getCategoryDao().insertOrReplace(cat);
+        Applic.getInstance().getDaoMaster().newSession().getCategoryDao().insertOrReplace(cat);
         cat.updateAndUpgrade();
         loadCategory();
         cname.setText("");
@@ -247,7 +248,7 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
 
     @XClick({R.id.selectPrint})
     private void selectPrint(final TextView view) {
-        final List<Printer> data = DaoExpand.queryNotDeleteAll(getDaoMaster().newSession().getPrinterDao());
+        final List<Printer> data = DaoExpand.queryNotDeleteAll(Applic.getInstance().getDaoMaster().newSession().getPrinterDao());
         data.removeAll(addPrints);
         if (data.size() == 0) {
             showToast("请先添加打印机");
@@ -283,7 +284,7 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
 
     private void loadCategory() {
 
-        List<Category> list = DaoExpand.queryNotDeleteAllQuery(getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.Cname).list();
+        List<Category> list = DaoExpand.queryNotDeleteAllQuery(Applic.getInstance().getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.Cname).list();
         categoryXAdapter.setData(list);
 
          categoryXAdapter.notifyDataSetChanged();
@@ -296,7 +297,7 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
 
     private void loadMenu() {
         if (mCategory != null) {
-            List<Menu> menuList = DaoExpand.queryMenuByCategory(getDaoMaster().newSession().getMenuDao(), mCategory);
+            List<Menu> menuList = DaoExpand.queryMenuByCategory(Applic.getInstance().getDaoMaster().newSession().getMenuDao(), mCategory);
             menuXAdapter.setData(menuList);
             menuXAdapter.notifyDataSetChanged();
         }

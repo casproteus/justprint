@@ -6,13 +6,11 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.just.print.db.bean.Mark;
-import com.just.print.db.dao.DaoMaster;
 import com.just.print.db.expand.DaoExpand;
 import com.just.print.util.ToastUtil;
 
@@ -26,8 +24,6 @@ import java.util.Map;
  */
 abstract public class BaseFragment extends Fragment {
     protected abstract int getLayoutId();
-
-    private DaoMaster daoMaster = null;
 
     @Override
     public Context getContext() {
@@ -45,7 +41,7 @@ abstract public class BaseFragment extends Fragment {
     public void showMarksDialog(List<Mark> choiceItem, final onChoiceMarks choiceMarks) {
         if (choiceMarks == null || choiceItem == null)
             throw new NullPointerException("showMarksDialog 的2个参数 必须要传");
-        final List<Mark> list = DaoExpand.queryNotDeleteAll(getDaoMaster().newSession().getMarkDao());
+        final List<Mark> list = DaoExpand.queryNotDeleteAll(Applic.getInstance().getDaoMaster().newSession().getMarkDao());
         String[] items = new String[list.size()];
         boolean[] checkedItems = new boolean[list.size()];
         final Map<String, Integer> sa = new HashMap<String, Integer>();
@@ -96,7 +92,6 @@ abstract public class BaseFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        daoMaster = Applic.getApp().getDaoMaster();
     }
 
     @Nullable
@@ -126,8 +121,4 @@ abstract public class BaseFragment extends Fragment {
     }
 
     public abstract void onCreated(Bundle savedInstanceState);
-
-    public DaoMaster getDaoMaster() {
-        return daoMaster;
-    }
 }

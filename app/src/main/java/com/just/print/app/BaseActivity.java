@@ -33,7 +33,7 @@ public class BaseActivity extends FragmentActivity implements EventBus {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        daoMaster = Applic.getApp().getDaoMaster();
+        daoMaster = Applic.getInstance().getDaoMaster();
     }
 
     public void showToast(String text) {

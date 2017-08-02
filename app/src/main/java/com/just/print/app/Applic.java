@@ -20,7 +20,7 @@ import static android.content.ContentValues.TAG;
 public class Applic extends Application {
     volatile static Applic app;
 
-    public static Applic getApp() {
+    public static Applic getInstance() {
         return app;
     }
 
@@ -47,13 +47,13 @@ public class Applic extends Application {
     }
 
 
-    private DaoMaster mDaoMaster;
+    private DaoMaster daoMaster;
 
     public void initDaoMaster(String shopName) {
-        if (mDaoMaster == null) {
+        if (daoMaster == null) {
             DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this,
                     getDBPath(shopName).getAbsolutePath(), null);
-            mDaoMaster = new DaoMaster(helper.getWritableDatabase());
+            daoMaster = new DaoMaster(helper.getWritableDatabase());
         }
     }
 
@@ -70,13 +70,11 @@ public class Applic extends Application {
     }
 
     public DaoMaster getDaoMaster() {
-        if (mDaoMaster == null) {
+        if (daoMaster == null) {
+            L.e("Applic","non-none daoMaster expected! db not inited!", null);
             new NullPointerException("请初始化数据库");
-//            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this,
-//                    "JustPrinter", null);
-//            mDaoMaster = new DaoMaster(helper.getWritableDatabase());
         }
-        return mDaoMaster;
+        return daoMaster;
     }
 
 }
