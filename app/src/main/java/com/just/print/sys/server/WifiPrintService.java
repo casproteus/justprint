@@ -55,9 +55,8 @@ public class WifiPrintService implements Runnable{
             switch (msg.what){
                 case WifiCommunication.WFPRINTER_CONNECTED:
                     L.d(TAG,"Connected ip#" + WifiPrintService.curPrintIp);
-                    //@TODO are we sure the connected IP is not an other ip????? shouldn't we save the connected ip into this.currentIP?
-                    Command.GS_ExclamationMark[2] = 0x11;
-                    wifiCommunication.sndByte(Command.GS_ExclamationMark);
+//                    Command.GS_ExclamationMark[2] = 0x11;
+//                    wifiCommunication.sndByte(Command.GS_ExclamationMark);//put it here will cause app exit in emulator(5x api 24)
                     isConnected = true;
                     break;
                 case WifiCommunication.WFPRINTER_DISCONNECTED:
@@ -203,7 +202,6 @@ public class WifiPrintService implements Runnable{
             }
 
             //do initSocket for the first non-empty entry, (non-empty means the values hidden in this printerIp is non-empty.)
-            //@TODO: did we think about the case that user define two printer with one ip?
             if(isConnected == false && nonEmptyListFound == false) {
                 Iterator iterator = contentForPrintMap.entrySet().iterator();
                 while(iterator.hasNext()){
@@ -234,15 +232,16 @@ public class WifiPrintService implements Runnable{
 
                         if(content.length()>0) {
                             wifiCommunication.sndByte(Command.BEEP);
+                            Command.GS_ExclamationMark[2] = 0x11;
+                            wifiCommunication.sndByte(Command.GS_ExclamationMark);
                             wifiCommunication.sendMsg(content, "GBK");
                             wifiCommunication.sndByte(Command.GS_V_m_n);
                         }
                     }
                     contentForPrintMap.get(curPrintIp).clear();
-
+                    isConnected = false;
                     //close the connectoion afer each print task.
                     wifiCommunication.close();
-                    isConnected = false;
                 }
             }
             AppUtils.sleep(1000);
