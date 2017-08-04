@@ -55,7 +55,7 @@ public class ConfigCategoryFragment extends BaseFragment implements OnClickItemL
 
     private void loadCategory() {
 
-        List<Category> list = DaoExpand.queryNotDeleteAllQuery(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.Cname).list();
+        List<Category> list = DaoExpand.queryNotDeletedAllQuery(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.Cname).list();
         categoryXAdapter.setData(list);
 
         categoryXAdapter.notifyDataSetChanged();

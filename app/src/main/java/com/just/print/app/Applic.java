@@ -15,15 +15,12 @@ import java.io.File;
 
 import static android.content.ContentValues.TAG;
 
-/**
- * Created by wangx on 2016/10/28.
- */
 public class Applic extends Application {
+
     public volatile static Applic app;
 
-    //public static Applic getInstance() {        return app;    }
-
     public UDPService mUDPService;
+
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -41,7 +38,7 @@ public class Applic extends Application {
         super.onCreate();
         startService(new Intent(this, UDPService.class));
         app = this;
-        new XCrashHandler().init(this);// 异常处理
+        new XCrashHandler().init(this);// for unhanddle.
         bindService(new Intent(this, UDPService.class), mServiceConnection, BIND_AUTO_CREATE);
     }
 

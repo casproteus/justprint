@@ -46,7 +46,7 @@ public class ConfigPrinterStatusFragment extends BaseFragment implements OnClick
     }
 
     private void loadMark() {
-        List<Mark> list = DaoExpand.queryNotDeleteAll(Applic.app.getDaoMaster().newSession().getMarkDao());
+        List<Mark> list = DaoExpand.queryNotDeletedAll(Applic.app.getDaoMaster().newSession().getMarkDao());
         markXAdapter.setData(list);
         markXAdapter.notifyDataSetChanged();
     }

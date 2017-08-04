@@ -248,7 +248,7 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
 
     @XClick({R.id.selectPrint})
     private void selectPrint(final TextView view) {
-        final List<Printer> data = DaoExpand.queryNotDeleteAll(Applic.app.getDaoMaster().newSession().getPrinterDao());
+        final List<Printer> data = DaoExpand.queryNotDeletedAll(Applic.app.getDaoMaster().newSession().getPrinterDao());
         data.removeAll(addPrints);
         if (data.size() == 0) {
             showToast("请先添加打印机");
@@ -284,7 +284,7 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
 
     private void loadCategory() {
 
-        List<Category> list = DaoExpand.queryNotDeleteAllQuery(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.Cname).list();
+        List<Category> list = DaoExpand.queryNotDeletedAllQuery(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.Cname).list();
         categoryXAdapter.setData(list);
 
          categoryXAdapter.notifyDataSetChanged();

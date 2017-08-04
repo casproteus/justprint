@@ -12,7 +12,6 @@ import java.util.List;
 
 import de.greenrobot.dao.AbstractDao;
 import de.greenrobot.dao.query.QueryBuilder;
-import de.greenrobot.dao.query.WhereCondition;
 
 /**
  * Created by wangx on 2016/11/2.
@@ -33,10 +32,10 @@ public final class DaoExpand {
         return builder.where(MenuDao.Properties.State.notEq(State.delete));
     }
 
-    static public <T, K> List<T> queryNotDeleteAll(AbstractDao<T, K> dao) {
-        return queryNotDeleteAllQuery(dao).list();
+    static public <T, K> List<T> queryNotDeletedAll(AbstractDao<T, K> dao) {
+        return queryNotDeletedAllQuery(dao).list();
     }
-    static public <T, K> QueryBuilder<T> queryNotDeleteAllQuery(AbstractDao<T, K> dao) {
+    static public <T, K> QueryBuilder<T> queryNotDeletedAllQuery(AbstractDao<T, K> dao) {
         return dao.queryBuilder().where(MenuDao.Properties.State.notEq(State.delete));
     }
 
@@ -44,7 +43,7 @@ public final class DaoExpand {
         return dao.queryBuilder().where(MenuDao.Properties.Cid.eq(category.getId()), MenuDao.Properties.State.notEq(State.delete)).list();
     }
 
-    static public <T, K> List<T> queryNotDeleteAll(AbstractDao<T, K> dao, String shop) {
+    static public <T, K> List<T> queryNotDeletedAll(AbstractDao<T, K> dao, String shop) {
         return dao.queryBuilder().where(MenuDao.Properties.State.notEq(State.delete)).list();
     }
 

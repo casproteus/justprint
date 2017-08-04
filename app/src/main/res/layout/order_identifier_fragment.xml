@@ -184,26 +184,12 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"/>
             </LinearLayout>
-        <!--
-            <GridView
-                android:id="@+id/odIdLoutMarksGv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:numColumns="3">
-            </GridView>
-        -->
             <GridView
                 android:id="@+id/odIdLoutItemsGv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:numColumns="2">
             </GridView>
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="DELIVERY"
-                android:layout_weight="1"
-                android:id="@+id/odIdDeliveryBtn"/>
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

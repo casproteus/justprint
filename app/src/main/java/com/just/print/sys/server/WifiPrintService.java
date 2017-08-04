@@ -112,7 +112,7 @@ public class WifiPrintService implements Runnable{
         contentForPrintMap = new HashMap<String,List<String>>();
         tmpralQueueMap = new HashMap<String,List<SelectionDetail>>();
 
-        List<Printer> printerList = DaoExpand.queryNotDeleteAll(Applic.app.getDaoMaster().newSession().getPrinterDao());//读取打印机位置
+        List<Printer> printerList = DaoExpand.queryNotDeletedAll(Applic.app.getDaoMaster().newSession().getPrinterDao());//读取打印机位置
         for(Printer printer:printerList){
             ipMap.put(printer.getIp(),printer);
             contentForPrintMap.put(printer.getIp(),new ArrayList<String>());

@@ -21,7 +21,6 @@ import com.just.print.sys.server.WifiPrintService;
 import com.just.print.ui.activity.ConfigActivity;
 import com.just.print.ui.holder.OrderIdentifierItemViewHolder;
 import com.just.print.ui.holder.OrderIdentifierMarkViewHolder;
-import com.just.print.ui.holder.OrderIdentifierViewHolder;
 import com.just.print.ui.holder.OrderMenuViewHolder;
 import com.just.print.util.L;
 import com.stupid.method.adapter.IXOnItemClickListener;
@@ -49,8 +48,6 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     private TextView odIdInput;
     @XViewByID(R.id.odIdfrName)
     private TextView odIdfrName;
-    //@XViewByID(R.id.odIdLoutMarksGv)
-    //private GridView odIdLoutMarksGv;
     @XViewByID(R.id.odIdLoutItemsGv)
     private GridView odIdLoutItemsGv;
     @XViewByID(R.id.odIdMarksGrid)
@@ -70,15 +67,11 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
     static int times = 0;
 
-    @XClick({R.id.odIdConfigBtn, R.id.odIdDeliveryBtn, R.id.odIdSndBtn, R.id.odIdDelBtn, R.id.odIdOkBtn})
+    @XClick({R.id.odIdConfigBtn, R.id.odIdSndBtn, R.id.odIdDelBtn, R.id.odIdOkBtn})
     private void exeControlCommand(View v) {
         switch (v.getId()) {
             case R.id.odIdConfigBtn:
                 startActivity(new Intent(getContext(), ConfigActivity.class));
-                break;
-            case R.id.odIdDeliveryBtn:
-                odIdTableTbtn.setText("Delivery");
-                CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
                 break;
             case R.id.odIdSndBtn:
                 String result = WifiPrintService.getInstance().exePrintCommand();
@@ -132,6 +125,10 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             switch (view.getId()) {
                 case R.id.buttonholder:
                     switch (i) {
+                        case 17:
+                            odIdTableTbtn.setText("Delivery");
+                            CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
+                            return;
                         case 18:
                             DelOneText();
                             break;
@@ -159,11 +156,13 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                             }
                             break;
                     }
-                    tmpMenu = SearchMenuFromDB(odIdInput.getText().toString());
-                    if (null != tmpMenu) {
-                        odIdfrName.setText(tmpMenu.getMname());
-                    } else {
-                        odIdfrName.setText("");
+                    if(!odIdTableTbtn.isChecked()){
+                        tmpMenu = SearchMenuFromDB(odIdInput.getText().toString());
+                        if (null != tmpMenu) {
+                            odIdfrName.setText(tmpMenu.getMname());
+                        } else {
+                            odIdfrName.setText("");
+                        }
                     }
                     break;
                 case R.id.tagid:
@@ -215,7 +214,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         //设置餐桌号用
         //CustomerSelection.getInstance().setTableNumber(odIdTableNumEt.getText().toString());
         storedMenu = null;
-        String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F"};
+        String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "G","DELIVERY"};
         itemList = new ArrayList<String>(Arrays.asList(items));
         itemXAdapter = new XAdapter2<String>(getActivity(), itemList, OrderIdentifierItemViewHolder.class);
         itemXAdapter.setClickItemListener(this.itemXAdapterClick);
@@ -234,7 +233,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
         //添加Mark列表
         markselect = new ArrayList<Mark>(3);
-        List<Mark> markList = DaoExpand.queryNotDeleteAll(Applic.getMarkDao());
+        List<Mark> markList = DaoExpand.queryNotDeletedAll(Applic.getMarkDao());
         List<Mark> marks = new ArrayList<Mark>();
         marks.add(markList.size() > 0 ? markList.get(0) : new Mark("M1"));
         marks.add(markList.size() > 1 ? markList.get(1) : new Mark("M2"));
@@ -246,7 +245,6 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         WifiPrintService.getInstance().registPrintState(this);
     }
 
-
     @Override
     public void onClick(View v) {
         int num;
@@ -257,15 +255,6 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                     odIdTableTbtn.setText("");
                 }
                 break;
-            /*
-            case R.id.odIdDefaultTbtn:
-                showMarksDialog(markselect,new onChoiceMarks(){
-                    @Override
-                    public void onChoiceMarks(List<Mark> result){
-
-                    }
-                });
-                */
         }
     }
 
@@ -288,14 +277,11 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 odIdInput.setText(odIdInput.getText().subSequence(0, odIdInput.length() - 1));
             }
         }
-
-
     }
 
     private Menu SearchMenuFromDB(String context) {
         List<Menu> mnlist = DaoExpand.queryFuzzyMenu(Applic.app.getDaoMaster().newSession().getMenuDao(), context);
         if (mnlist.size() >= 1) {
-            //对列表进行排序
             Collections.sort(mnlist, new Comparator<Menu>() {
                 @Override
                 public int compare(Menu m1, Menu m2) {
@@ -358,7 +344,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     }
 
     private void resetConvenienceMarkArea() {
-        List<Mark> markList = DaoExpand.queryNotDeleteAll(Applic.app.getDaoMaster().newSession().getMarkDao());
+        List<Mark> markList = DaoExpand.queryNotDeletedAll(Applic.app.getDaoMaster().newSession().getMarkDao());
         List<Mark> marks = new ArrayList<Mark>();
         //添加Mark列表
         marks.add(markList.size() > 0 ? markList.get(0) : new Mark("M1"));

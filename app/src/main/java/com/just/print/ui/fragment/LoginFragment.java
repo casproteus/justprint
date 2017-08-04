@@ -21,9 +21,6 @@ import com.stupid.method.reflect.annotation.XClick;
 import com.stupid.method.reflect.annotation.XGetValueByView;
 import com.stupid.method.reflect.annotation.XViewByID;
 
-/**
- * Created by wangx on 2016/11/2.
- */
 public class LoginFragment extends BaseFragment implements UDPService.UDPCallback {
     @Override
     protected int getLayoutId() {
@@ -57,7 +54,7 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
     @XClick(R.id.queryShop)
     private void queryShop(@XGetValueByView(fromId = R.id.shopName) String shopName) {
         if (StringUtils.isEmpty(shopName)) {
-            showToast("请输入店铺名称");
+            showToast("Please input the name for the store.");
             return;
         }
         if (!AppData.existShop(getContext(), shopName)) {
@@ -92,7 +89,7 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
 //                            AppData.saveShopName(getContext(), string);
 //                            AppData.createShopDB(getContext(), string);
                             findViewById(R.id.createShop).setVisibility(View.VISIBLE);
-                            showToast("店铺不存在,或者网络中没有该店铺的手机");
+                            showToast("store not existing, or no device belongs to this store in network was found");
                         }
                     }
                 });
@@ -107,7 +104,7 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
     @XClick({R.id.createShop})
     private void createShop(@XGetValueByView(fromId = R.id.shopName) String shopName) {
         if (StringUtils.isEmpty(shopName)) {
-            showToast("请输入店铺名称");
+            showToast("Please input the name of the store.");
             return;
         }
         AppData.saveShopName(getContext(), shopName);
@@ -120,7 +117,7 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
     private void onConfirmUserName(View view) {
         String userName = this.userName.getText().toString().trim();
         if (StringUtils.isEmpty(userName) || userName.length() < 2) {
-            showToast("请输入姓名");
+            showToast("Please input your name");
         } else {
             findViewById(R.id.shopShow).setVisibility(View.VISIBLE);
             view.setVisibility(View.GONE);

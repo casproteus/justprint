@@ -41,7 +41,7 @@ abstract public class BaseFragment extends Fragment {
     public void showMarksDialog(List<Mark> choiceItem, final onChoiceMarks choiceMarks) {
         if (choiceMarks == null || choiceItem == null)
             throw new NullPointerException("showMarksDialog need 2 parameters");
-        final List<Mark> list = DaoExpand.queryNotDeleteAll(Applic.app.getDaoMaster().newSession().getMarkDao());
+        final List<Mark> list = DaoExpand.queryNotDeletedAll(Applic.app.getDaoMaster().newSession().getMarkDao());
         String[] items = new String[list.size()];
         boolean[] checkedItems = new boolean[list.size()];
         final Map<String, Integer> sa = new HashMap<String, Integer>();
