@@ -219,15 +219,12 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         itemList = new ArrayList<String>(Arrays.asList(items));
         itemXAdapter = new XAdapter2<String>(getActivity(), itemList, OrderIdentifierItemViewHolder.class);
         itemXAdapter.setClickItemListener(this.itemXAdapterClick);
+        odIdLoutItemsGv.setAdapter(itemXAdapter);
+
         odIdTableTbtn.setTextOn(null);
         odIdTableTbtn.setTextOff(null);
         odIdTableTbtn.setText("TB");
         odIdTableTbtn.setOnClickListener(this);
-
-
-
-
-
 
         //initSelected dishes part.
         dishesXAdapter = new XAdapter2<SelectionDetail>(getContext(), OrderMenuViewHolder.class);
@@ -237,15 +234,14 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
         //添加Mark列表
         markselect = new ArrayList<Mark>(3);
-        List<Mark> markList = DaoExpand.queryNotDeleteAll(Applic.getInstance().getDaoMaster().newSession().getMarkDao());
+        List<Mark> markList = DaoExpand.queryNotDeleteAll(Applic.getMarkDao());
         List<Mark> marks = new ArrayList<Mark>();
         marks.add(markList.size() > 0 ? markList.get(0) : new Mark("M1"));
         marks.add(markList.size() > 1 ? markList.get(1) : new Mark("M2"));
         markXAdapter = new XAdapter2<Mark>(getActivity(), marks, OrderIdentifierMarkViewHolder.class);
         markXAdapter.setClickItemListener(this.itemXAdapterClick);
         odIdMarksGrid.setAdapter(markXAdapter);
-        //why not move it up together with the itemXAdapter code?
-        odIdLoutItemsGv.setAdapter(itemXAdapter);
+
         //注册打印机消息监听
         WifiPrintService.getInstance().registPrintState(this);
     }
@@ -297,7 +293,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     }
 
     private Menu SearchMenuFromDB(String context) {
-        List<Menu> mnlist = DaoExpand.queryFuzzyMenu(Applic.getInstance().getDaoMaster().newSession().getMenuDao(), context);
+        List<Menu> mnlist = DaoExpand.queryFuzzyMenu(Applic.app.getDaoMaster().newSession().getMenuDao(), context);
         if (mnlist.size() >= 1) {
             //对列表进行排序
             Collections.sort(mnlist, new Comparator<Menu>() {
@@ -362,7 +358,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     }
 
     private void resetConvenienceMarkArea() {
-        List<Mark> markList = DaoExpand.queryNotDeleteAll(Applic.getInstance().getDaoMaster().newSession().getMarkDao());
+        List<Mark> markList = DaoExpand.queryNotDeleteAll(Applic.app.getDaoMaster().newSession().getMarkDao());
         List<Mark> marks = new ArrayList<Mark>();
         //添加Mark列表
         marks.add(markList.size() > 0 ? markList.get(0) : new Mark("M1"));

@@ -45,7 +45,7 @@ public class AppData {
             String shoplist = getShopData(context).getString(KEY_SHOP_LIST, "");
             getShopData(context).putString(KEY_SHOP_LIST, shoplist + "," + shopName);
         }
-        Applic.getInstance().initDaoMaster(shopName);
+        Applic.app.initDaoMaster(shopName);
     }
 
     public static void saveShopName(Context context, String shopName) {

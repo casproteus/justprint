@@ -112,7 +112,7 @@ public class WifiPrintService implements Runnable{
         contentForPrintMap = new HashMap<String,List<String>>();
         tmpralQueueMap = new HashMap<String,List<SelectionDetail>>();
 
-        List<Printer> printerList = DaoExpand.queryNotDeleteAll(Applic.getInstance().getDaoMaster().newSession().getPrinterDao());//读取打印机位置
+        List<Printer> printerList = DaoExpand.queryNotDeleteAll(Applic.app.getDaoMaster().newSession().getPrinterDao());//读取打印机位置
         for(Printer printer:printerList){
             ipMap.put(printer.getIp(),printer);
             contentForPrintMap.put(printer.getIp(),new ArrayList<String>());
@@ -157,8 +157,8 @@ public class WifiPrintService implements Runnable{
                 Collections.sort(tmpralQueueMap.get(key), new Comparator<SelectionDetail>() {
                     @Override
                     public int compare(SelectionDetail dishesDetailModel, SelectionDetail t1) {
-                        Category c1 = Applic.getInstance().getDaoMaster().newSession().getCategoryDao().load(dishesDetailModel.getDish().getCid());
-                        Category c2 = Applic.getInstance().getDaoMaster().newSession().getCategoryDao().load(t1.getDish().getCid());
+                        Category c1 = Applic.app.getDaoMaster().newSession().getCategoryDao().load(dishesDetailModel.getDish().getCid());
+                        Category c2 = Applic.app.getDaoMaster().newSession().getCategoryDao().load(t1.getDish().getCid());
                         return c1.getCname().compareTo(c2.getCname());
                     }
                 });

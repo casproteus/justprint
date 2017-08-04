@@ -81,13 +81,13 @@ public class ConfigPrinterFragment extends BaseFragment implements
         name.setText("");
         checkBox.setChecked(false);
         printer.setState(State.def);
-        Applic.getInstance().getDaoMaster().newSession().getPrinterDao().insert(printer);
+        Applic.app.getDaoMaster().newSession().getPrinterDao().insert(printer);
         printer.updateAndUpgrade();
         loadPrinter();
     }
 
     private void loadPrinter() {
-        List<Printer> list = DaoExpand.queryNotDeleteAll(Applic.getInstance().getDaoMaster().newSession().getPrinterDao());
+        List<Printer> list = DaoExpand.queryNotDeleteAll(Applic.app.getDaoMaster().newSession().getPrinterDao());
         WifiPrintService.getInstance().reInitPrintRelatedMaps();
         printerXAdapter.setData(list);
     }

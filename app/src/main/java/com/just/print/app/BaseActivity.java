@@ -13,7 +13,6 @@ import com.just.print.util.ToastUtil;
 public class BaseActivity extends FragmentActivity implements EventBus {
 
 
-    private DaoMaster daoMaster = null;
     final EventBusImpl eventBus = new EventBusImpl();
 
     final public void post(String eventName, Object... argument) {
@@ -33,15 +32,10 @@ public class BaseActivity extends FragmentActivity implements EventBus {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        daoMaster = Applic.getInstance().getDaoMaster();
     }
 
     public void showToast(String text) {
         ToastUtil.showToast(this, text);
-    }
-
-    public DaoMaster getDaoMaster() {
-        return daoMaster;
     }
 
     public FragmentTransaction beginTransaction() {

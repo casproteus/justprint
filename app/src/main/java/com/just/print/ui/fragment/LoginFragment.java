@@ -63,7 +63,7 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
         if (!AppData.existShop(getContext(), shopName)) {
             QueryShopRequest request = new QueryShopRequest();
             request.setShopName(shopName);
-            Applic.getInstance().mUDPService.sendRequest(request, 1, this);
+            Applic.app.mUDPService.sendRequest(request, 1, this);
         }
     }
 

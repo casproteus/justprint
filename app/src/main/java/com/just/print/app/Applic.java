@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 
 import com.just.print.db.dao.DaoMaster;
+import com.just.print.db.dao.MarkDao;
 import com.just.print.net.UDPService;
 import com.just.print.util.L;
 
@@ -18,11 +19,9 @@ import static android.content.ContentValues.TAG;
  * Created by wangx on 2016/10/28.
  */
 public class Applic extends Application {
-    volatile static Applic app;
+    public volatile static Applic app;
 
-    public static Applic getInstance() {
-        return app;
-    }
+    //public static Applic getInstance() {        return app;    }
 
     public UDPService mUDPService;
     ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -77,4 +76,7 @@ public class Applic extends Application {
         return daoMaster;
     }
 
+    public static MarkDao getMarkDao(){
+        return app.getDaoMaster().newSession().getMarkDao();
+    }
 }

@@ -40,8 +40,8 @@ abstract public class BaseFragment extends Fragment {
 
     public void showMarksDialog(List<Mark> choiceItem, final onChoiceMarks choiceMarks) {
         if (choiceMarks == null || choiceItem == null)
-            throw new NullPointerException("showMarksDialog 的2个参数 必须要传");
-        final List<Mark> list = DaoExpand.queryNotDeleteAll(Applic.getInstance().getDaoMaster().newSession().getMarkDao());
+            throw new NullPointerException("showMarksDialog need 2 parameters");
+        final List<Mark> list = DaoExpand.queryNotDeleteAll(Applic.app.getDaoMaster().newSession().getMarkDao());
         String[] items = new String[list.size()];
         boolean[] checkedItems = new boolean[list.size()];
         final Map<String, Integer> sa = new HashMap<String, Integer>();
@@ -59,7 +59,7 @@ abstract public class BaseFragment extends Fragment {
                 else
                     sa.remove(Integer.toString(which));
             }
-        }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        }).setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 List<Mark> result = new ArrayList<Mark>();
@@ -69,7 +69,7 @@ abstract public class BaseFragment extends Fragment {
                 choiceMarks.onChoiceMarks(result);
 
             }
-        }).setNegativeButton("取消", null).show();
+        }).setNegativeButton("Cancel", null).show();
 
 
     }

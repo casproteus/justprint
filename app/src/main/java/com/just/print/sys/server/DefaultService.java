@@ -37,7 +37,7 @@ public class DefaultService extends AbsService {
         L.d(tag, "queryShop");
         QueryShopResult result = new QueryShopResult();
 
-        File dbfile = Applic.getInstance().getDBPath(queryShop.getShopName());
+        File dbfile = Applic.app.getDBPath(queryShop.getShopName());
         if (dbfile.exists()) {
             result.setExists(true);
             result.setFileSize(dbfile.length());

@@ -46,7 +46,7 @@ public class ConfigMarkFragment extends BaseFragment implements OnClickItemListe
     }
 
     private void loadMark() {
-        List<Mark> list = DaoExpand.queryNotDeleteAll(Applic.getInstance().getDaoMaster().newSession().getMarkDao());
+        List<Mark> list = DaoExpand.queryNotDeleteAll(Applic.app.getDaoMaster().newSession().getMarkDao());
         markXAdapter.setData(list);
         markXAdapter.notifyDataSetChanged();
     }
@@ -57,7 +57,7 @@ public class ConfigMarkFragment extends BaseFragment implements OnClickItemListe
         Mark mark1 = new Mark();
         mark1.setState(State.def);
         mark1.setName(mark);
-        Applic.getInstance().getDaoMaster().newSession().getMarkDao().insertOrReplace(mark1);
+        Applic.app.getDaoMaster().newSession().getMarkDao().insertOrReplace(mark1);
         mark1.updateAndUpgrade();
         loadMark();
     }

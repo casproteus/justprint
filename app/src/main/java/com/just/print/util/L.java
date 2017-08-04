@@ -54,7 +54,7 @@ public class L extends Thread{
     public void run() {
         super.run();
         boolean debug = true;
-        if(debug && AppUtils.hasInternet(Applic.getInstance().getApplicationContext())){
+        if(debug && AppUtils.hasInternet(Applic.app.getApplicationContext())){
 
             HttpURLConnection urlConnection = null;
             URL url = null;
