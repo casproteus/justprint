@@ -41,17 +41,21 @@ abstract public class BaseFragment extends Fragment {
     public void showMarksDialog(List<Mark> choiceItem, final onChoiceMarks choiceMarks) {
         if (choiceMarks == null || choiceItem == null)
             throw new NullPointerException("showMarksDialog need 2 parameters");
-        final List<Mark> list = DaoExpand.queryNotDeletedAll(Applic.app.getDaoMaster().newSession().getMarkDao());
-        String[] items = new String[list.size()];
-        boolean[] checkedItems = new boolean[list.size()];
+
+        final List<Mark> allMarks = DaoExpand.queryNotDeletedAll(Applic.app.getDaoMaster().newSession().getMarkDao());
+
+        String[] markNames = new String[allMarks.size()];
+        boolean[] selectionStatus = new boolean[allMarks.size()];
         final Map<String, Integer> sa = new HashMap<String, Integer>();
-        for (int i = 0, s = list.size(); i < s; i++) {
-            items[i] = list.get(i).getName();
-            checkedItems[i] = choiceItem.contains(list.get(i));
-            sa.put(Integer.toString(i),i);
+        for (int i = 0, s = allMarks.size(); i < s; i++) {
+            markNames[i] = allMarks.get(i).getName();
+            selectionStatus[i] = choiceItem.contains(allMarks.get(i));
+            if(selectionStatus[i]) {
+                sa.put(Integer.toString(i), i);
+            }
         }
 
-        new AlertDialog.Builder(this.getActivity()).setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+        new AlertDialog.Builder(this.getActivity()).setMultiChoiceItems(markNames, selectionStatus, new DialogInterface.OnMultiChoiceClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                 if (isChecked)
@@ -64,14 +68,12 @@ abstract public class BaseFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 List<Mark> result = new ArrayList<Mark>();
                 for (Integer i : sa.values()) {
-                    result.add(list.get(i));
+                    result.add(allMarks.get(i));
                 }
                 choiceMarks.onChoiceMarks(result);
 
             }
         }).setNegativeButton("Cancel", null).show();
-
-
     }
 
     public EventBus getEventBus() {
