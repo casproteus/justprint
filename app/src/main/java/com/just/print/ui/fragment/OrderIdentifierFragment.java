@@ -38,29 +38,35 @@ import java.util.List;
 
 
 public class OrderIdentifierFragment extends BaseFragment implements View.OnClickListener, OnClickItemListener, EventBus.EventHandler, WifiPrintService.StatusDisplayer {
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String EVENT_ADD_MENU = "EVENT_ADD_MENU=";
     private static final String TAG = "OrderIdentifierFragment";
+
     @XViewByID(R.id.odIdFrLoutMenuList)
     private ListView odIdFrLoutMenuList;
+
     @XViewByID(R.id.odIdInput)
     private TextView odIdInput;
+
     @XViewByID(R.id.odIdfrName)
     private TextView odIdfrName;
+
     @XViewByID(R.id.odIdLoutItemsGv)
     private GridView odIdLoutItemsGv;
+
     @XViewByID(R.id.odIdMarksGrid)
     private GridView odIdMarksGrid;
+
     @XViewByID(R.id.odIdTableTbtn)
     ToggleButton odIdTableTbtn;
-    //@XViewByID(R.id.odIdDefaultTbtn)
-    //ToggleButton odIdDefaultTbtn;
+
     private Menu storedMenu;
+
     XAdapter2<Mark> markXAdapter;
     XAdapter2<Menu> menuXAdapter;
-    private XAdapter2<SelectionDetail> dishesXAdapter;
+    XAdapter2<SelectionDetail> dishesXAdapter;
     XAdapter2<String> itemXAdapter;
+
     List<String> itemList;
     int curmarkitem;
     List<Mark> markselect;
