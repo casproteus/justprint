@@ -67,7 +67,6 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     XAdapter2<SelectionDetail> dishesXAdapter;
     XAdapter2<String> itemXAdapter;
 
-    List<String> itemList;
     int curmarkitem;
     List<Mark> markselect;
 
@@ -131,6 +130,41 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             switch (view.getId()) {
                 case R.id.buttonholder:
                     switch (i) {
+//                        in case the characters is not in order
+//                        case 0:
+//                            break;
+//                        case 1:
+//                            break;
+//                        case 2:
+//                            break;
+//                        case 3:
+//                            break;
+//                        case 4:
+//                            break;
+//                        case 5:
+//                            break;
+//                        case 6:
+//                            break;
+//                        case 7:
+//                            break;
+//                        case 8:
+//                            break;
+//                        case 9:
+//                            break;
+//                        case 10:
+//                            break;
+//                        case 11:
+//                            break;
+//                        case 12:
+//                            break;
+//                        case 13:
+//                            break;
+//                        case 14:
+//                            break;
+//                        case 15:
+//                            break;
+//                        case 16:
+//                            break;
                         case 17:
                             odIdTableTbtn.setText("Delivery");
                             CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
@@ -220,9 +254,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         //设置餐桌号用
         //CustomerSelection.getInstance().setTableNumber(odIdTableNumEt.getText().toString());
         storedMenu = null;
-        String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "G","DELIVERY"};
-        itemList = new ArrayList<String>(Arrays.asList(items));
-        itemXAdapter = new XAdapter2<String>(getActivity(), itemList, OrderIdentifierItemViewHolder.class);
+        String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "G","DELIVER"};
+        itemXAdapter = new XAdapter2<String>(getActivity(), Arrays.asList(items), OrderIdentifierItemViewHolder.class);
         itemXAdapter.setClickItemListener(this.itemXAdapterClick);
         odIdLoutItemsGv.setAdapter(itemXAdapter);
 
