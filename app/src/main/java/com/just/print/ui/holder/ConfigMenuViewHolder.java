@@ -27,6 +27,7 @@ public class ConfigMenuViewHolder extends XViewHolder<Menu> {
     @Override
     public void onCreate(Context context) {
         new StupidReflect(this, getView()).init();
+        findViewById(R.id.modifyMenu).setOnClickListener(this);
         findViewById(R.id.delMenu).setOnClickListener(this);
     }
 

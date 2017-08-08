@@ -41,6 +41,8 @@ import static android.content.DialogInterface.OnClickListener;
  */
 public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClickListener {
 
+    private static Menu modifyingMenu = null;
+
     XAdapter2<Category> categoryXAdapter;
     @XViewByID(R.id.lvCategory)
     ListView lvCategory;
@@ -80,6 +82,29 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
                     }
                     categoryXAdapter.get(i).logicDelete();
                     loadCategory();
+                    break;
+                case R.id.modifyMenu:
+                    findViewById(R.id.categoryLayout).setVisibility(View.GONE);
+                    findViewById(R.id.menuLayout).setVisibility(View.VISIBLE);
+
+                    modifyingMenu = menuXAdapter.get(i);
+                    ((EditText)findViewById(R.id.etMenuID)).setText(menuXAdapter.get(i).getID());
+                    ((EditText)findViewById(R.id.etMenu)).setText(menuXAdapter.get(i).getMname());
+
+                    addPrints = new ArrayList<Printer>();
+                    for(M2M_MenuPrint m2m_p : menuXAdapter.get(i).getM2M_MenuPrintList()){
+                        addPrints.add(m2m_p.getPrint());
+                    }
+
+                    addPrintsAdapter = new XAdapter2<Printer>(getContext(), addPrints, AddPrintViewHolder.class);
+                    addPrintListView.setAdapter(addPrintsAdapter);
+                    addPrintsAdapter.setClickItemListener(new IXOnItemClickListener() {
+                        @Override
+                        public void onClickItem(View view, int i) {
+                            addPrints.remove(i);
+                            addPrintsAdapter.notifyDataSetChanged();
+                        }
+                    });
                     break;
                 case R.id.delMenu:
                     //menuXAdapter.get(i).logicDelete();
@@ -128,14 +153,18 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
     @Override
     public void onCreated(Bundle savedInstanceState) {
         new StupidReflect(this, getView()).init();
+
         categoryXAdapter = new XAdapter2<Category>(getContext(), ConfigCategoryViewHolder.class);
         categoryXAdapter.setClickItemListener(categoryAdapterClick);
         categoryXAdapter.setLongClickItemListener(this);
         lvCategory.setAdapter(categoryXAdapter);
+
         menuXAdapter = new XAdapter2<Menu>(getContext(), ConfigMenuViewHolder.class);
         menuXAdapter.setClickItemListener(categoryAdapterClick);
         lvMenu.setAdapter(menuXAdapter);
+
         menuDao = Applic.app.getDaoMaster().newSession().getMenuDao();
+
         loadCategory();
         loadMenu();
     }
@@ -151,10 +180,12 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
 
     @XClick({R.id.showMenu})
     private void showMenu() {
-        findViewById(R.id.menuLayout).setVisibility(View.VISIBLE);
         findViewById(R.id.categoryLayout).setVisibility(View.GONE);
+        findViewById(R.id.menuLayout).setVisibility(View.VISIBLE);
+
         ((EditText)findViewById(R.id.etMenuID)).setText("");
         ((EditText)findViewById(R.id.etMenu)).setText("");
+
         addPrints = new ArrayList<Printer>(1);
         addPrintsAdapter = new XAdapter2<Printer>(getContext(), addPrints, AddPrintViewHolder.class);
         addPrintListView.setAdapter(addPrintsAdapter);
@@ -173,25 +204,25 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
     @XClick({R.id.addMenu})
     private void addMenu(@XGetValueByView(fromId = R.id.etMenuID) TextView mid,
                          @XGetValueByView(fromId = R.id.etMenu) TextView mname,
-                         @XGetValueByView(fromId = R.id.selectPrint) TextView print
-    ) {
+                         @XGetValueByView(fromId = R.id.selectPrint) TextView print) {
 
         if (mCategory == null) {
-            showToast("请选选择类别");
+            showToast("Please choose a category");
             return;
         }
         Menu menu = menuDao.load(mid.getText().toString());
         if (mid.getText().length() == 0 || mname.getText().length() == 0) {
-            showToast("请输入" + (mid.getText().length() == 0 ? "编号" : "名称"));
+            showToast("Please input " + (mid.getText().length() == 0 ? "code" : "name"));
             return;
         }
         if (addPrints == null || addPrints.size() == 0) {
-            showToast("请选择打印机");
+            showToast("Please select printer");
             return;
         }
-        if (menu != null && menu.getState() == State.def) {
 
-            showToast("该编号已存在");
+        //filter out "is adding" and "code is ocupied" case.
+        if (menu != null && menu.getState() == State.def && modifyingMenu == null) {
+            showToast("the code is used already");
             return;
         }
         /*
@@ -203,20 +234,40 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
             menu.updateAndUpgrade();
         }
         */
-        menu = new Menu();
-        menu.setID(mid.getText().toString().trim());
-        menu.setState(State.def);
-        menu.setMname(mname.getText().toString().trim());
-        menu.setCid(mCategory.getId());
-        menuDao.insert(menu);
+
+        if(menu == null){   //is adding mode( worry free about code duplication with existing one, it's filtered out.)
+            menu = new Menu();
+            menu.setID(mid.getText().toString().trim());
+            menu.setState(State.def);
+            menu.setMname(mname.getText().toString().trim());
+            menu.setCid(mCategory.getId());
+            menuDao.insert(menu);
+        }else{              //is modifying mode. means duplicated with others. but it's modifying, (duplicated and not modifying case has been filtered out).
+            menu.setID(mid.getText().toString().trim());
+            menu.setState(State.def);
+            menu.setMname(mname.getText().toString().trim());
+            menu.setCid(mCategory.getId());
+            menuDao.update(menu);
+        }
+        if(modifyingMenu != null && !modifyingMenu.getID().equals(menu.getID())){
+            menuDao.delete(modifyingMenu);
+        }
+
         menu.updateAndUpgrade();
         M2M_MenuPrintDao m2mDao = Applic.app.getDaoMaster().newSession().getM2M_MenuPrintDao();
+        if(modifyingMenu != null) {
+            for (M2M_MenuPrint p : modifyingMenu.getM2M_MenuPrintList()) {
+                m2mDao.delete(p);
+            }
+        }
         for (Printer p : addPrints) {
             M2M_MenuPrint m2m = new M2M_MenuPrint();
             m2m.setMenu(menu);
             m2m.setPrint(p);
             m2mDao.insertOrReplace(m2m);
         }
+
+        modifyingMenu = null;
         findViewById(R.id.menuLayout).setVisibility(View.GONE);
         loadMenu();
 
@@ -228,7 +279,7 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
     @XClick({R.id.addCategory})
     private void addCategory(@XGetValueByView(fromId = R.id.tvCategory) TextView cname) {
         if (cname.getText().length() == 0) {
-            showToast("请输入类别");
+            showToast("Please input category");
             return;
         }
 
@@ -251,11 +302,11 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
         final List<Printer> data = DaoExpand.queryNotDeletedAll(Applic.app.getDaoMaster().newSession().getPrinterDao());
         data.removeAll(addPrints);
         if (data.size() == 0) {
-            showToast("请先添加打印机");
+            showToast("Please add printer first");
             return;
         }
         if (data.size() == 0) {
-            showToast("没有可选的打印机了");
+            showToast("No printer to select");
             return;
         }
         final CharSequence[] items = new CharSequence[data.size()];
@@ -264,7 +315,7 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
             items[i] = p.getPname() + "_" + p.getIp();
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("请选择打印机");
+        builder.setTitle("Please choose a printer");
         builder.setSingleChoiceItems(items, -1, new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -286,8 +337,8 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
 
         List<Category> list = DaoExpand.queryNotDeletedAllQuery(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.Cname).list();
         categoryXAdapter.setData(list);
+        categoryXAdapter.notifyDataSetChanged();
 
-         categoryXAdapter.notifyDataSetChanged();
         menuXAdapter.clear();
         if (categoryXAdapter.size() > 0)
             onChangeCategory(categoryXAdapter.get(0));
@@ -305,7 +356,7 @@ public class ConfigMenuFragment extends BaseFragment implements IXOnItemLongClic
 
     @Override
     public String toString() {
-        return "菜单管理";
+        return "Menu Management";
     }
 
     Category mModifyCategoryTemp;

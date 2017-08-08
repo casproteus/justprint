@@ -13,7 +13,7 @@
         android:id="@+id/tvMenuTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="类别编号"
+        android:text="Category"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <LinearLayout
@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="4"
-            android:hint="编号"
+            android:hint="Code"
             android:singleLine="true" />
 
         <EditText
@@ -34,7 +34,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="名称"
+            android:hint="Name"
             android:singleLine="true" />
 
     </LinearLayout>
@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="right"
         android:drawableStart="@android:drawable/ic_input_add"
-        android:text="添加打印机"
+        android:text="Add Printer"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <ListView
@@ -66,7 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:text="取消" />
+            android:text="Cancel" />
 
         <Button
             android:id="@+id/addMenu"
@@ -74,6 +74,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:text="添加" />
+            android:text="OK" />
     </LinearLayout>
 </LinearLayout>

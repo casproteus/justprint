@@ -86,6 +86,10 @@ public class ConfigCategoryFragment extends BaseFragment implements OnClickItemL
             /**
              * 删除菜品种类
              */
+            case R.id.modifyCategory:
+                //show up hte modification dialog.
+                int a = 100;
+                break;
             case R.id.delCategory:
                 Category cag = categoryXAdapter.get(i);
                 MenuDao menuDao = Applic.app.getDaoMaster().newSession().getMenuDao();

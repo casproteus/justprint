@@ -11,10 +11,19 @@
         android:layout_weight="1"
         android:text="New Text" />
 
-    <Button
+    <ImageButton
+        android:id="@+id/modifyCategory"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/change"
+        />
+
+    <ImageButton
         android:id="@+id/delCategory"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="删除" />
+        android:src="@drawable/delete"
+        />
 </LinearLayout>

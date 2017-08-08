@@ -24,9 +24,20 @@
             android:text="New Text" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/delMenu"
+    <ImageButton
+        android:id="@+id/modifyMenu"
+        style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="删除" />
+        android:src="@drawable/change"
+        />
+
+    <ImageButton
+        android:id="@+id/delMenu"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/delete"
+        />
+
 </LinearLayout>
