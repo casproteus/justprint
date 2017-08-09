@@ -91,14 +91,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
-                    android:text="添加" />
+                    android:text="OK" />
 
                 <Button
                     android:id="@+id/cancel"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="取消" />
+                    android:text="Cancel" />
             </LinearLayout>
         </LinearLayout>
 

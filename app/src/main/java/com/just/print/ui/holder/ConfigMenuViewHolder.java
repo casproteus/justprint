@@ -34,9 +34,11 @@ public class ConfigMenuViewHolder extends XViewHolder<Menu> {
     @Override
     public void onResetView(Menu menu, int i) {
         mname.setText(menu.getMname());
-        msg.setText("编号:" + menu.getID());
+        msg.setText("Code:" + menu.getID());
         if (menu.getM2M_MenuPrintList() != null)
-            msg.append(" 打印机数量: " + menu.getM2M_MenuPrintList().size());
+            msg.append(" Printers: " + menu.getM2M_MenuPrintList().size());
+
+        msg.append(" Price: " + menu.getPrice());
 
     }
 }

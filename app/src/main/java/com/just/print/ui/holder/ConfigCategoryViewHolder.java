@@ -25,6 +25,7 @@ public class ConfigCategoryViewHolder extends XViewHolder<Category> {
     public void onCreate(Context context) {
         new StupidReflect(this, getView()).init();
         setOnClickListener(this);
+        findViewById(R.id.modifyCategory).setOnClickListener(this);
         findViewById(R.id.delCategory).setOnClickListener(this);
         setOnLongClickListener(this);
     }

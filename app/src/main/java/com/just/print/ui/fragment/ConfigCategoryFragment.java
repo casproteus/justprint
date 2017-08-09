@@ -83,9 +83,6 @@ public class ConfigCategoryFragment extends BaseFragment implements OnClickItemL
             case android.R.id.content:
 
                 break;
-            /**
-             * 删除菜品种类
-             */
             case R.id.modifyCategory:
                 //show up hte modification dialog.
                 int a = 100;

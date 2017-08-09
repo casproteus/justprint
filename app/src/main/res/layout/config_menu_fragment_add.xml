@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:ems="4"
             android:hint="Code"
-            android:singleLine="true" />
+            android:maxLines="1" />
 
         <EditText
             android:id="@+id/etMenu"
@@ -35,7 +35,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="Name"
-            android:singleLine="true" />
+            android:maxLines="1" />
+
+        <EditText
+            android:id="@+id/price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Price"
+            android:maxLines="1" />
 
     </LinearLayout>
 
