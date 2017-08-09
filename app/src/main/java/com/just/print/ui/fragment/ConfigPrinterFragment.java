@@ -34,7 +34,7 @@ public class ConfigPrinterFragment extends BaseFragment implements
 
     @Override
     public String toString() {
-        return "打印机设置";
+        return "Printer Settings";
     }
 
 

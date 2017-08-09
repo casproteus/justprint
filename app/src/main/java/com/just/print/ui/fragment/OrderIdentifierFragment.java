@@ -254,7 +254,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         //设置餐桌号用
         //CustomerSelection.getInstance().setTableNumber(odIdTableNumEt.getText().toString());
         storedMenu = null;
-        String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "G","DELIVER"};
+        String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", ".","DELIVER"};
         itemXAdapter = new XAdapter2<String>(getActivity(), Arrays.asList(items), OrderIdentifierItemViewHolder.class);
         itemXAdapter.setClickItemListener(this.itemXAdapterClick);
         odIdLoutItemsGv.setAdapter(itemXAdapter);
@@ -402,7 +402,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     public void showStatus(String src, int i) {
         switch (i) {
             case 2:     //WFPRINTER_CONNECTEDERR
-                showToast("打印机:" + src + " 连接错误");
+                showToast("Printer:" + src + " connection error!");
                 break;
             case 4:     //COMMON
                 showToast(src);

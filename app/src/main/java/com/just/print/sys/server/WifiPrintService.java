@@ -134,7 +134,7 @@ public class WifiPrintService implements Runnable{
                 //should never happen, jist in case someone changed db.
                 Printer printer = m2m.getPrint();
                 if(printer == null) {
-                    statusDisplayer.showStatus("选择菜品未绑定打印机",4);
+                    statusDisplayer.showStatus("Selected item not connected with printer yet.",4);
                     return "2";
                 }
 

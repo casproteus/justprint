@@ -83,27 +83,27 @@
             android:textOff=""
             android:textOn=""
             android:layout_weight="1" />
-        <Button
+        <ImageButton
+            android:id="@+id/odIdConfigBtn"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Config"
             android:layout_weight="1"
-            android:id="@+id/odIdConfigBtn"/>
-        <Button
+            android:src="@drawable/setting"/>
+        <ImageButton
+            android:id="@+id/odIdDelBtn"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Del"
-            android:background="#FFF0F5"
             android:layout_weight="1"
-            android:id="@+id/odIdDelBtn"/>
-        <Button
+            android:src="@drawable/erase"/>
+        <ImageButton
+            android:id="@+id/odIdOkBtn"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#8A2BE2"
-            android:text="OK"
             android:layout_weight="1"
-            android:id="@+id/odIdOkBtn"/>
+            android:src="@drawable/ok"/>
     </LinearLayout>
+    <!--android:background="#FFF0F5"-->
+    <!--android:background="#8A2BE2"-->
 
     <LinearLayout
         android:layout_width="match_parent"

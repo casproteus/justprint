@@ -37,6 +37,7 @@
 
         <Button
             android:id="@+id/odmnreduce"
+            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=" - " />
@@ -50,13 +51,13 @@
             android:minEms="1"
             android:text="0" />
 
-        <ImageButton
+        <Button
             android:id="@+id/odmnadd"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@+id/oddelDish"
-            android:src="@drawable/add"/>
+            android:text="+"/>
 
         <ImageButton
             android:id="@+id/oddelDish"

@@ -32,14 +32,14 @@
                     android:id="@+id/checkBox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="全单印机  " />
+                    android:text="Full Print  " />
 
                 <EditText
                     android:id="@+id/pname"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ems="4"
-                    android:hint="别名" />
+                    android:hint="Alias" />
 
                 <EditText
                     android:id="@+id/pip"
@@ -48,11 +48,11 @@
                     android:layout_weight="1"
                     android:hint="ip" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/addPrint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="add" />
+                    android:src="@drawable/add" />
 
             </LinearLayout>
 
@@ -67,13 +67,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:text="顺序打印" />
+                    android:text="In Order" />
 
                 <RadioButton
                     android:id="@+id/classPrint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="类别打印" />
+                    android:text="By Category" />
 
             </RadioGroup>
 
@@ -112,10 +112,9 @@
 
                 <ImageButton
                     android:id="@+id/modifyPrint"
-                    style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/change" />
+                    android:src="@drawable/ok" />
             </LinearLayout>
         </LinearLayout>
     </ViewSwitcher>
