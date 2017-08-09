@@ -15,6 +15,7 @@
         android:text="TextView"
         android:textAppearance="@android:style/TextAppearance" />
 
+    <!-- this button can not be changed into image button, if do so, it will report null pointer when stating up the app-->
     <Button
         android:id="@+id/button"
         android:layout_width="wrap_content"
