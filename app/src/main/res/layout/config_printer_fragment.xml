@@ -94,14 +94,14 @@
                     android:id="@+id/modifyCheckBox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="主打印机  " />
+                    android:text="Main Printer" />
 
                 <EditText
                     android:id="@+id/modifyPname"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ems="4"
-                    android:hint="别名" />
+                    android:hint="Alias" />
 
                 <EditText
                     android:id="@+id/modifyPip"
@@ -110,11 +110,12 @@
                     android:layout_weight="1"
                     android:hint="ip" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/modifyPrint"
+                    style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="修改" />
+                    android:src="@drawable/change" />
             </LinearLayout>
         </LinearLayout>
     </ViewSwitcher>

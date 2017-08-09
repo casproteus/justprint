@@ -35,7 +35,7 @@ import java.util.Map;
 
 public class OrderCategoryFragment extends BaseFragment {
 
-    //添加二级菜单
+    //add second level menu
     @XViewByID(R.id.odExCategory)
     ExpandableListView odExCategory;
 
@@ -88,7 +88,7 @@ public class OrderCategoryFragment extends BaseFragment {
         ddm.setMarkList(marks);
         CustomerSelection.getInstance().addSelectedDish(ddm);
         getEventBus().post(OrderIdentifierFragment.EVENT_ADD_MENU);
-        showToast("添加成功");
+        showToast("Added successfully");
     }
 
     @XViewByID(R.id.showTitle)

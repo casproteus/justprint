@@ -15,21 +15,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:text="菜单管理" />
+            android:text="Menu Management" />
 
         <TextView
             android:id="@+id/configPrintManager"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:text="打印管理" />
+            android:text="Printer Management" />
 
         <TextView
             android:id="@+id/configUserManager"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:text="员工管理"
+            android:text="Employee Management"
             android:visibility="gone" />
 
         <TextView
@@ -37,21 +37,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:text="标签管理" />
+            android:text="Label Management" />
 
         <TextView
             android:id="@+id/configPrintReport"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:text="打印报告" />
-
-        <TextView
-            android:id="@+id/configPrinterStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="打印机状态" />
+            android:text="Print Report" />
 
     </LinearLayout>
 

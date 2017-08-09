@@ -75,17 +75,13 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
                     long cid = cag.getId();
                     List<Menu> mList = menuDao._queryCategory_MenuList(cid);
                     for(Menu menu:mList) {
-                        /**
-                         * 删除菜单-打印机映射
-                         */
+                        //delete menu-printer maps
                         List<M2M_MenuPrint> m2mList = menu.getM2M_MenuPrintList();
                         for(M2M_MenuPrint m2m:m2mList) {
                             m2m.delete();
                         }
 
-                        /**
-                         * 删除菜单
-                         */
+                        // delete menu.
                         menu.delete();
                     }
                     categoryXAdapter.get(i).logicDelete();
@@ -293,9 +289,6 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
         loadMenu();
     }
 
-    /**
-     * 添加类别
-     */
     @XClick({R.id.addCategory})
     private void addCategory(@XGetValueByView(fromId = R.id.tvCategory) TextView cname) {
         if (cname.getText().length() == 0) {

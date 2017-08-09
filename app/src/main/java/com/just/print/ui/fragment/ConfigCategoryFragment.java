@@ -36,7 +36,7 @@ public class ConfigCategoryFragment extends BaseFragment implements OnClickItemL
 
     @Override
     public String toString() {
-        return "类目管理";
+        return "Category Management";
     }
 
     @Override
@@ -63,7 +63,7 @@ public class ConfigCategoryFragment extends BaseFragment implements OnClickItemL
     }
 
     /**
-     * 添加类别
+     * add category
      */
     @XClick({R.id.addCategory})
     private void addCategory(@XGetValueByView(fromId = R.id.tvCategory) String cname) {
@@ -93,17 +93,11 @@ public class ConfigCategoryFragment extends BaseFragment implements OnClickItemL
                 long cid = cag.getId();
                 List<Menu> mList = menuDao._queryCategory_MenuList(cid);
                 for(Menu menu:mList) {
-                    /**
-                     * 删除菜单-打印机映射
-                     */
                     List<M2M_MenuPrint> m2mList = menu.getM2M_MenuPrintList();
                     for(M2M_MenuPrint m2m:m2mList) {
                         m2m.delete();
                     }
 
-                    /**
-                     * 删除菜单
-                     */
                     menu.delete();
                 }
                 categoryXAdapter.get(i).logicDelete();

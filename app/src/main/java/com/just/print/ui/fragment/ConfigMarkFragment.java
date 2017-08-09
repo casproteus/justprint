@@ -68,8 +68,8 @@ public class ConfigMarkFragment extends BaseFragment implements OnClickItemListe
         final
         Mark mark = markXAdapter.getItem(i);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage("是否删除\"" + mark.getName() + "\"?");
-        builder.setTitle("提示").setNegativeButton("删除", new DialogInterface.OnClickListener() {
+        builder.setMessage("Are you sure to delete \"" + mark.getName() + "\"?");
+        builder.setTitle("Notice").setNegativeButton("Delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -77,7 +77,7 @@ public class ConfigMarkFragment extends BaseFragment implements OnClickItemListe
                 loadMark();
             }
         });
-        builder.setPositiveButton("取消", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();

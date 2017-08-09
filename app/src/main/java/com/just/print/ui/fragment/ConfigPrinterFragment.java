@@ -41,7 +41,7 @@ public class ConfigPrinterFragment extends BaseFragment implements
     @XViewByID(R.id.printList)
     private ListView printerListView = null;
     /**
-     * 用于存放临时修改
+     * for storing tempral modification
      */
     private Printer mModifyCache = null;
 
@@ -65,7 +65,7 @@ public class ConfigPrinterFragment extends BaseFragment implements
     ) {
 
         if (!isIP(ip)) {
-            showToast("请输入正确的ip地址");
+            showToast("Please input correct IP address.");
             return;
         }
 
@@ -96,7 +96,7 @@ public class ConfigPrinterFragment extends BaseFragment implements
     private void modifyPrint(@XGetValueByView(fromId = R.id.modifyCheckBox) CheckBox modifyCheckBox) {
         if (mModifyCache != null) {
             if (!isIP(modifIP.getText().toString())) {
-                showToast("请输入正确的ip");
+                showToast("Please input correct ip");
                 return;
             }
 
