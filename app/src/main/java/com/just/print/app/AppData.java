@@ -17,6 +17,7 @@ public class AppData {
     public static final String KEY_SHOP_LIST = "KEY_SHOP_LIST";
     public static final String KEY_SHOP_ID = "KEY_SHOP_ID";
     private static final String KEY_PREFIX_SHOP_ID_ = "KEY_SHOP_ID_";
+    private static final String KEY_SHOP_NAME = "shopName";
 
     public static SharedPreferencesHelper getShopData(Context context) {
         return SharedPreferencesHelper.getCache(context, KEY_SHOP_XML);
@@ -49,11 +50,11 @@ public class AppData {
     }
 
     public static void saveShopName(Context context, String shopName) {
-        getShopData(context).putString("shopName", shopName);
+        getShopData(context).putString(KEY_SHOP_NAME, shopName);
     }
 
     public static String getShopName(Context context) {
-        return getShopData(context).getString("shopName", "");
+        return getShopData(context).getString(KEY_SHOP_NAME, "");
     }
 
     public static void saveUserName(Context context, String userName) {

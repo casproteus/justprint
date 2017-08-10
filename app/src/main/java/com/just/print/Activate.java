@@ -50,7 +50,7 @@ public class Activate extends BaseActivity {
                 }
             }
         }
-        showToast("请输入正确的license");
+        showToast("Please input correct license code");
     }
 
 }

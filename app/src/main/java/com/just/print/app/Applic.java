@@ -21,6 +21,8 @@ public class Applic extends Application {
 
     public UDPService mUDPService;
 
+    private DaoMaster daoMaster;
+
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -42,9 +44,6 @@ public class Applic extends Application {
         bindService(new Intent(this, UDPService.class), mServiceConnection, BIND_AUTO_CREATE);
     }
 
-
-    private DaoMaster daoMaster;
-
     public void initDaoMaster(String shopName) {
         if (daoMaster == null) {
             DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this,
@@ -58,7 +57,6 @@ public class Applic extends Application {
     }
 
     public DaoMaster newDaoMaster(String dbname) {
-
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this,
                 getDBPath(dbname).getAbsolutePath(), null);
         DaoMaster daomaster = new DaoMaster(helper.getWritableDatabase());
@@ -68,7 +66,7 @@ public class Applic extends Application {
     public DaoMaster getDaoMaster() {
         if (daoMaster == null) {
             L.e("Applic","non-none daoMaster expected! db not inited!", null);
-            new NullPointerException("请初始化数据库");
+            new NullPointerException("Please initialize database!");
         }
         return daoMaster;
     }

@@ -9,16 +9,16 @@
         android:id="@+id/userName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="请输入姓名"
+        android:hint="Please input your name"
         android:maxLength="5"
-        android:singleLine="true" />
+        android:maxLines="1" />
 
     <Button
         android:id="@+id/confirmUserName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
-        android:text="确认姓名" />
+        android:text="Confirm" />
 
     <LinearLayout
         android:id="@+id/shopShow"
@@ -31,8 +31,8 @@
             android:id="@+id/shopName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="店铺名称"
-            android:maxLength="1" />
+            android:hint="Store name"
+            android:maxLines="1" />
 
 
         <LinearLayout
@@ -46,14 +46,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
-                android:text="查询店铺" />
+                android:text="Verify Store Name" />
 
             <Button
                 android:id="@+id/createShop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
-                android:text="创建店铺" />
+                android:text="Create" />
         </LinearLayout>
     </LinearLayout>
 

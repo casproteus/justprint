@@ -179,6 +179,8 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
     private void showCategory() {
         findViewById(R.id.menuLayout).setVisibility(View.GONE);
         findViewById(R.id.categoryLayout).setVisibility(View.VISIBLE);
+        ((EditText)findViewById(R.id.tvCategory)).setText("");
+        ((EditText)findViewById(R.id.displayIdx)).setText("");
     }
 
     @XViewByID(R.id.addPrintListView)
@@ -300,9 +302,9 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
         }
 
         Category cat = null;
-        if (modifyingCategory == null)
+        if (modifyingCategory == null) {
             cat = new Category();
-        else
+        }else
             cat = modifyingCategory;
 
         cat.setCname(cname.getText().toString().trim());
