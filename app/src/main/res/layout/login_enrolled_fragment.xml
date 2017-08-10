@@ -12,33 +12,33 @@
         android:id="@+id/shopName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="店铺名称" />
+        android:hint="Store Name" />
 
 
     <EditText
         android:id="@+id/userID"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="员工账号" />
+        android:hint="Employee Account" />
 
     <EditText
         android:id="@+id/userName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="姓名" />
+        android:hint="Name" />
 
     <EditText
         android:id="@+id/userPwd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="员工密码" />
+        android:hint="Password" />
 
     <Button
         android:id="@+id/createSubmit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
-        android:text="提交" />
+        android:text="OK" />
 
     <TextView
         android:id="@+id/showShopID"

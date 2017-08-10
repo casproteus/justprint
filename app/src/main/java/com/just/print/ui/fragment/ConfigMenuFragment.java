@@ -68,6 +68,8 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
                     showCategory();
                     TextView tvCategory = (TextView) findViewById(R.id.tvCategory);
                     tvCategory.setText(modifyingCategory.getCname());
+                    TextView displayIdx = (TextView) findViewById(R.id.displayIdx);
+                    displayIdx.setText(modifyingCategory.getDisplayIdx());
 
                     break;
                 case R.id.delCategory:
@@ -290,7 +292,8 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
     }
 
     @XClick({R.id.addCategory})
-    private void addCategory(@XGetValueByView(fromId = R.id.tvCategory) TextView cname) {
+    private void addCategory(@XGetValueByView(fromId = R.id.tvCategory) TextView cname,
+                             @XGetValueByView(fromId = R.id.displayIdx) TextView displayIdx) {
         if (cname.getText().length() == 0) {
             showToast("Please input category");
             return;
@@ -299,8 +302,12 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
         Category cat = null;
         if (modifyingCategory == null)
             cat = new Category();
-        else cat = modifyingCategory;
+        else
+            cat = modifyingCategory;
+
         cat.setCname(cname.getText().toString().trim());
+        cat.setDisplayIdx(displayIdx.getText().length() == 0 ? "TBD" : displayIdx.getText().toString());
+
         cat.setState(State.def);
         Applic.app.getDaoMaster().newSession().getCategoryDao().insertOrReplace(cat);
         cat.updateAndUpgrade();
@@ -340,7 +347,7 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
         builder.show();
     }
 
-    @XClick({R.id.cancel, R.id.cancel1})
+    @XClick({R.id.cancelAddCat, R.id.cancelAddMenu})
     private void cancel() {
         findViewById(R.id.menuLayout).setVisibility(View.GONE);
         findViewById(R.id.categoryLayout).setVisibility(View.GONE);
@@ -348,7 +355,7 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
 
     private void loadCategory() {
 
-        List<Category> list = DaoExpand.queryNotDeletedAllQuery(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.Cname).list();
+        List<Category> list = DaoExpand.queryNotDeletedAllQuery(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.DisplayIdx).list();
         categoryXAdapter.setData(list);
         categoryXAdapter.notifyDataSetChanged();
 

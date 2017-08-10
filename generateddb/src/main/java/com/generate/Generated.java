@@ -65,7 +65,7 @@ public class Generated {
          * */
         Entity category = schema.addEntity("Category");
         category.addStringProperty("cname").columnName("C_NAME");
-        category.addStringProperty("displayIdx").columnName("DISPALY_IDX");
+        category.addStringProperty("displayIdx").columnName("DISPLAY_IDX");
         category.addIdProperty();
 
         /**

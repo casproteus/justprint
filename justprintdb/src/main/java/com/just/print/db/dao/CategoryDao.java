@@ -24,7 +24,7 @@ public class CategoryDao extends AbstractDao<Category, Long> {
     */
     public static class Properties {
         public final static Property Cname = new Property(0, String.class, "cname", false, "C_NAME");
-        public final static Property DisplayIdx = new Property(1, String.class, "displayIdx", false, "DISPALY_IDX");
+        public final static Property DisplayIdx = new Property(1, String.class, "displayIdx", false, "DISPLAY_IDX");
         public final static Property Id = new Property(2, Long.class, "id", true, "_id");
         public final static Property State = new Property(3, Integer.class, "state", false, "STATE");
         public final static Property Version = new Property(4, Long.class, "version", false, "VERSION");
@@ -47,7 +47,7 @@ public class CategoryDao extends AbstractDao<Category, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'CATEGORY' (" + //
                 "'C_NAME' TEXT," + // 0: cname
-                "'DISPALY_IDX' TEXT," + // 1: displayIdx
+                "'DISPLAY_IDX' TEXT," + // 1: displayIdx
                 "'_id' INTEGER PRIMARY KEY ," + // 2: id
                 "'STATE' INTEGER," + // 3: state
                 "'VERSION' INTEGER);"); // 4: version
