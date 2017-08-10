@@ -63,8 +63,9 @@ public class Generated {
          * |    id   |   cname |
          * +---------+---------+
          * */
-        Entity category = schema.addEntity("Category");//类别
+        Entity category = schema.addEntity("Category");
         category.addStringProperty("cname").columnName("C_NAME");
+        category.addStringProperty("displayIdx").columnName("DISPALY_IDX");
         category.addIdProperty();
 
         /**

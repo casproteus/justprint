@@ -17,6 +17,7 @@ import com.just.print.db.dao.MenuDao;
 public class Category {
 
     private String cname;
+    private String displayIdx;
     private Long id;
     private Integer state;
     private Long version;
@@ -39,8 +40,9 @@ public class Category {
         this.id = id;
     }
 
-    public Category(String cname, Long id, Integer state, Long version) {
+    public Category(String cname, String displayIdx, Long id, Integer state, Long version) {
         this.cname = cname;
+        this.displayIdx = displayIdx;
         this.id = id;
         this.state = state;
         this.version = version;
@@ -58,6 +60,14 @@ public class Category {
 
     public void setCname(String cname) {
         this.cname = cname;
+    }
+
+    public String getDisplayIdx() {
+        return displayIdx;
+    }
+
+    public void setDisplayIdx(String displayIdx) {
+        this.displayIdx = displayIdx;
     }
 
     public Long getId() {
@@ -138,7 +148,7 @@ public class Category {
 
     public void logicDelete() {
         state = com.just.print.db.expand.State.delete;
-        cname="$"+cname;
+        cname = "$" + cname;
         updateAndUpgrade();
     }
     // KEEP METHODS END

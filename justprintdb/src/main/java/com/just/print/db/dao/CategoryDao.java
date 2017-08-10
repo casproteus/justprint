@@ -24,9 +24,10 @@ public class CategoryDao extends AbstractDao<Category, Long> {
     */
     public static class Properties {
         public final static Property Cname = new Property(0, String.class, "cname", false, "C_NAME");
-        public final static Property Id = new Property(1, Long.class, "id", true, "_id");
-        public final static Property State = new Property(2, Integer.class, "state", false, "STATE");
-        public final static Property Version = new Property(3, Long.class, "version", false, "VERSION");
+        public final static Property DisplayIdx = new Property(1, String.class, "displayIdx", false, "DISPALY_IDX");
+        public final static Property Id = new Property(2, Long.class, "id", true, "_id");
+        public final static Property State = new Property(3, Integer.class, "state", false, "STATE");
+        public final static Property Version = new Property(4, Long.class, "version", false, "VERSION");
     };
 
     private DaoSession daoSession;
@@ -46,9 +47,10 @@ public class CategoryDao extends AbstractDao<Category, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'CATEGORY' (" + //
                 "'C_NAME' TEXT," + // 0: cname
-                "'_id' INTEGER PRIMARY KEY ," + // 1: id
-                "'STATE' INTEGER," + // 2: state
-                "'VERSION' INTEGER);"); // 3: version
+                "'DISPALY_IDX' TEXT," + // 1: displayIdx
+                "'_id' INTEGER PRIMARY KEY ," + // 2: id
+                "'STATE' INTEGER," + // 3: state
+                "'VERSION' INTEGER);"); // 4: version
     }
 
     /** Drops the underlying database table. */
@@ -67,19 +69,24 @@ public class CategoryDao extends AbstractDao<Category, Long> {
             stmt.bindString(1, cname);
         }
  
+        String displayIdx = entity.getDisplayIdx();
+        if (displayIdx != null) {
+            stmt.bindString(2, displayIdx);
+        }
+ 
         Long id = entity.getId();
         if (id != null) {
-            stmt.bindLong(2, id);
+            stmt.bindLong(3, id);
         }
  
         Integer state = entity.getState();
         if (state != null) {
-            stmt.bindLong(3, state);
+            stmt.bindLong(4, state);
         }
  
         Long version = entity.getVersion();
         if (version != null) {
-            stmt.bindLong(4, version);
+            stmt.bindLong(5, version);
         }
     }
 
@@ -92,7 +99,7 @@ public class CategoryDao extends AbstractDao<Category, Long> {
     /** @inheritdoc */
     @Override
     public Long readKey(Cursor cursor, int offset) {
-        return cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1);
+        return cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2);
     }    
 
     /** @inheritdoc */
@@ -100,9 +107,10 @@ public class CategoryDao extends AbstractDao<Category, Long> {
     public Category readEntity(Cursor cursor, int offset) {
         Category entity = new Category( //
             cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // cname
-            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // id
-            cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2), // state
-            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3) // version
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // displayIdx
+            cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // id
+            cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // state
+            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4) // version
         );
         return entity;
     }
@@ -111,9 +119,10 @@ public class CategoryDao extends AbstractDao<Category, Long> {
     @Override
     public void readEntity(Cursor cursor, Category entity, int offset) {
         entity.setCname(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
-        entity.setId(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
-        entity.setState(cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2));
-        entity.setVersion(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
+        entity.setDisplayIdx(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setId(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
+        entity.setState(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
+        entity.setVersion(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
      }
     
     /** @inheritdoc */

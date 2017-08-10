@@ -163,8 +163,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 //                            break;
 //                        case 15:
 //                            break;
-//                        case 16:
-//                            break;
+                        case 16:
+                            InputText(".");
+                            break;
                         case 17:
                             odIdTableTbtn.setText("Delivery");
                             CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
