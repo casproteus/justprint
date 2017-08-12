@@ -41,12 +41,12 @@
             android:layout_gravity="right"
             android:orientation="horizontal">
 
-            <Button
+            <!--Button
                 android:id="@+id/queryShop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
-                android:text="Verify Store Name" />
+                android:text="Verify Store Name" /-->
 
             <Button
                 android:id="@+id/createShop"

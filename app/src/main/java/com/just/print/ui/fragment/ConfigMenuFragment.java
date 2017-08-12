@@ -70,7 +70,7 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
                     TextView tvCategory = (TextView) findViewById(R.id.tvCategory);
                     tvCategory.setText(modifyingCategory.getCname());
                     TextView displayIdx = (TextView) findViewById(R.id.displayIdx);
-                    displayIdx.setText(modifyingCategory.getDisplayIdx());
+                    displayIdx.setText(String.valueOf(modifyingCategory.getDisplayIdx()));
 
                     break;
                 case R.id.delCategory:

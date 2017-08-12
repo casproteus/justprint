@@ -15,6 +15,7 @@ import com.just.print.sys.model.QueryShopRequest;
 import com.just.print.sys.model.QueryShopResult;
 import com.just.print.ui.activity.OrderActivity;
 import com.just.print.util.Base64Util;
+import com.just.print.util.DatabaseUtil;
 import com.just.print.util.StringUtils;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
@@ -51,18 +52,18 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
     }
 
 
-    @XClick(R.id.queryShop)
-    private void queryShop(@XGetValueByView(fromId = R.id.shopName) String shopName) {
-        if (StringUtils.isEmpty(shopName)) {
-            showToast("Please input the name for the store.");
-            return;
-        }
-        if (!AppData.existShop(getContext(), shopName)) {
-            QueryShopRequest request = new QueryShopRequest();
-            request.setShopName(shopName);
-            Applic.app.mUDPService.sendRequest(request, 1, this);
-        }
-    }
+//    @XClick(R.id.queryShop)
+//    private void queryShop(@XGetValueByView(fromId = R.id.shopName) String shopName) {
+//        if (StringUtils.isEmpty(shopName)) {
+//            showToast("Please input the name for the store.");
+//            return;
+//        }
+//        if (!AppData.existShop(getContext(), shopName)) {
+//            QueryShopRequest request = new QueryShopRequest();
+//            request.setShopName(shopName);
+//            Applic.app.mUDPService.sendRequest(request, 1, this);
+//        }
+//    }
 
 
     @Override
@@ -73,7 +74,7 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
                 if (status && result2 != null && result2.isExists()) {
 
                     byte[] datas = Base64Util.decode(result2.getFileBase64());
-                    AppData.writeDBByte(getContext(), datas, result2.getShopName());
+                    DatabaseUtil.writeDBByte(datas);
                 }
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
