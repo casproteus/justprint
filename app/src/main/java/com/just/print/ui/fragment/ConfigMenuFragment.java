@@ -9,6 +9,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.just.print.R;
+import com.just.print.app.AppData;
 import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
 import com.just.print.db.bean.Category;
@@ -301,18 +302,30 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
             return;
         }
 
+        String idxString = displayIdx.getText().toString();
+        double idx = 0.0;
+        if(idxString.length() > 0) {
+            try {
+                idx = Double.valueOf(idxString);
+            } catch (Exception e) {
+                showToast("Please input a valid number to indicate the display order");
+                return;
+            }
+        }
+
         Category cat = null;
         if (modifyingCategory == null) {
             cat = new Category();
-        }else
+        }else {
             cat = modifyingCategory;
-
+        }
         cat.setCname(cname.getText().toString().trim());
-        cat.setDisplayIdx(displayIdx.getText().length() == 0 ? "TBD" : displayIdx.getText().toString());
+        cat.setDisplayIdx(idx);
 
         cat.setState(State.def);
         Applic.app.getDaoMaster().newSession().getCategoryDao().insertOrReplace(cat);
         cat.updateAndUpgrade();
+        AppData.updataeLastSyncDate(null);
         loadCategory();
         cname.setText("");
         modifyingCategory = null;

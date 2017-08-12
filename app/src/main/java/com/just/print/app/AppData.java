@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 
 /**
  * Created by wangx on 2016/11/4.
@@ -53,6 +54,9 @@ public class AppData {
         getShopData(context).putString(KEY_SHOP_NAME, shopName);
     }
 
+    public static String getShopName(){
+        return getShopName(Applic.app.getApplicationContext());
+    }
     public static String getShopName(Context context) {
         return getShopData(context).getString(KEY_SHOP_NAME, "");
     }
@@ -65,6 +69,9 @@ public class AppData {
         return getShopData(context).getString("userName", "");
     }
 
+    public static String getLicense() {
+        return getLicense(Applic.app.getApplicationContext());
+    }
     public static String getLicense(Context context) {
         return getShopData(context).getString("license", "");
     }
@@ -98,6 +105,14 @@ public class AppData {
     public static void putCustomData(Context baseContext, String key, String value) {
 
         getShopData(baseContext).putString("custom_" + key, value);
+    }
+
+    public static String getLastSyncDate(){
+        return getShopData(Applic.app.getApplicationContext()).getString("LastSyncDate","");
+    }
+    public static void updataeLastSyncDate(String lastUpdateTime) {
+        getShopData(Applic.app.getApplicationContext()).putString("LastSyncDate",
+                lastUpdateTime != null && lastUpdateTime.length() > 1 ? lastUpdateTime : String.valueOf(new Date().getTime()));
     }
 
     public static String getCustomData(Context context, String key) {

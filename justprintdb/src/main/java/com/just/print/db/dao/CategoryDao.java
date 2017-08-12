@@ -24,7 +24,7 @@ public class CategoryDao extends AbstractDao<Category, Long> {
     */
     public static class Properties {
         public final static Property Cname = new Property(0, String.class, "cname", false, "C_NAME");
-        public final static Property DisplayIdx = new Property(1, String.class, "displayIdx", false, "DISPLAY_IDX");
+        public final static Property DisplayIdx = new Property(1, Double.class, "displayIdx", false, "DISPLAY_IDX");
         public final static Property Id = new Property(2, Long.class, "id", true, "_id");
         public final static Property State = new Property(3, Integer.class, "state", false, "STATE");
         public final static Property Version = new Property(4, Long.class, "version", false, "VERSION");
@@ -47,7 +47,7 @@ public class CategoryDao extends AbstractDao<Category, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "'CATEGORY' (" + //
                 "'C_NAME' TEXT," + // 0: cname
-                "'DISPLAY_IDX' TEXT," + // 1: displayIdx
+                "'DISPLAY_IDX' REAL," + // 1: displayIdx
                 "'_id' INTEGER PRIMARY KEY ," + // 2: id
                 "'STATE' INTEGER," + // 3: state
                 "'VERSION' INTEGER);"); // 4: version
@@ -69,9 +69,9 @@ public class CategoryDao extends AbstractDao<Category, Long> {
             stmt.bindString(1, cname);
         }
  
-        String displayIdx = entity.getDisplayIdx();
+        Double displayIdx = entity.getDisplayIdx();
         if (displayIdx != null) {
-            stmt.bindString(2, displayIdx);
+            stmt.bindDouble(2, displayIdx);
         }
  
         Long id = entity.getId();
@@ -107,7 +107,7 @@ public class CategoryDao extends AbstractDao<Category, Long> {
     public Category readEntity(Cursor cursor, int offset) {
         Category entity = new Category( //
             cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // cname
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // displayIdx
+            cursor.isNull(offset + 1) ? null : cursor.getDouble(offset + 1), // displayIdx
             cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2), // id
             cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // state
             cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4) // version
@@ -119,7 +119,7 @@ public class CategoryDao extends AbstractDao<Category, Long> {
     @Override
     public void readEntity(Cursor cursor, Category entity, int offset) {
         entity.setCname(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
-        entity.setDisplayIdx(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setDisplayIdx(cursor.isNull(offset + 1) ? null : cursor.getDouble(offset + 1));
         entity.setId(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
         entity.setState(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
         entity.setVersion(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));

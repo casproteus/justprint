@@ -7,6 +7,7 @@ import android.view.View;
 import com.just.print.R;
 import com.just.print.app.BaseFragment;
 import com.just.print.ui.activity.ConfigActivity;
+import com.just.print.util.DatabaseUtil;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
 
@@ -43,7 +44,7 @@ public class ConfigMainFragment extends BaseFragment {
                 getEventBus().post(ConfigActivity.CHANGE_PAGE, ConfigPrintReportFragment.class);
                 break;
             case R.id.synchronizedb:
-
+                DatabaseUtil.syncDbOntoServer();
                 break;
         }
     }

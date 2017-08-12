@@ -59,13 +59,13 @@ public class Generated {
         /**
          *  @table Category 类别
          *  @pk id
-         * +---------+---------+
-         * |    id   |   cname |
-         * +---------+---------+
+         * +---------+---------+-------------+
+         * |    id   |   cname |  displayIdx |
+         * +---------+---------+-------------+
          * */
         Entity category = schema.addEntity("Category");
         category.addStringProperty("cname").columnName("C_NAME");
-        category.addStringProperty("displayIdx").columnName("DISPLAY_IDX");
+        category.addDoubleProperty("displayIdx").columnName("DISPLAY_IDX");
         category.addIdProperty();
 
         /**

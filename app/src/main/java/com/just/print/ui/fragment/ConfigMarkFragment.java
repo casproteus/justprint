@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.just.print.R;
+import com.just.print.app.AppData;
 import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
 import com.just.print.db.bean.Mark;
@@ -59,6 +60,7 @@ public class ConfigMarkFragment extends BaseFragment implements OnClickItemListe
         mark1.setName(mark);
         Applic.app.getDaoMaster().newSession().getMarkDao().insertOrReplace(mark1);
         mark1.updateAndUpgrade();
+        AppData.updataeLastSyncDate(null);
         loadMark();
     }
 

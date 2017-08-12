@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.just.print.R;
+import com.just.print.app.AppData;
 import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
 import com.just.print.db.bean.Printer;
@@ -83,6 +84,7 @@ public class ConfigPrinterFragment extends BaseFragment implements
         printer.setState(State.def);
         Applic.app.getDaoMaster().newSession().getPrinterDao().insert(printer);
         printer.updateAndUpgrade();
+        AppData.updataeLastSyncDate(null);
         loadPrinter();
     }
 
