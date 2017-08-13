@@ -7,17 +7,20 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Toast;
 
+import com.just.print.app.Applic;
+
 import java.lang.ref.WeakReference;
 
-/**
- * @author wangx
- **/
 public class ToastUtil {
     volatile static WeakReference<Toast> refToast = null;
     volatile static WeakReference<Handler> refHandler = null;
 
     private static Toast getToast() {
         return refToast == null ? null : refToast.get();
+    }
+
+    public static void showToast(CharSequence text) {
+        showToast(Applic.app.getApplicationContext(), text, Toast.LENGTH_SHORT);
     }
 
     public static void showToast(Context context, CharSequence text) {

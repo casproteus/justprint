@@ -80,28 +80,6 @@ public class AppData {
         getShopData(context).putString("license", license);
     }
 
-    public static void writeDBByte(Context context, byte[] datas, String dbname) {
-
-        File file = context.getDatabasePath("JustPrinter_" + dbname);
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-        try {
-            file.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            OutputStream outputStream = new FileOutputStream(file);
-            outputStream.write(datas);
-            outputStream.flush();
-            outputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
     public static void putCustomData(Context baseContext, String key, String value) {
 
         getShopData(baseContext).putString("custom_" + key, value);
