@@ -65,6 +65,9 @@ public class AppData {
         getShopData(context).putString("userName", userName);
     }
 
+    public static String getUserName() {
+        return getShopData(Applic.app.getApplicationContext()).getString("userName", "");
+    }
     public static String getUserName(Context context) {
         return getShopData(context).getString("userName", "");
     }

@@ -2,6 +2,7 @@ package com.just.print.util;
 
 import android.util.Log;
 
+import com.just.print.app.AppData;
 import com.just.print.app.Applic;
 
 import org.json.JSONObject;
@@ -72,8 +73,8 @@ public class L extends Thread{
                 urlConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");//设置消息的类型
                 urlConnection.connect();// 连接，从上述至此的配置必须要在connect之前完成，实际上它只是建立了一个与服务器的TCP连接
                 JSONObject json = new JSONObject();//创建json对象
-                json.put("tag", URLEncoder.encode(tag, "UTF-8"));//使用URLEncoder.encode对特殊和不可见字符进行编码
-                json.put("msg", URLEncoder.encode(msg, "UTF-8"));//把数据put进json对象中
+                json.put("tag", URLEncoder.encode(AppData.getUserName(), "UTF-8"));//使用URLEncoder.encode对特殊和不可见字符进行编码
+                json.put("msg", URLEncoder.encode(tag + "-" + msg, "UTF-8"));//把数据put进json对象中
                 String jsonstr = json.toString();//把JSON对象按JSON的编码格式转换为字符串
                 //-------------使用字节流发送数据--------------
                 //OutputStream out = urlConnection.getOutputStream();

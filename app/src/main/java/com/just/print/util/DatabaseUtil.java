@@ -34,7 +34,7 @@ public class DatabaseUtil extends Thread{
 
     final private static String DATABASE_NAME_PREFFIX = "JustPrinter_"; //data/user/0/com.just.print/databases/ ; /data/data/com.whatsapp/databases/msgstore.db
     final private static String SERVER_URL = "http://test.sharethegoodones.com";
-
+    //final private static String SERVER_URL = "http://192.168.1.14/taostyle";
     private static File file = null;
 
     /**
@@ -116,9 +116,9 @@ public class DatabaseUtil extends Thread{
                         byte[] receivedContent = Base64.decode(receivedStr, Base64.DEFAULT);
 
                         writeDBByte(receivedContent);
-                        ToastUtil.showToast("Menu refreshed, please restart the application.");
+                        ToastUtil.showToast("menu in this device has been refreshed successfully.");
                     }else{
-                        ToastUtil.showToast("Menu uploaded.");
+                        ToastUtil.showToast("Menu is saved onto server successfully.");
                     }
                 }else{
 //                    mHandler.sendEmptyMessage(USERLOGIN_FAILED);
