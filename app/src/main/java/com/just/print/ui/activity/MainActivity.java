@@ -14,6 +14,7 @@ import com.just.print.app.Applic;
 import com.just.print.app.BaseActivity;
 import com.just.print.ui.holder.ActivityViewHolder;
 import com.just.print.util.L;
+import com.just.print.util.ToastUtil;
 import com.stupid.method.adapter.XAdapter2;
 import com.stupid.method.reflect.StupidReflect;
 
@@ -36,7 +37,7 @@ public class MainActivity extends BaseActivity {
 
         if (timeLeftStr != null && timeLeftStr.length() > 0) {
             try {
-                timeLeft = Long.valueOf(timeLeftStr) - timepassed;
+                timeLeft = Long.valueOf(timeLeftStr) - Math.abs(timepassed);
 
                 if (timeLeft > 0 && timeLeft < 34560000000l) {
                     AppData.putCustomData("lastsuccess", String.valueOf(currentTime));
@@ -62,6 +63,9 @@ public class MainActivity extends BaseActivity {
             Activate.currentSN = AppData.getLicense(this);
             long timeLeft = checkDaysleft();
             if (Activate.currentSN != null && timeLeft > 0) {
+                if(timeLeft < 3024000000l){
+                    ToastUtil.showToast("Application expired! Please re-activate it!");
+                }
                 startActivity(new Intent(this, LoginActivity.class));
             } else
                 startActivity(new Intent(this, Activate.class));
