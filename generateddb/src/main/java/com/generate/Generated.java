@@ -87,8 +87,7 @@ public class Generated {
 
         /**
          * printer and dish are multi to multi, add a dish table.
-         *
-         * **/
+         */
         Entity menuPrint = schema.addEntity("M2M_MenuPrint");
         Property.PropertyBuilder pid = menuPrint.addLongProperty("pid");
         Property.PropertyBuilder mid = menuPrint.addStringProperty("mid");
@@ -140,6 +139,20 @@ public class Generated {
         Entity device = schema.addEntity("Device");//在线设备
         device.addStringProperty("ip");
         device.addStringProperty("userName");
+
+        /**
+         *  @table SaleRecord
+         *  @pk id
+         * +---------+-----------+------------+---------+
+         * |    id   |   mname   |  number    |   price |
+         * +---------+-----------+------------+---------+
+         */
+        Entity saleRecord = schema.addEntity("SaleRecord");
+        saleRecord.addStringProperty("ID").primaryKey().unique();
+        saleRecord.addStringProperty("mname").columnName("M_NAME");
+        saleRecord.addDoubleProperty("number");
+        saleRecord.addDoubleProperty("price");
+
     }
 
     protected String getOutPath() {
