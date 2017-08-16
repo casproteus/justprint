@@ -17,7 +17,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:ems="10"
-        android:hint="请输入激活码"
+        android:hint="Please input SN code."
         android:inputType="textPersonName" />
 
     <Button
@@ -27,5 +27,5 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="28dp"
         android:layout_toEndOf="@+id/license"
-        android:text="激活" />
+        android:text="OK" />
 </RelativeLayout>

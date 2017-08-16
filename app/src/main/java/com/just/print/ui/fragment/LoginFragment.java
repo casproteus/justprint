@@ -22,6 +22,8 @@ import com.stupid.method.reflect.annotation.XClick;
 import com.stupid.method.reflect.annotation.XGetValueByView;
 import com.stupid.method.reflect.annotation.XViewByID;
 
+import java.util.Date;
+
 public class LoginFragment extends BaseFragment implements UDPService.UDPCallback {
     @Override
     protected int getLayoutId() {
@@ -99,21 +101,6 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
         return true;
     }
 
-
-    final static String tag = "login";
-
-    @XClick({R.id.createShop})
-    private void createShop(@XGetValueByView(fromId = R.id.shopName) String shopName) {
-        if (StringUtils.isEmpty(shopName)) {
-            showToast("Please input the name of the store.");
-            return;
-        }
-        AppData.saveShopName(getContext(), shopName);
-        AppData.createShopDB(getContext(), shopName);
-        startActivity(new Intent(getContext(), OrderActivity.class));
-        getActivity().finish();
-    }
-
     @XClick({R.id.confirmUserName})
     private void onConfirmUserName(View view) {
         String userName = this.userName.getText().toString().trim();
@@ -126,4 +113,21 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
             this.userName.setEnabled(false);
         }
     }
+
+    @XClick({R.id.createShop})
+    private void createShop(@XGetValueByView(fromId = R.id.shopName) String shopName) {
+        if (StringUtils.isEmpty(shopName)) {
+            showToast("Please input the name of the store.");
+            return;
+        }
+        AppData.saveShopName(getContext(), shopName);
+        AppData.createShopDB(getContext(), shopName);
+
+        //initialize the days left and the stated days.
+        new AppData().start();
+
+        startActivity(new Intent(getContext(), OrderActivity.class));
+        getActivity().finish();
+    }
+
 }

@@ -1,9 +1,11 @@
 package com.just.print.ui.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.just.print.Activate;
 import com.just.print.R;
 import com.just.print.app.BaseFragment;
 import com.just.print.ui.activity.ConfigActivity;
@@ -25,7 +27,8 @@ public class ConfigMainFragment extends BaseFragment {
         new StupidReflect(this, getView()).init();
     }
 
-    @XClick({R.id.configMenuManager, R.id.configPrintManager, R.id.configTagManager, R.id.configUserManager, R.id.configPrintReport, R.id.synchronizedb})
+    @XClick({R.id.configMenuManager, R.id.configPrintManager, R.id.configTagManager,
+            R.id.configUserManager, R.id.configPrintReport, R.id.synchronizedb, R.id.reactivate})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.configMenuManager:
@@ -45,6 +48,9 @@ public class ConfigMainFragment extends BaseFragment {
                 break;
             case R.id.synchronizedb:
                 DatabaseUtil.syncDbOntoServer();
+                break;
+            case R.id.reactivate:
+                getEventBus().post(ConfigActivity.CHANGE_PAGE, ReActivateFragment.class);
                 break;
         }
     }
