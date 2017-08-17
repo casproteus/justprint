@@ -81,11 +81,12 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             case R.id.odIdSndBtn:
                 String result = WifiPrintService.getInstance().exePrintCommand();
                 if("2".equals(result)){
-                    times++;
                     if(times < 1) {
-                        showToast("The content of last time is not printed yet. please wait and try again.");
+                        showToast("The content was not printed well. please wait and try again.");
+                        times++;
                     }else if(times < 2){
                         showToast("Please restart the device which blocked the printer, then try again!");
+                        times++;
                     }else{
                         WifiPrintService.getInstance().reInitPrintRelatedMaps();
                         if("0".equals(WifiPrintService.getInstance().exePrintCommand())){
