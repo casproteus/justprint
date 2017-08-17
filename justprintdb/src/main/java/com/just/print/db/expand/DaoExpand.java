@@ -13,9 +13,6 @@ import java.util.List;
 import de.greenrobot.dao.AbstractDao;
 import de.greenrobot.dao.query.QueryBuilder;
 
-/**
- * Created by wangx on 2016/11/2.
- */
 public final class DaoExpand {
     /**
      * 根据类id查询menu

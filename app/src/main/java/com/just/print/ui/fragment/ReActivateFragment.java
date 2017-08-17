@@ -1,26 +1,18 @@
 package com.just.print.ui.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.just.print.Activate;
 import com.just.print.R;
 import com.just.print.app.AppData;
 import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
-import com.just.print.db.bean.Mark;
-import com.just.print.ui.activity.LoginActivity;
-import com.just.print.ui.holder.ConfigPrintReportViewHolder;
 import com.just.print.util.AppUtils;
 import com.stupid.method.adapter.OnClickItemListener;
-import com.stupid.method.adapter.XAdapter2;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
 import com.stupid.method.reflect.annotation.XGetValueByView;
-import com.stupid.method.reflect.annotation.XViewByID;
-import com.stupid.method.widget.flowlayout.FlowListView;
 
 public class ReActivateFragment extends BaseFragment implements OnClickItemListener {
 
