@@ -28,9 +28,19 @@ public class MainActivity extends BaseActivity {
     boolean debug = false;
 
     private long checkDaysleft() {
-        String lastsuccess = AppData.getCustomData("lastsuccess");
+
         long currentTime = new Date().getTime();
-        long timepassed = currentTime - Long.valueOf(lastsuccess);
+        //time of last open
+        String lastsuccessStr = AppData.getCustomData("lastsuccessStr");
+        long lastSuccess = 0l;
+        try{
+            lastSuccess= Long.valueOf(lastsuccessStr);
+        }catch(Exception e){
+            lastSuccess = currentTime;
+        }
+
+        //time passed since last open.
+        long timepassed = currentTime - lastSuccess;
 
         String timeLeftStr = AppData.getCustomData("number");
         long timeLeft = 0;
@@ -40,10 +50,10 @@ public class MainActivity extends BaseActivity {
                 timeLeft = Long.valueOf(timeLeftStr) - Math.abs(timepassed);
 
                 if (timeLeft > 0 && timeLeft < 34560000000l) {
-                    AppData.putCustomData("lastsuccess", String.valueOf(currentTime));
+                    AppData.putCustomData("lastsuccessStr", String.valueOf(currentTime));
                     AppData.putCustomData("number", String.valueOf(timeLeft));
                 } else {
-                    AppData.putCustomData("lastsuccess", String.valueOf(currentTime));
+                    AppData.putCustomData("lastsuccessStr", String.valueOf(currentTime));
                 }
             }catch(Exception e){
                 L.e("MainActivity", "the left time number can not be pasered into a long", e);

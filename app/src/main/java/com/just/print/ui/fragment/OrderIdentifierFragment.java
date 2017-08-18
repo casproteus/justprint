@@ -12,8 +12,12 @@ import com.just.print.R;
 import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
 import com.just.print.app.EventBus;
+import com.just.print.db.bean.M2M_MenuPrint;
 import com.just.print.db.bean.Mark;
 import com.just.print.db.bean.Menu;
+import com.just.print.db.bean.Printer;
+import com.just.print.db.bean.SaleRecord;
+import com.just.print.db.dao.SaleRecordDao;
 import com.just.print.db.expand.DaoExpand;
 import com.just.print.sys.model.SelectionDetail;
 import com.just.print.sys.server.CustomerSelection;
@@ -396,6 +400,24 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
     private void clearOrderMenu() {
         L.d(TAG, "clearOrderMenu start...");
+        
+        //save the menu into database.
+        SaleRecordDao saleRecordDao = Applic.app.getDaoMaster().newSession().getSaleRecordDao();
+        for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
+            int number = selectionDetail.getDishNum();
+            Menu menu = selectionDetail.getDish();
+            String name = menu.getMname();
+            Double price = menu.getPrice() * number;
+
+            SaleRecord saleRecord = new SaleRecord();
+            saleRecord.setMname(name);
+            saleRecord.setNumber(Double.valueOf(number));
+            saleRecord.setPrice(price);
+            saleRecord.update();
+            saleRecordDao.insert(saleRecord);
+        }
+
+        //clear selected menu
         CustomerSelection.getInstance().clearMenu();
         odIdTableTbtn.setText("");
         loadOrderMenu();

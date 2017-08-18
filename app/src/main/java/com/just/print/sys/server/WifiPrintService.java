@@ -159,7 +159,7 @@ public class WifiPrintService implements Runnable{
                     public int compare(SelectionDetail dishesDetailModel, SelectionDetail t1) {
                         Category c1 = Applic.app.getDaoMaster().newSession().getCategoryDao().load(dishesDetailModel.getDish().getCid());
                         Category c2 = Applic.app.getDaoMaster().newSession().getCategoryDao().load(t1.getDish().getCid());
-                        return c1.getCname().compareTo(c2.getCname());
+                        return c1.getDisplayIdx().compareTo(c2.getDisplayIdx());
                     }
                 });
             }
