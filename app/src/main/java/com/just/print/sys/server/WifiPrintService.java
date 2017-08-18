@@ -9,11 +9,13 @@ import com.just.print.db.bean.Category;
 import com.just.print.db.bean.M2M_MenuPrint;
 import com.just.print.db.bean.Mark;
 import com.just.print.db.bean.Printer;
+import com.just.print.db.bean.SaleRecord;
 import com.just.print.db.expand.DaoExpand;
 import com.just.print.sys.model.SelectionDetail;
 import com.just.print.util.AppUtils;
 import com.just.print.util.Command;
 import com.just.print.util.L;
+import com.just.print.util.ToastUtil;
 import com.zj.wfsdk.WifiCommunication;
 
 import java.text.DateFormat;
@@ -195,6 +197,37 @@ public class WifiPrintService implements Runnable{
         return "0";
     }
 
+    //The start time and end time are long format, need to be translate for print.
+    public String exePrintReportCommand(List<SaleRecord> saleRecords, String startTime, String endTime){
+        L.d("ConfigPrintReportFragment","exePrintCommand");
+        List<Printer> printers = Applic.app.getDaoMaster().newSession().getPrinterDao().loadAll();
+        String printerIP = printers.get(0).getIp();
+
+        HashMap<String, SaleRecord> map = new HashMap<String, SaleRecord>();
+        //combine the records
+        for(SaleRecord saleRecord : saleRecords){
+            SaleRecord exist = map.get(saleRecord.getMname());
+            if(exist == null){
+                map.put(saleRecord.getMname(), saleRecord);
+            }else{
+                exist.setNumber(exist.getNumber() + saleRecord.getNumber());
+                exist.setPrice(exist.getPrice() + saleRecord.getPrice());
+            }
+        }
+        List<SaleRecord> combinedSaleRecords = new ArrayList<>();
+        for(Map.Entry<String, SaleRecord> entry :map.entrySet()){
+            combinedSaleRecords.add(entry.getValue());
+        }
+
+        contentForPrintMap = new HashMap<String,List<String>>();
+        List<String> stringList = new ArrayList<>();
+        stringList.add(formatContentForPrintReport(combinedSaleRecords, startTime, endTime));
+        contentForPrintMap.put(printerIP, stringList);
+
+        ToastUtil.showToast("salesReport has been send to printer: " + printerIP);
+        return "0";
+    }
+
     public void run(){
         while(true){
             if(false){
@@ -255,6 +288,44 @@ public class WifiPrintService implements Runnable{
 //        }
 //    }
 
+    private String formatContentForPrintReport(List<SaleRecord> saleRecords, String startTime, String endTime) {
+        L.d(TAG,"formatContentForPrintReport");
+
+        //translate the time format
+        DateFormat df = new SimpleDateFormat("MM:dd:HH:mm");
+        Date d = new Date(Long.valueOf(startTime));
+        startTime = df.format(d);
+        d = new Date(Long.valueOf(endTime));
+        endTime = df.format(d);
+
+        String spaceStr = generateSpaceString(len_80mm - (startTime.length() + endTime.length()));
+
+        StringBuilder content = new StringBuilder("\n\n");
+        content.append(startTime).append("-").append(endTime);
+        content.append("============================");
+        Double total = Double.valueOf(0);
+        for(SaleRecord saleRecord:saleRecords){
+            content.append(saleRecord.getMname());
+
+            content.append(generateSpaceString(25 - saleRecord.getMname().length()));
+            content.append("X");
+            content.append(saleRecord.getNumber());
+
+            L.d(TAG,Integer.toString(saleRecord.getMname().getBytes().length));
+            content.append(generateSpaceString(14 - (saleRecord.getMname().getBytes().length)/3*2)).append(String.valueOf(saleRecord.getPrice()));
+
+            content.append("\n");
+            total += saleRecord.getPrice();
+        }
+        content.append("-----------------------------");
+        content.append("\n");
+        content.append("total");
+        content.append(String.valueOf(total));
+        //content.append(generateSpaceString(5)).append("* ").append(str.getName()).append(" *\n");
+        content.append("\n\n\n\n\n");
+        return content.toString();
+    }
+
     private String formatContentForPrint(List<SelectionDetail> list){
         L.d(TAG,"formatContentForPrint");
         StringBuilder content = new StringBuilder("\n\n");
@@ -263,7 +334,7 @@ public class WifiPrintService implements Runnable{
         String dateStr = df.format(d);
         String spaceStr = generateSpaceString(len_80mm - (CustomerSelection.getInstance().getTableNumber().length() + dateStr.length()));
         content.append(CustomerSelection.getInstance().getTableNumber()).append(spaceStr).append(dateStr);
-        content.append("------------------------");
+        content.append("===========================");
         for(SelectionDetail dd:list){
             content.append(dd.getDish().getID());
             content.append(generateSpaceString(5 - dd.getDish().getID().length()));
