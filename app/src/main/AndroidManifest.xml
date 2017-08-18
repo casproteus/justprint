@@ -22,14 +22,14 @@
 
         <service android:name=".net.UDPService" />
 
-        <activity android:name=".ui.activity.ConfigActivity" />
-        <activity android:name=".ui.activity.LoginActivity" />
-        <activity android:name=".ui.activity.OrderActivity" />
+        <activity android:name=".ui.activity.ConfigActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".ui.activity.LoginActivity" android:screenOrientation="portrait" />
+        <activity android:name=".ui.activity.OrderActivity" android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activity.SildingMenuListViewDemo"
-            android:label="@string/title_activity_silding_menu_list_view_demo" />
+            android:label="@string/title_activity_silding_menu_list_view_demo"  android:screenOrientation="portrait"/>
         <activity
-            android:name=".Activate"
+            android:name=".Activate" android:screenOrientation="portrait"
             android:label="@string/title_activity_activate"></activity>
     </application>
 
