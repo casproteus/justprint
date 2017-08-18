@@ -413,8 +413,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             saleRecord.setMname(name);
             saleRecord.setNumber(Double.valueOf(number));
             saleRecord.setPrice(price);
-            saleRecord.update();
-            saleRecordDao.insert(saleRecord);
+            saleRecordDao.insertOrReplace(saleRecord);
         }
 
         //clear selected menu

@@ -14,10 +14,12 @@ import com.just.print.db.dao.SaleRecordDao;
  */
 public class SaleRecord {
 
-    private String ID;
+    private Long id;
     private String mname;
     private Double number;
     private Double price;
+    private Integer state;
+    private Long version;
 
     /** Used to resolve relations */
     private transient DaoSession daoSession;
@@ -32,15 +34,17 @@ public class SaleRecord {
     public SaleRecord() {
     }
 
-    public SaleRecord(String ID) {
-        this.ID = ID;
+    public SaleRecord(Long id) {
+        this.id = id;
     }
 
-    public SaleRecord(String ID, String mname, Double number, Double price) {
-        this.ID = ID;
+    public SaleRecord(Long id, String mname, Double number, Double price, Integer state, Long version) {
+        this.id = id;
         this.mname = mname;
         this.number = number;
         this.price = price;
+        this.state = state;
+        this.version = version;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -49,12 +53,12 @@ public class SaleRecord {
         myDao = daoSession != null ? daoSession.getSaleRecordDao() : null;
     }
 
-    public String getID() {
-        return ID;
+    public Long getId() {
+        return id;
     }
 
-    public void setID(String ID) {
-        this.ID = ID;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getMname() {
@@ -79,6 +83,22 @@ public class SaleRecord {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     /** Convenient call for {@link AbstractDao#delete(Object)}. Entity must attached to an entity context. */

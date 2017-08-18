@@ -302,7 +302,7 @@ public class WifiPrintService implements Runnable{
 
         StringBuilder content = new StringBuilder("\n\n");
         content.append(startTime).append("-").append(endTime);
-        content.append("============================");
+        content.append("=========================");
         Double total = Double.valueOf(0);
         for(SaleRecord saleRecord:saleRecords){
             content.append(saleRecord.getMname());
@@ -330,18 +330,21 @@ public class WifiPrintService implements Runnable{
         L.d(TAG,"formatContentForPrint");
         StringBuilder content = new StringBuilder("\n\n");
         DateFormat df = new SimpleDateFormat("HH:mm");
-        Date d = new Date();
-        String dateStr = df.format(d);
-        String spaceStr = generateSpaceString(len_80mm - (CustomerSelection.getInstance().getTableNumber().length() + dateStr.length()));
-        content.append(CustomerSelection.getInstance().getTableNumber()).append(spaceStr).append(dateStr);
-        content.append("===========================");
+        String tableName = CustomerSelection.getInstance().getTableNumber();
+        String dateStr = df.format(new Date());
+        String spaceStr = generateSpaceString(len_80mm - (2 + CustomerSelection.getInstance().getTableNumber().length() + dateStr.length()));
+        content.append("(").append(tableName).append(")").append(spaceStr).append(dateStr);
+
+        content.append("========================");
+
         for(SelectionDetail dd:list){
             content.append(dd.getDish().getID());
             content.append(generateSpaceString(5 - dd.getDish().getID().length()));
             content.append(dd.getDish().getMname());
             if(dd.getDishNum() > 1){
                 L.d(TAG,Integer.toString(dd.getDish().getMname().getBytes().length));
-                content.append(generateSpaceString(14 - (dd.getDish().getMname().getBytes().length)/3*2)).append("X").append(Integer.toString(dd.getDishNum()));
+                content.append(generateSpaceString(dd.getDishNum() < 10 ? 8 : 12 - (dd.getDish().getMname().getBytes().length) / 3 * 2));
+                content.append("X").append(Integer.toString(dd.getDishNum()));
             }
 
             content.append("\n");
@@ -349,6 +352,8 @@ public class WifiPrintService implements Runnable{
             for(Mark str:dd.getMarkList()){
                 content.append(generateSpaceString(5)).append("* ").append(str.getName()).append(" *\n");
             }
+
+            content.append("------------------------");
         }
         content.append("\n\n\n\n\n");
         return content.toString();

@@ -40,14 +40,12 @@ public class Generated {
     }
 
     protected void creat(Schema schema) {
-        /**
-         *  @table Printer
-         *  @pk id
-         *
-         * +---------+---------+---------+---------+
-         * |    id   |   pname |   ip    |   note  |
-         * +---------+---------+---------+---------+
-         * */
+
+        //  @table Printer
+        //  @pk id
+        // +---------+---------+---------+---------+
+        // |    id   |   pname |   ip    |   note  |
+        // +---------+---------+---------+---------+
         Entity print = schema.addEntity("Printer");
         print.addIdProperty();
         print.addStringProperty("ip").columnName("IP");
@@ -56,28 +54,25 @@ public class Generated {
         print.addIntProperty("firstPrint");
         print.addIntProperty("type");
 
-        /**
-         *  @table Category 类别
-         *  @pk id
-         * +---------+---------+-------------+
-         * |    id   |   cname |  displayIdx |
-         * +---------+---------+-------------+
-         * */
+        //  @table Category 类别
+        //  @pk id
+        // +---------+---------+-------------+
+        // |    id   |   cname |  displayIdx |
+        // +---------+---------+-------------+
         Entity category = schema.addEntity("Category");
         category.addStringProperty("cname").columnName("C_NAME");
         category.addDoubleProperty("displayIdx").columnName("DISPLAY_IDX");
         category.addIdProperty();
 
-        /**
-         *  @table Menu 菜单
-         *  @pk id
-         *  @fk pid, cid
-         *  pid->Printer.id;
-         *  cid->Category.id;
-         * +---------+---------+---------+---------+
-         * |    id   |   pid   |  cid    |   manem |
-         * +---------+---------+---------+---------+
-         * */
+        //  @table Menu
+        //  @pk id
+        //  @fk pid, cid
+        //  pid->Printer.id;
+        //  cid->Category.id;
+        // +---------+---------+---------+---------+
+        // |    id   |   pid   |  cid    |   manem |
+        // +---------+---------+---------+---------+
+        //
         Entity menu = schema.addEntity("Menu");//类别->菜单
         menu.addStringProperty("mname").columnName("M_NAME");
         menu.addStringProperty("ID").primaryKey().unique();
@@ -85,9 +80,7 @@ public class Generated {
         Property.PropertyBuilder cid = menu.addLongProperty("cid").columnName("C_ID");
         category.addToMany(menu, cid.getProperty());
 
-        /**
-         * printer and dish are multi to multi, add a dish table.
-         */
+        // printer and dish are multi to multi, add a dish table.
         Entity menuPrint = schema.addEntity("M2M_MenuPrint");
         Property.PropertyBuilder pid = menuPrint.addLongProperty("pid");
         Property.PropertyBuilder mid = menuPrint.addStringProperty("mid");
@@ -96,10 +89,11 @@ public class Generated {
         menuPrint.addToOne(menu, mid.getProperty(), "menu");
         menu.addToMany(menuPrint, mid.getProperty());
 
-        /****/
+        //  @table Mark
         Entity mark = schema.addEntity("Mark");
          mark.addStringProperty("name").columnName("NAME").primaryKey().unique();
 
+        //  @table Log
         Entity log = schema.addEntity("Log");
         log.setTableName("Logs");
         log.addIdProperty();
@@ -107,6 +101,17 @@ public class Generated {
         log.addStringProperty("uName");
         log.addDateProperty("date");
         log.addIntProperty("logType");
+
+        // @table SaleRecord
+        //  @pk id
+        // +---------+-----------+------------+---------+
+        // |    id   |   mname   |  number    |   price |
+        // +---------+-----------+------------+---------+
+        Entity saleRecord = schema.addEntity("SaleRecord");
+        saleRecord.addIdProperty().primaryKeyAsc().unique();
+        saleRecord.addStringProperty("mname").columnName("M_NAME");
+        saleRecord.addDoubleProperty("number");
+        saleRecord.addDoubleProperty("price");
 
         //---------------添加店铺外键-------------
 
@@ -140,18 +145,6 @@ public class Generated {
         device.addStringProperty("ip");
         device.addStringProperty("userName");
 
-        /**
-         *  @table SaleRecord
-         *  @pk id
-         * +---------+-----------+------------+---------+
-         * |    id   |   mname   |  number    |   price |
-         * +---------+-----------+------------+---------+
-         */
-        Entity saleRecord = schema.addEntity("SaleRecord");
-        saleRecord.addStringProperty("ID").primaryKey().unique();
-        saleRecord.addStringProperty("mname").columnName("M_NAME");
-        saleRecord.addDoubleProperty("number");
-        saleRecord.addDoubleProperty("price");
 
     }
 
