@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.just.print.app.AppData;
 import com.just.print.app.Applic;
+import com.just.print.ui.activity.MainActivity;
 
 import org.json.JSONObject;
 
@@ -48,8 +49,7 @@ public class L extends Thread{
     @Override
     public void run() {
         super.run();
-        boolean debug = true;
-        if(debug && AppUtils.hasInternet(Applic.app.getApplicationContext())){
+        if(MainActivity.debug && AppUtils.hasInternet(Applic.app.getApplicationContext())){
 
             HttpURLConnection urlConnection = null;
             try {

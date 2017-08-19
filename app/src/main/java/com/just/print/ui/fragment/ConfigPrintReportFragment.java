@@ -1,5 +1,6 @@
 package com.just.print.ui.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -17,6 +18,7 @@ import com.just.print.db.dao.SaleRecordDao;
 import com.just.print.sys.model.SelectionDetail;
 import com.just.print.sys.server.CustomerSelection;
 import com.just.print.sys.server.WifiPrintService;
+import com.just.print.ui.activity.OrderActivity;
 import com.just.print.ui.holder.ConfigPrintReportViewHolder;
 import com.just.print.util.L;
 import com.just.print.util.ToastUtil;
@@ -91,6 +93,9 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
             saleRecordDao.deleteAll();
             AppData.putCustomData("reportStartDate", String.valueOf(now));
             showToast("Report printted!");
+
+            startActivity(new Intent(getContext(), OrderActivity.class));
+            getActivity().finish();
         }
     }
 

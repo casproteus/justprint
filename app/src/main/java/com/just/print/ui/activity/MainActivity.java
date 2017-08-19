@@ -25,7 +25,8 @@ public class MainActivity extends BaseActivity {
 
 //    ServiceConnection serviceConnection;
 //    UDPService udp;
-    boolean debug = false;
+    private static String isDebug = AppData.getCustomData("Debug");
+    public static boolean debug = isDebug == null ? false : Boolean.valueOf(isDebug);
 
     private long checkDaysleft() {
 
@@ -80,9 +81,7 @@ public class MainActivity extends BaseActivity {
                 startActivity(new Intent(this, Activate.class));
             finish();
             return;
-        }
-
-        if (debug) {
+        } else {
             ListView listView = (ListView) findViewById(R.id.listView);
             XAdapter2<ActivityInfo> adapter = new XAdapter2<ActivityInfo>(this, ActivityViewHolder.class);
             try {

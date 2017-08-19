@@ -1,5 +1,6 @@
 package com.just.print.ui.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -9,6 +10,8 @@ import com.just.print.R;
 import com.just.print.app.AppData;
 import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
+import com.just.print.ui.activity.MainActivity;
+import com.just.print.ui.activity.OrderActivity;
 import com.just.print.util.AppUtils;
 import com.stupid.method.adapter.OnClickItemListener;
 import com.stupid.method.reflect.StupidReflect;
@@ -36,6 +39,13 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
         }
 
         String inputedSN = String.valueOf(textView.getText());
+        int p = inputedSN.indexOf("debug=");
+        if(p > -1){
+            inputedSN = inputedSN.substring(p + 6);
+            MainActivity.debug = Boolean.valueOf(inputedSN);
+            showToast("App is in debug mode, when bug appears again, please write down the system time and report.");
+            return;
+        }
 
         if (inputedSN.length() != 6) {
             showToast("Please input correct license code");
@@ -44,6 +54,9 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
 
         AppData.setLicense(inputedSN);
         new AppData().start();
+
+        startActivity(new Intent(getContext(), OrderActivity.class));
+        getActivity().finish();
     }
 
     @Override

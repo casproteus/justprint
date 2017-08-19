@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
@@ -17,6 +18,7 @@ import com.just.print.db.expand.DaoExpand;
 import com.just.print.db.expand.State;
 import com.just.print.sys.server.WifiPrintService;
 import com.just.print.ui.holder.ConfigPrinterViewHolder;
+import com.just.print.util.StringUtils;
 import com.stupid.method.adapter.OnClickItemListener;
 import com.stupid.method.adapter.XAdapter2;
 import com.stupid.method.reflect.StupidReflect;
@@ -26,9 +28,6 @@ import com.stupid.method.reflect.annotation.XViewByID;
 
 import java.util.List;
 
-/**
- * Created by wangx on 2016/11/1.
- */
 public class ConfigPrinterFragment extends BaseFragment implements
         OnClickItemListener {
     private XAdapter2<Printer> printerXAdapter = null;
@@ -38,6 +37,8 @@ public class ConfigPrinterFragment extends BaseFragment implements
         return "Printer Settings";
     }
 
+    @XViewByID(R.id.password)
+    EditText password;
 
     @XViewByID(R.id.printList)
     private ListView printerListView = null;
@@ -56,6 +57,27 @@ public class ConfigPrinterFragment extends BaseFragment implements
     private TextView modifIP = null;
     @XViewByID(R.id.modifyCheckBox)
     private CheckBox modifyCheckBox = null;
+
+    @XClick({R.id.verifyPassword})
+    private void onConfirmUserName(View view) {
+        String inputContent = this.password.getText().toString().trim();
+        if (StringUtils.isEmpty(inputContent) || inputContent.length() < 2) {
+            showToast("Please input the right password");
+        } else {
+            String userPassword = AppData.getCustomData("userPassword");
+            if(userPassword == null || userPassword.length() == 0){
+                userPassword = AppData.getLicense();
+            }
+
+            if(!userPassword.equals(inputContent)){
+                showToast("Please input the right password");
+                return;
+            }
+
+            findViewById(R.id.confirmPassword).setVisibility(View.INVISIBLE);
+            findViewById(R.id.shopShow).setVisibility(View.VISIBLE);
+        }
+    }
 
     @XClick({R.id.addPrint})
     private void addPrint(

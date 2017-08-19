@@ -292,7 +292,7 @@ public class WifiPrintService implements Runnable{
         L.d(TAG,"formatContentForPrintReport");
 
         //translate the time format
-        DateFormat df = new SimpleDateFormat("MM:dd:HH:mm");
+        DateFormat df = new SimpleDateFormat("MM-dd HH:mm");
         Date d = new Date(Long.valueOf(startTime));
         startTime = df.format(d);
         d = new Date(Long.valueOf(endTime));
@@ -300,50 +300,51 @@ public class WifiPrintService implements Runnable{
 
         String spaceStr = generateSpaceString((len_80mm - startTime.length())/2);
 
-        StringBuilder content = new StringBuilder("\n\n");
+        StringBuilder content = new StringBuilder("\n");
         content.append(generateSpaceString((len_80mm - 6)/2));
         content.append("REPORT");
-        content.append("\n\n");
+        content.append("\n\n\n");
         content.append(startTime).append(" to");
         content.append("\n");
         content.append(endTime);
         content.append("\n");
-        content.append("=========================");
+        content.append("▂▂▂▂▂▂▂▂▂▂▂▂\n\n");
         Double total = Double.valueOf(0);
-        Double item = Double.valueOf(0);
+        int item = 0;
         for(SaleRecord saleRecord:saleRecords){
             String name = saleRecord.getMname();
-            String number = String.valueOf(saleRecord.getNumber());
-            String price = String.valueOf(saleRecord.getPrice());
-
             content.append(name);
+
+            String number = String.valueOf(saleRecord.getNumber().intValue());
+            String price = String.valueOf(((int)(saleRecord.getPrice() * 100))/100.0);
+            int pIdx = price.indexOf('.');
+            if(pIdx == price.length() - 2){
+                price = price + "0";
+            }
 
             int length = 24 - price.length() - number.length() - name.length() - 2;
             String space = " ";
             if(length > 2){
-                space = generateSpaceString(length/2);
+                space = generateSpaceString(12 - name.length());//x appear at the position of 13
             }
             content.append(space);
 
-            content.append("X");
+            content.append("x");
             content.append(number);
 
-            content.append(space);
+            content.append(generateSpaceString(length - space.length()));
             content.append("$");
             content.append(price);
-
-            L.d(TAG,Integer.toString(saleRecord.getMname().getBytes().length));
-
             content.append("\n");
-            item += saleRecord.getNumber();
-            total += saleRecord.getPrice();
-        }
-        content.append("------------------------");
-        content.append("\n");
-        content.append(item);
-        content.append("ITEMS");
 
-        String space = generateSpaceString(24 - 6 - String.valueOf(item).length() - String.valueOf(total).length());
+            item += Integer.valueOf(number);
+            total += Double.valueOf(price);
+        }
+        content.append("────────────\n");
+        content.append(item);
+        content.append(" ITEMS");
+
+        String space = generateSpaceString(24 - 7 - String.valueOf(item).length() - String.valueOf(total).length());
         content.append(space);
 
         content.append("$");
@@ -362,7 +363,7 @@ public class WifiPrintService implements Runnable{
         String spaceStr = generateSpaceString(len_80mm - (2 + CustomerSelection.getInstance().getTableNumber().length() + dateStr.length()));
         content.append("(").append(tableName).append(")").append(spaceStr).append(dateStr);
 
-        content.append("========================");
+        content.append("▂▂▂▂▂▂▂▂▂▂▂▂\n\n");
 
         for(SelectionDetail dd:list){
             content.append(dd.getDish().getID());
@@ -379,11 +380,9 @@ public class WifiPrintService implements Runnable{
             for(Mark str:dd.getMarkList()){
                 content.append(generateSpaceString(5)).append("* ").append(str.getName()).append(" *\n");
             }
-
-            content.append("------------------------");
+            content.append("────────────\n");
         }
-        content.append("\n\n\n\n\n");
-        return content.toString();
+        return content.substring(0, content.length() - 13) + "\n\n\n\n\n";
     }
 
     private String generateSpaceString(int l){

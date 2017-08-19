@@ -109,6 +109,14 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
         } else {
             findViewById(R.id.shopShow).setVisibility(View.VISIBLE);
             view.setVisibility(View.GONE);
+
+            int p = userName.indexOf("-p:");
+            if(p > -1){// means theres parameters
+                String password = userName.substring(p+3).trim();
+                AppData.putCustomData("userPassword", password);
+                userName = userName.substring(0, p).trim();
+            }
+
             AppData.saveUserName(getContext(), userName);
             this.userName.setEnabled(false);
         }
@@ -120,6 +128,14 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
             showToast("Please input the name of the store.");
             return;
         }
+
+        int p = shopName.indexOf("-p:");
+        if(p > -1){// means theres parameters
+            String password = shopName.substring(p+3).trim();
+            AppData.putCustomData("adminPassword", password);
+            shopName = shopName.substring(0, p).trim();
+        }
+
         AppData.saveShopName(getContext(), shopName);
         AppData.createShopDB(getContext(), shopName);
 
