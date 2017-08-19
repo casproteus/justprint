@@ -15,8 +15,6 @@ import com.stupid.method.reflect.annotation.XGetValueByView;
 
 public class Activate extends BaseActivity {
 
-    public static String currentSN;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -63,7 +63,8 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
     @XClick({R.id.verifyPassword})
     private void verifyPassword(@XGetValueByView(fromId = R.id.etMark) String mark) {
         //maybe we should hide the functions into a "more..." button.
-        if(!Activate.currentSN.equals(mark)){
+        String adminPassword = AppData.getCustomData("adminPassword");
+        if(adminPassword != null && !adminPassword.equals(mark)){
             showToast("Please input correct password!");
             return;
         }
@@ -77,7 +78,7 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
         }
 
         String reportStartDate = AppData.getCustomData("reportStartDate");
-        if(reportStartDate == null){
+        if(reportStartDate == null || reportStartDate.length() < 1){
             reportStartDate = AppData.getCustomData("lastsuccess");
         }
         long start = new Date(Long.valueOf(reportStartDate)).getTime();

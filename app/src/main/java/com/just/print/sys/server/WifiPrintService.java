@@ -298,28 +298,55 @@ public class WifiPrintService implements Runnable{
         d = new Date(Long.valueOf(endTime));
         endTime = df.format(d);
 
-        String spaceStr = generateSpaceString(len_80mm - (startTime.length() + endTime.length()));
+        String spaceStr = generateSpaceString((len_80mm - startTime.length())/2);
 
         StringBuilder content = new StringBuilder("\n\n");
-        content.append(startTime).append("-").append(endTime);
+        content.append(generateSpaceString((len_80mm - 6)/2));
+        content.append("REPORT");
+        content.append("\n\n");
+        content.append(startTime).append(" to");
+        content.append("\n");
+        content.append(endTime);
+        content.append("\n");
         content.append("=========================");
         Double total = Double.valueOf(0);
+        Double item = Double.valueOf(0);
         for(SaleRecord saleRecord:saleRecords){
-            content.append(saleRecord.getMname());
+            String name = saleRecord.getMname();
+            String number = String.valueOf(saleRecord.getNumber());
+            String price = String.valueOf(saleRecord.getPrice());
 
-            content.append(generateSpaceString(25 - saleRecord.getMname().length()));
+            content.append(name);
+
+            int length = 24 - price.length() - number.length() - name.length() - 2;
+            String space = " ";
+            if(length > 2){
+                space = generateSpaceString(length/2);
+            }
+            content.append(space);
+
             content.append("X");
-            content.append(saleRecord.getNumber());
+            content.append(number);
+
+            content.append(space);
+            content.append("$");
+            content.append(price);
 
             L.d(TAG,Integer.toString(saleRecord.getMname().getBytes().length));
-            content.append(generateSpaceString(14 - (saleRecord.getMname().getBytes().length)/3*2)).append(String.valueOf(saleRecord.getPrice()));
 
             content.append("\n");
+            item += saleRecord.getNumber();
             total += saleRecord.getPrice();
         }
-        content.append("-----------------------------");
+        content.append("------------------------");
         content.append("\n");
-        content.append("total");
+        content.append(item);
+        content.append("ITEMS");
+
+        String space = generateSpaceString(24 - 6 - String.valueOf(item).length() - String.valueOf(total).length());
+        content.append(space);
+
+        content.append("$");
         content.append(String.valueOf(total));
         //content.append(generateSpaceString(5)).append("* ").append(str.getName()).append(" *\n");
         content.append("\n\n\n\n\n");

@@ -70,9 +70,8 @@ public class MainActivity extends BaseActivity {
         new StupidReflect(this).init();
 
         if (!debug) {
-            Activate.currentSN = AppData.getLicense(this);
             long timeLeft = checkDaysleft();
-            if (Activate.currentSN != null && timeLeft > 0) {
+            if (timeLeft > 0) {
                 if(timeLeft < 3024000000l){
                     ToastUtil.showToast("Application expired! Please re-activate it!");
                 }

@@ -3,6 +3,7 @@ package com.just.print.app;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.just.print.Activate;
 import com.just.print.util.AppUtils;
 import com.just.print.util.SharedPreferencesHelper;
 import com.just.print.util.ToastUtil;
@@ -32,7 +33,6 @@ public class AppData extends Thread{
     public static SharedPreferencesHelper getShopData(Context context) {
         return SharedPreferencesHelper.getCache(context, KEY_SHOP_XML);
     }
-
 
     /**
      * 判断店铺是否存在
@@ -66,6 +66,7 @@ public class AppData extends Thread{
     public static String getShopName(){
         return getShopName(Applic.app.getApplicationContext());
     }
+
     public static String getShopName(Context context) {
         return getShopData(context).getString(KEY_SHOP_NAME, "");
     }
@@ -77,6 +78,7 @@ public class AppData extends Thread{
     public static String getUserName() {
         return getShopData(Applic.app.getApplicationContext()).getString("userName", "");
     }
+
     public static String getUserName(Context context) {
         return getShopData(context).getString("userName", "");
     }
@@ -84,6 +86,7 @@ public class AppData extends Thread{
     public static String getLicense() {
         return getLicense(Applic.app.getApplicationContext());
     }
+
     public static String getLicense(Context context) {
         return getShopData(context).getString("license", "");
     }
@@ -99,6 +102,7 @@ public class AppData extends Thread{
     public static String getLastSyncDate(){
         return getShopData(Applic.app.getApplicationContext()).getString("LastSyncDate","");
     }
+
     public static void updataeLastSyncDate(String lastUpdateTime) {
         getShopData(Applic.app.getApplicationContext()).putString("LastSyncDate",
                 lastUpdateTime != null && lastUpdateTime.length() > 1 ? lastUpdateTime : String.valueOf(new Date().getTime()));
@@ -175,6 +179,7 @@ public class AppData extends Thread{
                             AppData.putCustomData("number",responseString);
                             AppData.putCustomData("celebrate", String.valueOf(new Date().getTime()));
                             AppData.putCustomData("lastsuccess", String.valueOf(new Date().getTime()));
+
                             ToastUtil.showToast("Application is activated successfully!");
                         }else{
                             ToastUtil.showToast("Please provide valid information!");
