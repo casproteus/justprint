@@ -267,7 +267,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
         odIdTableTbtn.setTextOn(null);
         odIdTableTbtn.setTextOff(null);
-        odIdTableTbtn.setText("TB");
+        odIdTableTbtn.setText("");
+        odIdTableTbtn.setChecked(true);
         odIdTableTbtn.setOnClickListener(this);
 
         //initSelected dishes part.
@@ -419,7 +420,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         //clear selected menu
         CustomerSelection.getInstance().clearMenu();
         odIdTableTbtn.setText("");
+        odIdTableTbtn.setChecked(true);
         loadOrderMenu();
+
     }
 
     public void showStatus(String src, int i) {

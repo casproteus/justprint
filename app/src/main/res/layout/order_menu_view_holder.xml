@@ -39,7 +39,7 @@
             android:id="@+id/odmnreduce"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=" - " />
+            android:text="  -  " />
 
         <TextView
             android:id="@+id/odmnnum"
@@ -55,7 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@+id/oddelDish"
-            android:text="+"/>
+            android:text="  +  "/>
 
         <ImageButton
             android:id="@+id/oddelDish"
