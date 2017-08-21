@@ -322,10 +322,10 @@ public class WifiPrintService implements Runnable{
                 price = price + "0";
             }
 
-            int length = 24 - price.length() - number.length() - name.length() - 2;
+            int length = 24 - price.length() - number.length() - name.getBytes().length - 2;
             String space = " ";
             if(length > 2){
-                space = generateSpaceString(12 - name.length());//x appear at the position of 13
+                space = generateSpaceString(12 - name.getBytes().length);//x appear at the position of 13
             }
             content.append(space);
 
