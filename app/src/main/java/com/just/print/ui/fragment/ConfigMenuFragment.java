@@ -222,7 +222,13 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
         }
 
         if (mid.getText().length() == 0 || mname.getText().length() == 0 || mprice.getText().length() == 0 ) {
-            showToast("Please input " + (mid.getText().length() == 0 ? "code" : "name"));
+            if(mid.getText().length() == 0) {
+                showToast("Please input code");
+            }else if(mname.getText().length() == 0){
+                showToast("Please input name");
+            }else if(mprice.getText().length() == 0){
+                showToast("Please input price");
+            }
             return;
         }
         Double price = 0.0;

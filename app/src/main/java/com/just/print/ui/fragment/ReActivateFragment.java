@@ -39,7 +39,7 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
         }
 
         String inputedSN = String.valueOf(textView.getText());
-        int p = inputedSN.indexOf("debug=");
+        int p = inputedSN.indexOf("-debug:");
         if(p > -1){
             inputedSN = inputedSN.substring(p + 6);
             MainActivity.debug = Boolean.valueOf(inputedSN);

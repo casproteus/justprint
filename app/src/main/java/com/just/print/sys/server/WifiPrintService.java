@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
 
+import com.just.print.app.AppData;
 import com.just.print.app.Applic;
 import com.just.print.db.bean.Category;
 import com.just.print.db.bean.M2M_MenuPrint;
@@ -315,40 +316,45 @@ public class WifiPrintService implements Runnable{
             String name = saleRecord.getMname();
             content.append(name);
 
+            int lengthOfName = getLengthOfString(name);
+            StringBuilder content2 = new StringBuilder();
+            if(lengthOfName < 11){
+                content2.append(generateSpaceString(12 - lengthOfName));//x appear at the position of 13
+            }else{
+                content2.append(" ");
+            }
+
             String number = String.valueOf(saleRecord.getNumber().intValue());
-            String price = String.valueOf(((int)(saleRecord.getPrice() * 100))/100.0);
-            int pIdx = price.indexOf('.');
-            if(pIdx == price.length() - 2){
-                price = price + "0";
+            content2.append("x");
+            content2.append(number);
+            content.append(content2);
+
+            String price = String.format("%.2f", saleRecord.getPrice());//String.valueOf(((int)(saleRecord.getPrice() * 100))/100.0);
+
+            int spaceLeft = 24 - (lengthOfName + content2.length() + price.length() + 1);
+            if(spaceLeft < 2){
+                content.append(" ");
+            }else{
+                content.append(generateSpaceString(spaceLeft));
             }
 
-            int length = 24 - price.length() - number.length() - name.getBytes().length - 2;
-            String space = " ";
-            if(length > 2){
-                space = generateSpaceString(12 - name.getBytes().length);//x appear at the position of 13
-            }
-            content.append(space);
-
-            content.append("x");
-            content.append(number);
-
-            content.append(generateSpaceString(length - space.length()));
             content.append("$");
             content.append(price);
             content.append("\n");
 
             item += Integer.valueOf(number);
-            total += Double.valueOf(price);
+            total += Double.valueOf(saleRecord.getPrice());
         }
         content.append("────────────\n");
         content.append(item);
         content.append(" ITEMS");
 
-        String space = generateSpaceString(24 - 7 - String.valueOf(item).length() - String.valueOf(total).length());
+        String totalStr = String.format("%.2f", total);
+        String space = generateSpaceString(24 - 7 - String.valueOf(item).length() - totalStr.length());
         content.append(space);
 
         content.append("$");
-        content.append(String.valueOf(total));
+        content.append(totalStr);
         //content.append(generateSpaceString(5)).append("* ").append(str.getName()).append(" *\n");
         content.append("\n\n\n\n\n");
         return content.toString();
@@ -361,20 +367,28 @@ public class WifiPrintService implements Runnable{
         String tableName = CustomerSelection.getInstance().getTableNumber();
         String dateStr = df.format(new Date());
         String spaceStr = generateSpaceString(len_80mm - (2 + CustomerSelection.getInstance().getTableNumber().length() + dateStr.length()));
+
+        boolean needBigger = "bigger".equals(AppData.getCustomData("version"));
+        if(needBigger){
+            content.append("\n\n");
+        }
+
         content.append("(").append(tableName).append(")").append(spaceStr).append(dateStr);
 
-        content.append("▂▂▂▂▂▂▂▂▂▂▂▂\n\n");
+        content.append(needBigger ? "▂▂▂▂▂▂▂▂▂▂▂▂\n\n" : "────────────\n");
 
         for(SelectionDetail dd:list){
-            content.append(dd.getDish().getID());
-            content.append(generateSpaceString(5 - dd.getDish().getID().length()));
-            content.append(dd.getDish().getMname());
+            StringBuilder sb = new StringBuilder();
+            sb.append(dd.getDish().getID());
+            sb.append(generateSpaceString(5 - dd.getDish().getID().length()));
+            sb.append(dd.getDish().getMname());
             if(dd.getDishNum() > 1){
-                L.d(TAG,Integer.toString(dd.getDish().getMname().getBytes().length));
-                content.append(generateSpaceString(dd.getDishNum() < 10 ? 8 : 12 - (dd.getDish().getMname().getBytes().length) / 3 * 2));
-                content.append("X").append(Integer.toString(dd.getDishNum()));
+                String space = " ";
+                int occupiedLength = getLengthOfString(sb.toString());
+                sb.append(generateSpaceString(24 - occupiedLength - (dd.getDishNum() < 10 ? 2 : 3)));
+                sb.append("X").append(Integer.toString(dd.getDishNum()));
             }
-
+            content.append(sb);
             content.append("\n");
 
             for(Mark str:dd.getMarkList()){
@@ -383,6 +397,18 @@ public class WifiPrintService implements Runnable{
             content.append("────────────\n");
         }
         return content.substring(0, content.length() - 13) + "\n\n\n\n\n";
+    }
+
+    private int getLengthOfString(String content){
+        int length = content.length();
+        int realWidth = length;
+        for(int i = 0; i < length; i++) {
+            char c = content.charAt(i);
+            if(c >=19968 && c <= 171941) {
+                realWidth++;
+            }
+        }
+        return realWidth;
     }
 
     private String generateSpaceString(int l){

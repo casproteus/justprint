@@ -59,7 +59,7 @@
 
         <ImageButton
             android:id="@+id/oddelDish"
-            android:layout_width="wrap_content"
+            android:layout_width="45dp"
             android:layout_height="wrap_content"
             android:src="@drawable/delete"/>
     </LinearLayout>
@@ -75,7 +75,7 @@
             android:textColor="#9c9a9a" />
         <ImageButton
             android:id="@+id/odMnLoutMarkBtn"
-            android:layout_width="wrap_content"
+            android:layout_width="45dp"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:src="@drawable/change"/>
