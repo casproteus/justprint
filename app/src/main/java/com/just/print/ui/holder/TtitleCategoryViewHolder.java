@@ -12,10 +12,6 @@ import com.stupid.method.adapter.expand.XExpadnViewHolder;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XViewByID;
 
-/**
- * Created by Administrator on 2016/11/17.
- */
-
 public class TtitleCategoryViewHolder extends XExpadnViewHolder<Category> {
     @XViewByID(R.id.title)
     TextView title;
