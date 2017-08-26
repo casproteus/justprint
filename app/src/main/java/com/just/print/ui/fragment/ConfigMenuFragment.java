@@ -32,6 +32,7 @@ import com.stupid.method.reflect.annotation.XGetValueByView;
 import com.stupid.method.reflect.annotation.XViewByID;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static android.content.DialogInterface.OnClickListener;
@@ -269,7 +270,7 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
             menu.setCid(mCategory.getId());
             menu.setPrice(price);
             menuDao.insert(menu);
-        }else{              //the code is same with some record in db.)
+        }else{              //the code is same with some record in db. means it's updating....
             menu.setID(mid.getText().toString().trim());
             menu.setState(State.def);
             menu.setMname(mname.getText().toString().trim());
@@ -294,7 +295,7 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
             m2m.setPrint(p);
             m2mDao.insertOrReplace(m2m);
         }
-
+        AppData.updataeLastSyncDate(null);
         modifyingMenu = null;
         findViewById(R.id.menuLayout).setVisibility(View.GONE);
         loadMenu();
