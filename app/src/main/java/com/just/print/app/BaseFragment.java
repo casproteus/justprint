@@ -39,8 +39,10 @@ abstract public class BaseFragment extends Fragment {
     }
 
     public void showMarksDialog(List<Mark> choiceItem, final onChoiceMarks choiceMarks) {
-        if (choiceMarks == null || choiceItem == null)
-            throw new NullPointerException("showMarksDialog need 2 parameters");
+
+        if (choiceItem == null) {
+            choiceItem = new ArrayList<Mark>();
+        }
 
         final List<Mark> allMarks = DaoExpand.queryNotDeletedAll(Applic.app.getDaoMaster().newSession().getMarkDao());
 

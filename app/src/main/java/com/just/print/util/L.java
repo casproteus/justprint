@@ -23,12 +23,14 @@ public class L extends Thread{
         this.tag = tag;
         this.msg = msg;
     }
-    public static void d(String tag, String msg){
-        sendToServer(AppData.getShopName()+"_"+AppData.getUserName(), tag + ":" + msg);
-        Log.d(tag, msg);
+
+    public static void d(String tag, Object msg){
+        sendToServer(AppData.getShopName()+"_"+AppData.getUserName(), tag + ":" + String.valueOf(msg));
+        Log.d(tag, String.valueOf(msg));
     }
 
     public static void e(String tag, String msg, Throwable e){
+        MainActivity.debug = true;
         sendToServer(AppData.getShopName()+"_"+AppData.getUserName(), tag + ":" + msg);
         Log.i(tag, msg, e);
     }

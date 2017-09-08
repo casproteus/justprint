@@ -44,9 +44,9 @@ public class OrderIdentifierMarkViewHolder extends XViewHolder<Mark>{
 
     @Override
     public void onResetView(Mark mark, int i) {
-        L.d(TAG,"onResetView");
-        L.d(TAG,"hashcode: " + String.valueOf(mark.hashCode()));
-        L.d(TAG,"item: " + String.valueOf(i) + "select: " + String.valueOf(mark.select));
+//        L.d(TAG,"onResetView");
+//        L.d(TAG,"hashcode: " + String.valueOf(mark.hashCode()));
+//        L.d(TAG,"item: " + String.valueOf(i) + "select: " + String.valueOf(mark.select));
         textView.setText(mark.getName());
         textView.setChecked(mark.select);
     }

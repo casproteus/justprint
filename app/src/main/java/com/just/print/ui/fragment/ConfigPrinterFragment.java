@@ -127,11 +127,12 @@ public class ConfigPrinterFragment extends BaseFragment implements
             mModifyCache.setPname(modifName.getText().toString());
             mModifyCache.setIp(modifIP.getText().toString().trim());
             mModifyCache.setVersion(mModifyCache.getVersion() + 1);
-//            if (modifyCheckBox.isChecked()) {
+            if (modifyCheckBox.isChecked()) {
 //                DaoExpand.updateAllPrintTo0(getDaoMaster().newSession().getPrinterDao());
-//                mModifyCache.setFirstPrint(1);
-//            } else
-//                mModifyCache.setFirstPrint(0);
+                mModifyCache.setFirstPrint(1);
+            } else {
+                mModifyCache.setFirstPrint(0);
+            }
             mModifyCache.update();
             mModifyCache = null;
             printerXAdapter.notifyDataSetChanged();

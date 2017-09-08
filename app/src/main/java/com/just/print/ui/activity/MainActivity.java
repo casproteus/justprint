@@ -28,11 +28,18 @@ public class MainActivity extends BaseActivity {
     private static String isDebug = AppData.getCustomData("Debug");
     public static boolean debug = isDebug == null ? false : Boolean.valueOf(isDebug);
 
+    //@note: there's a issue in this method!!!!!
+    //@in some device, it always return a negative value and cause reactive dlg displayed.
     private long checkDaysleft() {
+        Object limitationMode = AppData.getCustomData("limitation");        L.d("limitationMode:", limitationMode);
 
-        long currentTime = new Date().getTime();
-        //time of last open
-        String lastsuccessStr = AppData.getCustomData("lastsuccessStr");
+        if("none".equals(limitationMode)){
+            return 3024000000l + 1;
+        }
+        long currentTime = new Date().getTime();                            L.d("currentTime:", currentTime);
+
+        //time of last open, if existing number is not valid, then use current time as last open time.
+        String lastsuccessStr = AppData.getCustomData("lastsuccessStr");    L.d("lastSuccessStr:",lastsuccessStr);
         long lastSuccess = 0l;
         try{
             lastSuccess= Long.valueOf(lastsuccessStr);
@@ -40,22 +47,21 @@ public class MainActivity extends BaseActivity {
             lastSuccess = currentTime;
         }
 
+        long timepassed = currentTime - lastSuccess;                        L.d("timePassed:",timepassed);
         //time passed since last open.
-        long timepassed = currentTime - lastSuccess;
 
-        String timeLeftStr = AppData.getCustomData("number");
+        String timeLeftStr = AppData.getCustomData("number");               L.d("timeLeft(before deduct:", timeLeftStr);
         long timeLeft = 0;
 
+        //if timeLeftStr is valid, then it has a chance to turn the timeLeft to be a number bigger than 0.
         if (timeLeftStr != null && timeLeftStr.length() > 0) {
             try {
-                timeLeft = Long.valueOf(timeLeftStr) - Math.abs(timepassed);
+                //the time left from last calculation, minus time passed. @note: we use abs, so is the time is negative, will still be minused!
+                timeLeft = Long.valueOf(timeLeftStr) - Math.abs(timepassed);    L.d("timeLeft - timePassed:", timeLeft);
 
-                if (timeLeft > 0 && timeLeft < 34560000000l) {
-                    AppData.putCustomData("lastsuccessStr", String.valueOf(currentTime));
-                    AppData.putCustomData("number", String.valueOf(timeLeft));
-                } else {
-                    AppData.putCustomData("lastsuccessStr", String.valueOf(currentTime));
-                }
+                //update the number and lastsuccess into local cache.
+                AppData.putCustomData("lastsuccessStr", String.valueOf(currentTime));   L.d("update new lastSuccess string with:", currentTime);
+                AppData.putCustomData("number", String.valueOf(timeLeft));              L.d("update new number with:", timeLeft);
             }catch(Exception e){
                 L.e("MainActivity", "the left time number can not be pasered into a long", e);
             }
@@ -69,29 +75,37 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         new StupidReflect(this).init();
-
-        if (!debug) {
-            long timeLeft = checkDaysleft();
-            if (timeLeft > 0) {
-                if(timeLeft < 3024000000l){
-                    ToastUtil.showToast("Application expired! Please re-activate it!");
-                }
-                startActivity(new Intent(this, LoginActivity.class));
-            } else
-                startActivity(new Intent(this, Activate.class));
-            finish();
-            return;
-        } else {
-            ListView listView = (ListView) findViewById(R.id.listView);
-            XAdapter2<ActivityInfo> adapter = new XAdapter2<ActivityInfo>(this, ActivityViewHolder.class);
-            try {
-                PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_ACTIVITIES);
-                adapter.addAll(Arrays.asList(info.activities));
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
-            listView.setAdapter(adapter);
+        try {
+            debug = Boolean.valueOf(AppData.getCustomData("debug"));
+        }catch(Exception e){
+            L.i("the value of debug in customerr Data ", "can  not be parsered into a boolean!");
         }
+
+        long timeLeft = checkDaysleft();
+        if (timeLeft > 0) {
+            if (timeLeft < 3024000000l) {
+                ToastUtil.showToast("Application is about to expire! Please re-activate it!");
+            }
+            startActivity(new Intent(this, LoginActivity.class));
+        } else {
+            ToastUtil.showToast("Application expired! Please re-activate it!");
+            startActivity(new Intent(this, Activate.class));
+        }
+        finish();
+        return;
+
+        //@TODO: don't understand when should we use this part?
+//        if(false) {
+//            ListView listView = (ListView) findViewById(R.id.listView);
+//            XAdapter2<ActivityInfo> adapter = new XAdapter2<ActivityInfo>(this, ActivityViewHolder.class);
+//            try {
+//                PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_ACTIVITIES);
+//                adapter.addAll(Arrays.asList(info.activities));
+//            } catch (PackageManager.NameNotFoundException e) {
+//                e.printStackTrace();
+//            }
+//            listView.setAdapter(adapter);
+//        }
 //        bindService(new Intent(this, UDPService.class), serviceConnection = new ServiceConnection() {
 //            @Override
 //            public void onServiceConnected(ComponentName name, IBinder service) {

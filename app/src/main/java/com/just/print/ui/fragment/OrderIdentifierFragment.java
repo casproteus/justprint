@@ -41,7 +41,7 @@ import java.util.Comparator;
 import java.util.List;
 
 
-public class OrderIdentifierFragment extends BaseFragment implements View.OnClickListener, OnClickItemListener, EventBus.EventHandler, WifiPrintService.StatusDisplayer {
+public class OrderIdentifierFragment extends BaseFragment implements View.OnClickListener, OnClickItemListener, EventBus.EventHandler{
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String EVENT_ADD_MENU = "EVENT_ADD_MENU=";
     private static final String TAG = "OrderIdentifierFragment";
@@ -254,13 +254,12 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
     @Override
     public void onCreated(Bundle savedInstanceState) {
-        L.d(TAG, "onCreated");
         getEventBus().register(EVENT_ADD_MENU, this);
         new StupidReflect(this, getView()).init();
         //设置餐桌号用
         //CustomerSelection.getInstance().setTableNumber(odIdTableNumEt.getText().toString());
         storedMenu = null;
-        String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "+","DELIVER"};
+        String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "+","DELI"};
         itemXAdapter = new XAdapter2<String>(getActivity(), Arrays.asList(items), OrderIdentifierItemViewHolder.class);
         itemXAdapter.setClickItemListener(this.itemXAdapterClick);
         odIdLoutItemsGv.setAdapter(itemXAdapter);
@@ -286,9 +285,6 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         markXAdapter = new XAdapter2<Mark>(getActivity(), marks, OrderIdentifierMarkViewHolder.class);
         markXAdapter.setClickItemListener(this.itemXAdapterClick);
         odIdMarksGrid.setAdapter(markXAdapter);
-
-        //注册打印机消息监听
-        WifiPrintService.getInstance().registPrintState(this);
     }
 
     @Override
@@ -422,17 +418,6 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         odIdTableTbtn.setText("");
         odIdTableTbtn.setChecked(true);
         loadOrderMenu();
-
-    }
-
-    public void showStatus(String src, int i) {
-        switch (i) {
-            case 2:     //WFPRINTER_CONNECTEDERR
-                showToast("Printer:" + src + " connection error!");
-                break;
-            case 4:     //COMMON
-                showToast(src);
-        }
 
     }
 }

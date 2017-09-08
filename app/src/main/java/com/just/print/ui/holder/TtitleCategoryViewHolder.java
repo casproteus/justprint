@@ -1,6 +1,8 @@
 package com.just.print.ui.holder;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +15,8 @@ import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XViewByID;
 
 public class TtitleCategoryViewHolder extends XExpadnViewHolder<Category> {
+    @XViewByID(R.id.code)
+    TextView code;
     @XViewByID(R.id.title)
     TextView title;
     @XViewByID(R.id.button)
@@ -36,9 +40,12 @@ public class TtitleCategoryViewHolder extends XExpadnViewHolder<Category> {
     @Override
     public void onCreate(Context context) {
         new StupidReflect(this, getView()).init();
+        code.setVisibility(View.GONE);
         button.setVisibility(View.GONE);
-        title.setGravity(Gravity.RIGHT);
-
+        title.setGravity(Gravity.CENTER);
+        title.setTextColor(Color.rgb(000, 000,255));
+        int size = (int) title.getTextSize();
+        title.setTextSize(TypedValue.COMPLEX_UNIT_PX,size + 20);
     }
 
     @Override

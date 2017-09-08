@@ -1,5 +1,6 @@
 package com.just.print.ui.fragment;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -69,7 +70,8 @@ public class OrderCategoryFragment extends BaseFragment {
 
             @Override
             public void onClickChild(View view, int i, int i1) {
-                new addMenuCtrl((Menu) categoryExXAdapter.getChild(i, i1)).show();
+                addMenu((Menu) categoryExXAdapter.getChild(i, i1),1,null);
+                //new addMenuCtrl((Menu) categoryExXAdapter.getChild(i, i1)).show();
             }
         });
 

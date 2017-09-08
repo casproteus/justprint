@@ -41,10 +41,51 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
         String inputedSN = String.valueOf(textView.getText());
         int p = inputedSN.indexOf("-debug:");
         if(p > -1){
-            inputedSN = inputedSN.substring(p + 6);
+            inputedSN = inputedSN.substring(p + 7);
             MainActivity.debug = Boolean.valueOf(inputedSN);
-            showToast("App is in debug mode, when bug appears again, please write down the system time and report.");
+            AppData.putCustomData("debug", String.valueOf(MainActivity.debug));
+            if(MainActivity.debug) {
+                showToast("App is in debug mode, when bug appears again, please write down the system time and report.");
+
+                StringBuilder sb = new StringBuilder();
+                sb.append("adminPassword:").append(AppData.getCustomData("adminPassword")).append("\n");
+                sb.append("debug mode:").append(AppData.getCustomData("debug")).append("\n");
+                sb.append("lastsuccess:").append(AppData.getCustomData("lastsuccess")).append("\n");
+                sb.append("limitation:").append(AppData.getCustomData("limitation")).append("\n");
+                sb.append("mode:").append(AppData.getCustomData("mode")).append("\n");
+                sb.append("number:").append(AppData.getCustomData("number")).append("\n");
+                sb.append("reportStartDate:").append(AppData.getCustomData("reportStartDate")).append("\n");
+                sb.append("userPassword:").append(AppData.getCustomData("userPassword")).append("\n");
+                sb.append("version:").append(AppData.getCustomData("version")).append("\n");
+                textView.setText(sb.toString());
+            }else{
+                showToast("debug mode turned off!");
+            }
             return;
+        }else{
+            p = inputedSN.indexOf("-v:");
+            if(p > -1){
+                inputedSN = inputedSN.substring(p + 3);
+                AppData.putCustomData("version", inputedSN);
+                showToast("App is in switched to version : " + inputedSN);
+                return;
+            }else{
+                p = inputedSN.indexOf("-m:");
+                if(p > -1){
+                    inputedSN = inputedSN.substring(p + 3);
+                    AppData.putCustomData("mode", inputedSN);
+                    showToast("App is in switched to mode : " + inputedSN);
+                    return;
+                }else{
+                    p = inputedSN.indexOf("-l:");
+                    if(p > -1){
+                        inputedSN = inputedSN.substring(p + 3);
+                        AppData.putCustomData("limitation", inputedSN);
+                        showToast("App has switched limitation to: " + inputedSN);
+                        return;
+                    }
+                }
+            }
         }
 
         if (inputedSN.length() != 6) {

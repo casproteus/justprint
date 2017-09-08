@@ -28,7 +28,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true"
-                    android:text="JustPrint-v170822"
+                    android:text="JustPrint-v10906-N"
                     android:textAlignment="viewStart"
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"

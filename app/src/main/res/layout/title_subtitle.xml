@@ -6,14 +6,24 @@
     android:padding="5dp">
 
     <TextView
+        android:id="@+id/code"
+        android:layout_width="1dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.38"
+        android:fontFamily="monospace"
+        android:padding="5dp"
+        android:textSize="24dp"
+        android:text="TextView" />
+
+    <TextView
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:fontFamily="monospace"
         android:padding="5dp"
-        android:text="TextView"
-        android:textAppearance="@android:style/TextAppearance" />
+        android:textSize="24dp"
+        android:text="TextView" />
 
     <!-- this button can not be changed into image button, if do so, it will report null pointer when stating up the app-->
     <Button
@@ -21,5 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:elevation="0dp"
-        android:text="Add" />
+        android:text="Add"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 </LinearLayout>

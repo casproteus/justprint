@@ -1,6 +1,8 @@
 package com.just.print.ui.holder;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -8,9 +10,13 @@ import android.widget.TextView;
 
 import com.just.print.R;
 import com.just.print.db.bean.Menu;
+import com.just.print.sys.model.SelectionDetail;
+import com.just.print.sys.server.CustomerSelection;
 import com.stupid.method.adapter.expand.XExpadnViewHolder;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XViewByID;
+
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/11/17.
@@ -18,6 +24,8 @@ import com.stupid.method.reflect.annotation.XViewByID;
 
 public class SubTitleMenuExpandViewHolder extends XExpadnViewHolder<Menu> {
 
+    @XViewByID(R.id.code)
+    TextView code;
     @XViewByID(R.id.title)
     TextView title;
     @XViewByID(R.id.button)
@@ -33,7 +41,6 @@ public class SubTitleMenuExpandViewHolder extends XExpadnViewHolder<Menu> {
 
     }
 
-
     @Override
     public int getLayoutId() {
         return R.layout.title_subtitle;
@@ -46,7 +53,23 @@ public class SubTitleMenuExpandViewHolder extends XExpadnViewHolder<Menu> {
     }
 
     @Override
+    public void onClick(View v){
+        button.setTextColor(Color.rgb(000, 000, 255));
+        super.onClick(v);
+    }
+    @Override
     public void onResetView(Menu menu, int i) {
+        code.setText(menu.getID());
         title.setText(menu.getMname());
+        button.setTextColor(Color.rgb(000, 000, 000));
+        List<SelectionDetail> selections =  CustomerSelection.getInstance().getSelectedDishes();
+        if(selections != null) {
+            for (SelectionDetail selectionDetail : selections) {
+                if(selectionDetail.getDish().getID().equals(menu.getID())){
+                    button.setTextColor(Color.rgb(000, 000, 255));
+                    button.setTypeface(null, Typeface.BOLD);
+                }
+            }
+        }
     }
 }
