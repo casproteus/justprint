@@ -83,6 +83,22 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
                         AppData.putCustomData("limitation", inputedSN);
                         showToast("App has switched limitation to: " + inputedSN);
                         return;
+                    }else{
+                        p = inputedSN.indexOf("-f:");
+                        if(p > -1) {
+                            inputedSN = inputedSN.substring(p + 3);
+                            AppData.putCustomData("font", inputedSN);
+                            showToast("App has set font to: " + inputedSN);
+                            return;
+                        }else{
+                            p = inputedSN.indexOf("-w:");
+                            if(p > -1) {
+                                inputedSN = inputedSN.substring(p + 3);
+                                AppData.putCustomData("width", inputedSN);
+                                showToast("App has set width to: " + inputedSN);
+                                return;
+                            }
+                        }
                     }
                 }
             }

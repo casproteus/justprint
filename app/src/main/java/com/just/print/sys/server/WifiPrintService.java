@@ -16,6 +16,7 @@ import com.just.print.sys.model.SelectionDetail;
 import com.just.print.util.AppUtils;
 import com.just.print.util.Command;
 import com.just.print.util.L;
+import com.just.print.util.StringUtils;
 import com.just.print.util.ToastUtil;
 import com.zj.wfsdk.WifiCommunication;
 
@@ -39,7 +40,7 @@ public class WifiPrintService implements Runnable{
     private HashMap<String,List<String>> contentForPrintMap;
 
     private static String curPrintIp = "";
-    private int paperWidth = 24;
+    private int width = 24;
 
     private WifiCommunication wifiCommunication;
     private boolean isConnected;
@@ -161,7 +162,7 @@ public class WifiPrintService implements Runnable{
             L.d(TAG,"ip#" + printerIP + "list size#" + dishList.size());
             if(dishList.size() > 0){
                 if(tmpralQueueMap.get(printerIP) != dishList){
-                    System.out.println("Attenttion! the dishList are different from tmpralQueueMap.get(printerIP)!!!!");
+                    L.d("Attenttion!", "the dishList are different from tmpralQueueMap.get(printerIP)!!!!");
                 }
                 if(ipMap.get(printerIP).getFirstPrint() == 1){  //全单封装
                     contentForPrintMap.get(printerIP).add(formatContentForPrint(dishList));
@@ -242,13 +243,21 @@ public class WifiPrintService implements Runnable{
                             if(!"silent".equals(AppData.getCustomData("mode"))) {
                                 wifiCommunication.sndByte(Command.BEEP);
                             }
-                            String version = AppData.getCustomData("version");
-                            if("bigger".equals(AppData.getCustomData("version"))) {
-                                Command.GS_ExclamationMark[2] = (byte) (((int)Command.GS_ExclamationMark[2]) * 3);
-//                                Command.GS_ExclamationMark[5] = (byte) (((int)Command.GS_ExclamationMark[2]) * 3);
-//                                Command.GS_ExclamationMark[8] = (byte) (((int)Command.GS_ExclamationMark[2]) * 3);
+                            String font = AppData.getCustomData("font");
+                            if(StringUtils.isBlank(font)) {
+                                wifiCommunication.sndByte(Command.GS_ExclamationMark);
+                            }else{
+                                //"29, 33, 17";
+                                String[] pieces = font.split(",");
+                                if(pieces.length != 3) {
+                                    wifiCommunication.sndByte(Command.GS_ExclamationMark);
+                                }else {
+                                    for (int i = 0; i < 3; i++) {
+                                        Command.GS_ExclamationMark[i] = Integer.valueOf(pieces[i].trim()).byteValue();
+                                    }
+                                    wifiCommunication.sndByte(Command.GS_ExclamationMark);
+                                }
                             }
-                            wifiCommunication.sndByte(Command.GS_ExclamationMark);
                             wifiCommunication.sendMsg(content, "GBK");//"UTF-8");
                             wifiCommunication.sndByte(Command.GS_V_m_n);
                         }
@@ -280,10 +289,10 @@ public class WifiPrintService implements Runnable{
         d = new Date(Long.valueOf(endTime));
         endTime = df.format(d);
 
-        String spaceStr = generateSpaceString((paperWidth - startTime.length())/2);
+        String spaceStr = generateString((width - startTime.length())/2, " ");
 
         StringBuilder content = new StringBuilder("\n");
-        content.append(generateSpaceString((paperWidth - 6)/2));
+        content.append(generateString((width - 6)/2, " "));
         content.append("REPORT");
         content.append("\n\n\n");
         content.append(startTime).append(" to");
@@ -300,7 +309,7 @@ public class WifiPrintService implements Runnable{
             int lengthOfName = getLengthOfString(name);
             StringBuilder content2 = new StringBuilder();
             if(lengthOfName < 11){
-                content2.append(generateSpaceString(12 - lengthOfName));//x appear at the position of 13
+                content2.append(generateString(12 - lengthOfName, " "));//x appear at the position of 13
             }else{
                 content2.append(" ");
             }
@@ -312,11 +321,11 @@ public class WifiPrintService implements Runnable{
 
             String price = String.format("%.2f", saleRecord.getPrice());//String.valueOf(((int)(saleRecord.getPrice() * 100))/100.0);
 
-            int spaceLeft = paperWidth - (lengthOfName + content2.length() + price.length() + 1);
+            int spaceLeft = width - (lengthOfName + content2.length() + price.length() + 1);
             if(spaceLeft < 2){
                 content.append(" ");
             }else{
-                content.append(generateSpaceString(spaceLeft));
+                content.append(generateString(spaceLeft, " "));
             }
 
             content.append("$");
@@ -331,7 +340,7 @@ public class WifiPrintService implements Runnable{
         content.append(" ITEMS");
 
         String totalStr = String.format("%.2f", total);
-        String space = generateSpaceString(paperWidth - 7 - String.valueOf(item).length() - totalStr.length());
+        String space = generateString(width - 7 - String.valueOf(item).length() - totalStr.length(), " ");
         content.append(space);
 
         content.append("$");
@@ -343,45 +352,49 @@ public class WifiPrintService implements Runnable{
 
     private String formatContentForPrint(List<SelectionDetail> list){
         L.d(TAG,"formatContentForPrint");
-        boolean needBigger = "bigger".equals(AppData.getCustomData("version"));
-        if(needBigger){
-            paperWidth = 16;
+        String font = AppData.getCustomData("font");
+        if(!StringUtils.isBlank(font)){
+            try {
+                width = Integer.valueOf(AppData.getCustomData("width"));
+            }catch(Exception e){
+
+            }
         }
         StringBuilder content = new StringBuilder("\n\n");
         DateFormat df = new SimpleDateFormat("HH:mm");
         String tableName = CustomerSelection.getInstance().getTableNumber();
         String dateStr = df.format(new Date());
-        String spaceStr = generateSpaceString(paperWidth - (2 + CustomerSelection.getInstance().getTableNumber().length() + dateStr.length()));
+        String spaceStr = generateString(width - (2 + CustomerSelection.getInstance().getTableNumber().length() + dateStr.length()), " ");
 
-        if(needBigger){
+        if(width < 20){
             content.append("\n\n");
         }
 
         content.append("(").append(tableName).append(")").append(spaceStr).append(dateStr).append("\n");
 
-        content.append(needBigger ? "▂▂▂▂▂▂▂▂\n\n" : "▂▂▂▂▂▂▂▂▂▂▂▂\n");
+        content.append(generateString(width /2, "▂")).append("\n");
 
         for(SelectionDetail dd:list){
             StringBuilder sb = new StringBuilder();
             sb.append(dd.getDish().getID());
-            sb.append(generateSpaceString(5 - dd.getDish().getID().length()));
+            sb.append(generateString(5 - dd.getDish().getID().length(), " "));
             sb.append(dd.getDish().getMname());
             if(dd.getDishNum() > 1){
                 String space = " ";
                 int occupiedLength = getLengthOfString(sb.toString());
-                sb.append(generateSpaceString(paperWidth - occupiedLength - (dd.getDishNum() < 10 ? 2 : 3)));
+                sb.append(generateString(width - occupiedLength - (dd.getDishNum() < 10 ? 2 : 3), " "));
                 sb.append("X").append(Integer.toString(dd.getDishNum()));
             }
             content.append(sb);
             content.append("\n");
             if(dd.getMarkList() != null) {
                 for (Mark str : dd.getMarkList()) {
-                    content.append(generateSpaceString(5)).append("* ").append(str.getName()).append(" *\n");
+                    content.append(generateString(5, " ")).append("* ").append(str.getName()).append(" *\n");
                 }
             }
-            content.append(needBigger ? "────────\n" :"────────────\n");
+            content.append(generateString(width /2, "─")).append("\n");
         }
-        return content.substring(0, content.length() - (needBigger ? 9 : 13)) + "\n\n\n\n\n";
+        return content.substring(0, content.length() - (width /2 + 1)) + "\n\n\n\n\n";
     }
 
     private int getLengthOfString(String content){
@@ -396,10 +409,10 @@ public class WifiPrintService implements Runnable{
         return realWidth;
     }
 
-    private String generateSpaceString(int l){
+    private String generateString(int l, String character){
         StringBuilder sb = new StringBuilder("");
         for (int i = 0;i<l;i++){
-            sb.append(" ");
+            sb.append(character);
         }
         return sb.toString();
     }
