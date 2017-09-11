@@ -83,7 +83,7 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
         if(reportStartDate == null || reportStartDate.length() < 1){
             reportStartDate = AppData.getCustomData("lastsuccess");
         }
-        long start = new Date(Long.valueOf(reportStartDate)).getTime();
+
         long now = new Date().getTime();
 
         //print code:

@@ -175,9 +175,7 @@ public class AppData extends Thread{
                     try{
                         time = Long.valueOf(responseString);
                         if(time > 0){//if success
-                            AppData.putCustomData("lifeCode",responseString);
                             AppData.putCustomData("number",responseString);
-                            AppData.putCustomData("celebrate", String.valueOf(new Date().getTime()));
                             AppData.putCustomData("lastsuccess", String.valueOf(new Date().getTime()));
 
                             ToastUtil.showToast("Application is activated successfully!");

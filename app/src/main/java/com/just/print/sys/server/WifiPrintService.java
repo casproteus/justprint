@@ -284,11 +284,30 @@ public class WifiPrintService implements Runnable{
 
         //translate the time format
         DateFormat df = new SimpleDateFormat("MM-dd HH:mm");
-        Date d = new Date(Long.valueOf(startTime));
-        startTime = df.format(d);
-        d = new Date(Long.valueOf(endTime));
-        endTime = df.format(d);
+        try {
+            Date d = new Date(Long.valueOf(startTime));
+            startTime = df.format(d);
+        }catch(Exception e){
+            startTime = "";
+        }
 
+        try{
+            Date d = new Date(Long.valueOf(endTime));
+            endTime = df.format(d);
+        }catch(Exception e){
+            Date d = new Date();
+            endTime = df.format(d);
+        }
+
+        //determin the width of paper.
+        String font = AppData.getCustomData("font");
+        if(!StringUtils.isBlank(font)){
+            try {
+                width = Integer.valueOf(AppData.getCustomData("width"));
+            }catch(Exception e){
+
+            }
+        }
         String spaceStr = generateString((width - startTime.length())/2, " ");
 
         StringBuilder content = new StringBuilder("\n");
@@ -299,7 +318,7 @@ public class WifiPrintService implements Runnable{
         content.append("\n");
         content.append(endTime);
         content.append("\n");
-        content.append("▂▂▂▂▂▂▂▂▂▂▂▂\n\n");
+        content.append(generateString(width/2, "▂")).append("\n\n");
         Double total = Double.valueOf(0);
         int item = 0;
         for(SaleRecord saleRecord:saleRecords){
@@ -335,7 +354,7 @@ public class WifiPrintService implements Runnable{
             item += Integer.valueOf(number);
             total += Double.valueOf(saleRecord.getPrice());
         }
-        content.append("────────────\n");
+        content.append(generateString(width/2, "─")).append("\n");
         content.append(item);
         content.append(" ITEMS");
 
@@ -372,7 +391,7 @@ public class WifiPrintService implements Runnable{
 
         content.append("(").append(tableName).append(")").append(spaceStr).append(dateStr).append("\n");
 
-        content.append(generateString(width /2, "▂")).append("\n");
+        content.append(generateString(width /2, "▂")).append("\n\n");
 
         for(SelectionDetail dd:list){
             StringBuilder sb = new StringBuilder();

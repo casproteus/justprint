@@ -95,6 +95,9 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
                             if(p > -1) {
                                 inputedSN = inputedSN.substring(p + 3);
                                 AppData.putCustomData("width", inputedSN);
+                                if("16".equals(inputedSN)){
+                                    AppData.putCustomData("font", "29, 33, 34");
+                                }
                                 showToast("App has set width to: " + inputedSN);
                                 return;
                             }
