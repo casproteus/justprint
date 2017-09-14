@@ -100,7 +100,16 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
                                 }
                                 showToast("App has set width to: " + inputedSN);
                                 return;
+                            }else{
+                                p = inputedSN.indexOf("-c:");
+                                if(p > -1) {
+                                    inputedSN = inputedSN.substring(p + 3);
+                                    AppData.putCustomData("code", inputedSN);
+                                    showToast("App has set code to: " + inputedSN);
+                                    return;
+                                }
                             }
+
                         }
                     }
                 }

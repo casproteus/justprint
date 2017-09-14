@@ -12,10 +12,8 @@ import com.just.print.R;
 import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
 import com.just.print.app.EventBus;
-import com.just.print.db.bean.M2M_MenuPrint;
 import com.just.print.db.bean.Mark;
 import com.just.print.db.bean.Menu;
-import com.just.print.db.bean.Printer;
 import com.just.print.db.bean.SaleRecord;
 import com.just.print.db.dao.SaleRecordDao;
 import com.just.print.db.expand.DaoExpand;
@@ -27,6 +25,7 @@ import com.just.print.ui.holder.OrderIdentifierItemViewHolder;
 import com.just.print.ui.holder.OrderIdentifierMarkViewHolder;
 import com.just.print.ui.holder.OrderMenuViewHolder;
 import com.just.print.util.L;
+import com.just.print.util.ToastUtil;
 import com.stupid.method.adapter.IXOnItemClickListener;
 import com.stupid.method.adapter.OnClickItemListener;
 import com.stupid.method.adapter.XAdapter2;
@@ -73,7 +72,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
     int curmarkitem;
     List<Mark> markselect;
-
+    public static List<SelectionDetail> bkOfLastSelection;
+    private static CharSequence bkOfLastTable;
     static int times = 0;
 
     @XClick({R.id.odIdConfigBtn, R.id.odIdSndBtn, R.id.odIdDelBtn, R.id.odIdOkBtn})
@@ -108,6 +108,11 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 DelOneText();
                 break;
             case R.id.odIdOkBtn:
+                if(bkOfLastSelection != null){
+                    rollbackLastOrder();
+                    ToastUtil.showToast("last order was not printed yet, please check the printer and try again.");
+                    return;
+                }
                 if (odIdTableTbtn.isChecked() == false) {
                     if (null != storedMenu) {
                         addDish();
@@ -396,11 +401,43 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     }
 
     private void clearOrderMenu() {
-        L.d(TAG, "clearOrderMenu start...");
-        
+        //bk and clear selected menu
+        bkOfLastSelection = new ArrayList<SelectionDetail>();
+        for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
+            bkOfLastSelection.add(selectionDetail);
+        }
+        CustomerSelection.getInstance().clearMenu();
+
+        //bk and clear bkOfLastTable
+        bkOfLastTable = odIdTableTbtn.getText();
+        odIdTableTbtn.setText("");
+        odIdTableTbtn.setChecked(true);
+        loadOrderMenu();
+
+    }
+
+    private void rollbackLastOrder() {
+        //save the menu into database.
+        for(SelectionDetail selectionDetail : bkOfLastSelection){
+            CustomerSelection.getInstance().addSelectedDish(selectionDetail);
+        }
+
+        //clear selected menu
+        odIdTableTbtn.setText(bkOfLastTable);
+        odIdTableTbtn.setChecked(false);
+        loadOrderMenu();
+
+    }
+
+    public static void comfirmPrintOK(){
+
+        if(bkOfLastSelection == null){
+            return;
+        }
+
         //save the menu into database.
         SaleRecordDao saleRecordDao = Applic.app.getDaoMaster().newSession().getSaleRecordDao();
-        for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
+        for(SelectionDetail selectionDetail : bkOfLastSelection){
             int number = selectionDetail.getDishNum();
             Menu menu = selectionDetail.getDish();
             String name = menu.getMname();
@@ -412,12 +449,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             saleRecord.setPrice(price);
             saleRecordDao.insertOrReplace(saleRecord);
         }
-
-        //clear selected menu
-        CustomerSelection.getInstance().clearMenu();
-        odIdTableTbtn.setText("");
-        odIdTableTbtn.setChecked(true);
-        loadOrderMenu();
-
+        bkOfLastSelection = null;
+        bkOfLastTable = "TB";
     }
 }

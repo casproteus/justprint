@@ -13,6 +13,7 @@ import com.just.print.db.bean.Printer;
 import com.just.print.db.bean.SaleRecord;
 import com.just.print.db.expand.DaoExpand;
 import com.just.print.sys.model.SelectionDetail;
+import com.just.print.ui.fragment.OrderIdentifierFragment;
 import com.just.print.util.AppUtils;
 import com.just.print.util.Command;
 import com.just.print.util.L;
@@ -41,6 +42,7 @@ public class WifiPrintService implements Runnable{
 
     private static String curPrintIp = "";
     private int width = 24;
+    private String code = "GBK";
 
     private WifiCommunication wifiCommunication;
     private boolean isConnected;
@@ -212,25 +214,25 @@ public class WifiPrintService implements Runnable{
 
     public void run(){
         while(true){
-
-            //do initSocket for the first non-empty entry, (non-empty means the values hidden in this printerIp is non-empty.)
+            //when shall we do the init socket work? not connected to any one and didn't fond any content to print.
             if(isConnected == false && nonEmptyListFound == false) {
+                //do initSocket for the first non-empty entry, (non-empty means the values hidden in this printerIp is non-empty.)
                 for(Map.Entry entry : contentForPrintMap.entrySet()){
-                    String printerIP = (String)entry.getKey();
                     List<String> contentList = (List<String>)entry.getValue();
                     if(contentList.size() > 0){
-                        nonEmptyListFound = true;
+                        nonEmptyListFound = true;                   //mark that we have found something to print, don't do init socket any more.
 
-                        L.d(TAG,"ip#" + printerIP + "list size#" + contentList.size());
+                        curPrintIp = (String)entry.getKey();
+                        L.d(TAG,"ip#" + curPrintIp + "list size#" + contentList.size());
                         L.d(TAG,"initSocket");
-                        wifiCommunication.initSocket(printerIP,9100);
-                        curPrintIp = printerIP;
-                        break;
+                        wifiCommunication.initSocket(curPrintIp,9100);   //this should result in the "isConnected" become true .
+                        break;  //stop for getting content for other printers, stop here, when one printer finished, open connection to an other printer and print again.
                     }
                 }
             }
 
             //if find some "non-empty" value behind any printerIp in the map, and the isConnected is happened set to true then execute print.
+            //while if nonEmptyListFound is set, isConnected not set, then jump over this part.
             if(nonEmptyListFound == true && isConnected == true){
                 if(contentForPrintMap !=null && contentForPrintMap.get(curPrintIp) != null) {
                     L.d(TAG,"Start print");
@@ -247,7 +249,7 @@ public class WifiPrintService implements Runnable{
                             if(StringUtils.isBlank(font)) {
                                 wifiCommunication.sndByte(Command.GS_ExclamationMark);
                             }else{
-                                //"29, 33, 17";
+                                //default: "27, 33, 48" because it works for both thermal and non-thermal
                                 String[] pieces = font.split(",");
                                 if(pieces.length != 3) {
                                     wifiCommunication.sndByte(Command.GS_ExclamationMark);
@@ -258,16 +260,40 @@ public class WifiPrintService implements Runnable{
                                     wifiCommunication.sndByte(Command.GS_ExclamationMark);
                                 }
                             }
-                            wifiCommunication.sendMsg(content, "GBK");//"UTF-8");
+
+                            //code can be customzed
+                            String tCode = AppData.getCustomData("code");
+                            if(tCode != null && tCode.length() > 2){
+                                code = tCode;
+                            }
+                            wifiCommunication.sendMsg(content, code);
+
+                            //cut the paper.
                             wifiCommunication.sndByte(Command.GS_V_m_n);
                         }
                     }
                     contentForPrintMap.get(curPrintIp).clear();
                     isConnected = false;
+                    nonEmptyListFound = false;
                     //close the connectoion afer each print task.
                     wifiCommunication.close();
+
+                    //if all content printed, then clean the selection interface
+                    boolean isAllPrinted = true;
+                    for(Map.Entry entry : contentForPrintMap.entrySet()) {
+                        List<String> tContentList = (List<String>) entry.getValue();
+                        if (tContentList.size() > 0) {
+                            isAllPrinted = false;
+                            break;
+                        }
+                    }
+                    if(isAllPrinted){
+                        OrderIdentifierFragment.comfirmPrintOK();
+                    }
                 }
             }
+
+            //if nonEmptyListFound = true, then keep waiting for isConnected being set to true.
             AppUtils.sleep(1000);
         }
     }
@@ -318,7 +344,7 @@ public class WifiPrintService implements Runnable{
         content.append("\n");
         content.append(endTime);
         content.append("\n");
-        content.append(generateString(width/2, "▂")).append("\n\n");
+        content.append(generateString(width, "=")).append("\n\n");
         Double total = Double.valueOf(0);
         int item = 0;
         for(SaleRecord saleRecord:saleRecords){
@@ -354,7 +380,7 @@ public class WifiPrintService implements Runnable{
             item += Integer.valueOf(number);
             total += Double.valueOf(saleRecord.getPrice());
         }
-        content.append(generateString(width/2, "─")).append("\n");
+        content.append(generateString(width, "-")).append("\n");
         content.append(item);
         content.append(" ITEMS");
 
@@ -391,7 +417,7 @@ public class WifiPrintService implements Runnable{
 
         content.append("(").append(tableName).append(")").append(spaceStr).append(dateStr).append("\n");
 
-        content.append(generateString(width /2, "▂")).append("\n\n");
+        content.append(generateString(width, "=")).append("\n\n");
 
         for(SelectionDetail dd:list){
             StringBuilder sb = new StringBuilder();
@@ -411,9 +437,9 @@ public class WifiPrintService implements Runnable{
                     content.append(generateString(5, " ")).append("* ").append(str.getName()).append(" *\n");
                 }
             }
-            content.append(generateString(width /2, "─")).append("\n");
+            content.append(generateString(width, "-")).append("\n");
         }
-        return content.substring(0, content.length() - (width /2 + 1)) + "\n\n\n\n\n";
+        return content.substring(0, content.length() - (width + 1)) + "\n\n\n\n\n";
     }
 
     private int getLengthOfString(String content){
