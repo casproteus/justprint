@@ -43,6 +43,9 @@ public class WifiPrintService implements Runnable{
     private static String curPrintIp = "";
     private int width = 24;
     private String code = "GBK";
+    private String SEP_STR1 = "=";
+    private String SEP_STR2 = "-";
+
 
     private WifiCommunication wifiCommunication;
     private boolean isConnected;
@@ -344,7 +347,12 @@ public class WifiPrintService implements Runnable{
         content.append("\n");
         content.append(endTime);
         content.append("\n");
-        content.append(generateString(width, "=")).append("\n\n");
+
+        String sep_str1 = AppData.getCustomData("sep_str1");
+        if(sep_str1 == null || sep_str1.length() == 0){
+            sep_str1 = SEP_STR1;
+        }
+        content.append(generateString(width, sep_str1)).append("\n\n");
         Double total = Double.valueOf(0);
         int item = 0;
         for(SaleRecord saleRecord:saleRecords){
@@ -380,7 +388,7 @@ public class WifiPrintService implements Runnable{
             item += Integer.valueOf(number);
             total += Double.valueOf(saleRecord.getPrice());
         }
-        content.append(generateString(width, "-")).append("\n");
+        content.append(generateString(width, SEP_STR2)).append("\n");
         content.append(item);
         content.append(" ITEMS");
 
@@ -417,7 +425,16 @@ public class WifiPrintService implements Runnable{
 
         content.append("(").append(tableName).append(")").append(spaceStr).append(dateStr).append("\n");
 
-        content.append(generateString(width, "=")).append("\n\n");
+        String sep_str1 = AppData.getCustomData("sep_str1");
+        if(sep_str1 == null || sep_str1.length() == 0){
+            sep_str1 = SEP_STR1;
+        }
+        String sep_str2 = AppData.getCustomData("sep_str2");
+        if(sep_str2 == null || sep_str2.length() == 0){
+            sep_str2 = SEP_STR2;
+        }
+
+        content.append(generateString(width, sep_str1)).append("\n\n");
 
         for(SelectionDetail dd:list){
             StringBuilder sb = new StringBuilder();
@@ -437,7 +454,7 @@ public class WifiPrintService implements Runnable{
                     content.append(generateString(5, " ")).append("* ").append(str.getName()).append(" *\n");
                 }
             }
-            content.append(generateString(width, "-")).append("\n");
+            content.append(generateString(width, sep_str2)).append("\n");
         }
         return content.substring(0, content.length() - (width + 1)) + "\n\n\n\n\n";
     }

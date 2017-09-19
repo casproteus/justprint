@@ -107,6 +107,29 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
                                     AppData.putCustomData("code", inputedSN);
                                     showToast("App has set code to: " + inputedSN);
                                     return;
+                                }else{
+                                    p = inputedSN.indexOf("-p:");
+                                    if(p > -1){// means theres parameters
+                                        inputedSN = inputedSN.substring(p + 3).trim();
+                                        AppData.putCustomData("adminPassword", inputedSN);
+                                        showToast("App has set adminPassword to: " + inputedSN);
+                                    }else {
+                                        p = inputedSN.indexOf("-s1:");
+                                        if (p > -1) {
+                                            inputedSN = inputedSN.substring(p + 4);
+                                            AppData.putCustomData("sep_str1", inputedSN);
+                                            showToast("App has set sep_str1 to: " + inputedSN);
+                                            return;
+                                        } else {
+                                            p = inputedSN.indexOf("-s2:");
+                                            if (p > -1) {
+                                                inputedSN = inputedSN.substring(p + 4);
+                                                AppData.putCustomData("sep_str2", inputedSN);
+                                                showToast("App has set sep_str2 to: " + inputedSN);
+                                                return;
+                                            }
+                                        }
+                                    }
                                 }
                             }
 
