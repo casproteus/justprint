@@ -14,7 +14,7 @@ public class Generated {
 
     @Test
     public void gen() {
-        generateAll(1, "com.just.print");
+        generateAll(1, "com.just.print_night");
     }
 
 
@@ -85,7 +85,7 @@ public class Generated {
         Property.PropertyBuilder pid = menuPrint.addLongProperty("pid");
         Property.PropertyBuilder mid = menuPrint.addStringProperty("mid");
         menuPrint.addIdProperty().primaryKeyAsc().unique();
-        menuPrint.addToOne(print, pid.getProperty(), "print");
+        menuPrint.addToOne(print, pid.getProperty(), "print_night");
         menuPrint.addToOne(menu, mid.getProperty(), "menu");
         menu.addToMany(menuPrint, mid.getProperty());
 

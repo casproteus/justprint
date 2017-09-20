@@ -5,7 +5,7 @@ android {
     buildToolsVersion '25.0.0'
 
     defaultConfig {
-        applicationId "com.just.print"
+        applicationId "com.just.print_night"
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 1

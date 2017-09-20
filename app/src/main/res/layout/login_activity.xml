@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.just.print.ui.activity.LoginActivity">
+    tools:context="com.just.print_night.ui.activity.LoginActivity">
 
     <FrameLayout
         android:id="@+id/content"
@@ -37,7 +37,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true"
-                    android:text="JustPrint"
+                    android:text="JustPrint-N"
                     android:textAlignment="viewStart"
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"
