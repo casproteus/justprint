@@ -54,7 +54,7 @@ public class SubTitleMenuExpandViewHolder extends XExpadnViewHolder<Menu> {
 
     @Override
     public void onClick(View v){
-        button.setTextColor(Color.rgb(000, 000, 255));
+        button.setTextColor(Color.rgb(000, 145, 213));
         super.onClick(v);
     }
     @Override
@@ -66,7 +66,7 @@ public class SubTitleMenuExpandViewHolder extends XExpadnViewHolder<Menu> {
         if(selections != null) {
             for (SelectionDetail selectionDetail : selections) {
                 if(selectionDetail.getDish().getID().equals(menu.getID())){
-                    button.setTextColor(Color.rgb(000, 000, 255));
+                    button.setTextColor(Color.rgb(000, 145, 213));
                     button.setTypeface(null, Typeface.BOLD);
                 }
             }
