@@ -46,7 +46,7 @@ public class OrderCategoryFragment extends BaseFragment {
     }
 
 
-    XExpadnAdapter<Category, Menu> categoryExXAdapter;
+    public XExpadnAdapter<Category, Menu> categoryExXAdapter;
 
     @Override
     public void onCreated(Bundle savedInstanceState) {

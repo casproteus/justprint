@@ -177,7 +177,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                             InputText("+");
                             break;
                         case 17:
-                            odIdTableTbtn.setText("Delivery");
+                            odIdTableTbtn.setText("TOGO");
                             CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
                             return;
                         case 18:
@@ -264,7 +264,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         //设置餐桌号用
         //CustomerSelection.getInstance().setTableNumber(odIdTableNumEt.getText().toString());
         storedMenu = null;
-        String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "+","TOGO"};
+        String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "+","togo"};
         itemXAdapter = new XAdapter2<String>(getActivity(), Arrays.asList(items), OrderIdentifierItemViewHolder.class);
         itemXAdapter.setClickItemListener(this.itemXAdapterClick);
         odIdLoutItemsGv.setAdapter(itemXAdapter);
@@ -350,7 +350,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         switch (view.getId()) {
             case R.id.oddelDish:
                 SelectionDetail a = dishesXAdapter.get(i);
-                dishesXAdapter.remove(a);
+                //dishesXAdapter.remove(a);
                 CustomerSelection.getInstance().deleteSelectedDish(a);
                 loadOrderMenu();
                 break;
