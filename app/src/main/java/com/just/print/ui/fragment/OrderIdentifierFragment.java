@@ -169,10 +169,12 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 //                            break;
 //                        case 13:
 //                            break;
-//                        case 14:
-//                            break;
-//                        case 15:
-//                            break;
+                        case 14:
+                            odIdTableTbtn.setText("F");
+                            break;
+                        case 15:
+                            odIdTableTbtn.setText("H");
+                            break;
                         case 16:
                             InputText("+");
                             break;
@@ -264,7 +266,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         //设置餐桌号用
         //CustomerSelection.getInstance().setTableNumber(odIdTableNumEt.getText().toString());
         storedMenu = null;
-        String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "+","togo"};
+        String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "F", "H", "+","togo"};
         itemXAdapter = new XAdapter2<String>(getActivity(), Arrays.asList(items), OrderIdentifierItemViewHolder.class);
         itemXAdapter.setClickItemListener(this.itemXAdapterClick);
         odIdLoutItemsGv.setAdapter(itemXAdapter);
