@@ -122,9 +122,10 @@ public class WifiPrintService implements Runnable{
     public String exePrintCommand(){
         L.d(TAG,"exePrintCommand");
         if(!isIpContentMapEmpty()){
-            ToastUtil.showToast("current print job not finished yet!");
+            L.d(TAG,"current print job not finished yet!");
             return ERROR;                     //未打印完毕
         }
+
 
         //1、遍历每个选中的菜，并分别遍历加在其上的打印机。并在ipSelectionsMap上对应IP后面增加菜品
         for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){

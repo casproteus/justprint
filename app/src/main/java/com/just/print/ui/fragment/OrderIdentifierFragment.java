@@ -83,6 +83,12 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 startActivity(new Intent(getContext(), ConfigActivity.class));
                 break;
             case R.id.odIdSndBtn:
+                List<SelectionDetail> selectionDetails = CustomerSelection.getInstance().getSelectedDishes();
+                if(selectionDetails == null || selectionDetails.size() == 0){
+                    showToast("Nothing selected!");
+                    return;
+                }
+
                 String result = WifiPrintService.getInstance().exePrintCommand();
                 if(WifiPrintService.ERROR.equals(result)){
                     if(times < 1) {
