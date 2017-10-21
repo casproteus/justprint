@@ -30,9 +30,9 @@ public final class DaoExpand {
     }
 
     static public <T, K> List<T> queryNotDeletedAll(AbstractDao<T, K> dao) {
-        return queryNotDeletedAllQuery(dao).list();
+        return queryAllNotDeleted(dao).list();
     }
-    static public <T, K> QueryBuilder<T> queryNotDeletedAllQuery(AbstractDao<T, K> dao) {
+    static public <T, K> QueryBuilder<T> queryAllNotDeleted(AbstractDao<T, K> dao) {
         return dao.queryBuilder().where(MenuDao.Properties.State.notEq(State.delete));
     }
 

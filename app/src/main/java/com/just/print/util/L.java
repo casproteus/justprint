@@ -16,6 +16,7 @@ import java.net.URLEncoder;
  */
 
 public class L extends Thread{
+    private static int index = 0;
     private  String tag;
     private String msg;
 
@@ -25,7 +26,7 @@ public class L extends Thread{
     }
 
     public static void d(String tag, Object msg){
-        sendToServer(AppData.getShopName()+"_"+AppData.getUserName(), tag + ":" + String.valueOf(msg));
+        sendToServer(AppData.getShopName()+"_"+AppData.getUserName(), index++ + "_" + tag + ":" + String.valueOf(msg));
         Log.d(tag, String.valueOf(msg));
     }
 

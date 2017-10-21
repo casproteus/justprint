@@ -32,7 +32,6 @@ import com.stupid.method.reflect.annotation.XGetValueByView;
 import com.stupid.method.reflect.annotation.XViewByID;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static android.content.DialogInterface.OnClickListener;
@@ -377,7 +376,7 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
 
     private void loadCategory() {
 
-        List<Category> list = DaoExpand.queryNotDeletedAllQuery(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.DisplayIdx).list();
+        List<Category> list = DaoExpand.queryAllNotDeleted(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.DisplayIdx).list();
         categoryXAdapter.setData(list);
         categoryXAdapter.notifyDataSetChanged();
 

@@ -84,7 +84,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 break;
             case R.id.odIdSndBtn:
                 String result = WifiPrintService.getInstance().exePrintCommand();
-                if("2".equals(result)){
+                if(WifiPrintService.ERROR.equals(result)){
                     if(times < 1) {
                         showToast("The content was not printed well. please wait and try again.");
                         times++;
@@ -93,7 +93,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         times++;
                     }else{
                         WifiPrintService.getInstance().reInitPrintRelatedMaps();
-                        if("0".equals(WifiPrintService.getInstance().exePrintCommand())){
+                        if(WifiPrintService.SUCCESS.equals(WifiPrintService.getInstance().exePrintCommand())){
                             times = 0;
                             clearOrderMenu();
                         }
@@ -134,7 +134,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     IXOnItemClickListener itemXAdapterClick = new IXOnItemClickListener() {
         @Override
         public void onClickItem(View view, int i) {
-            L.d(TAG, "onClickItem1");
+            L.d(TAG, "onClickItem");
             Menu tmpMenu;
             L.d(TAG, String.valueOf(view.getId()) + String.valueOf(i));
             switch (view.getId()) {
@@ -195,7 +195,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                             break;
                         case 20:
                             String result = WifiPrintService.getInstance().exePrintCommand();
-                            if ("2".equals(result)) {
+                            if (WifiPrintService.ERROR.equals(result)) {
                                 showToast("The content of last time is not printed yet. please wait and try again.");
                             } else{
                                 clearOrderMenu();

@@ -1,6 +1,5 @@
 package com.just.print.ui.fragment;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -55,7 +54,7 @@ public class OrderCategoryFragment extends BaseFragment {
                 SubTitleMenuExpandViewHolder.class);
         odExCategory.setAdapter(categoryExXAdapter);
         Map<Category, List<Menu>> mdata = new LinkedHashMap<>();
-        List<Category> list = DaoExpand.queryNotDeletedAllQuery(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.DisplayIdx).list();
+        List<Category> list = DaoExpand.queryAllNotDeleted(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.DisplayIdx).list();
         MenuDao dao = Applic.app.getDaoMaster().newSession().getMenuDao();
         for (Category ca : list) {
             mdata.put(ca, DaoExpand.queryMenuByCategory(ca, dao));
