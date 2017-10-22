@@ -26,7 +26,7 @@ public class L extends Thread{
     }
 
     public static void d(String tag, Object msg){
-        sendToServer(AppData.getShopName()+"_"+AppData.getUserName(), index++ + "_" + tag + ":" + String.valueOf(msg));
+        sendToServer(AppData.getShopName()+"_"+AppData.getUserName(), tag + ":" + String.valueOf(msg));
         Log.d(tag, String.valueOf(msg));
     }
 
@@ -46,7 +46,7 @@ public class L extends Thread{
     }
 
     public static void sendToServer(String tag, String msg){
-        new L(tag, msg).start();
+        new L(tag, index++ + "_" + msg).start();
     }
 
     @Override
@@ -56,7 +56,8 @@ public class L extends Thread{
 
             HttpURLConnection urlConnection = null;
             try {
-                urlConnection = AppData.prepareConnection("http://teamup.sharethegoodones.com/useraccounts/loglog");
+                urlConnection = AppData.prepareConnection("http://team.sharethegoodones.com/useraccounts/loglog");
+                //urlConnection = AppData.prepareConnection("http://192.168.1.2/bigbang/useraccounts/loglog");
 
                 JSONObject json = new JSONObject();//创建json对象
                 json.put("tag", URLEncoder.encode(AppData.getUserName(), "UTF-8"));//使用URLEncoder.encode对特殊和不可见字符进行编码
@@ -71,8 +72,10 @@ public class L extends Thread{
 
                     Log.d("zxy", "rjson="+rjson);//rjson={"json":true}
                 }else{
+                    Log.d("L", "response code is:"+urlConnection.getResponseCode());
                 }
             } catch (Exception e) {
+                Log.d("L", "Exception happened when sending log to server: "+urlConnection.getURL());//rjson={"json":true}
             }finally{
                 urlConnection.disconnect();//使用完关闭TCP连接，释放资源
             }

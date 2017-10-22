@@ -154,7 +154,7 @@ public class AppData extends Thread{
             HttpURLConnection urlConnection = null;
             try {
                 urlConnection = prepareConnection("http://test.sharethegoodones.com/activeJustPrintAccount");
-                //urlConnection = prepareConnection("http://192.168.1.14/taostyle/activeJustPrintAccount");
+                //urlConnection = prepareConnection("http://192.168.1.2/taostyle/activeJustPrintAccount");
 
                 StringBuilder content = new StringBuilder(AppData.getLicense());
                 content.append(",");

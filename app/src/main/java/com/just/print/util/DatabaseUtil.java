@@ -34,7 +34,7 @@ public class DatabaseUtil extends Thread{
 
     final private static String DATABASE_NAME_PREFFIX = "JustPrinter_"; //data/user/0/com.just.print/databases/ ; /data/data/com.whatsapp/databases/msgstore.db
     final private static String SERVER_URL = "http://test.sharethegoodones.com";
-    //final private static String SERVER_URL = "http://192.168.1.14/taostyle";
+    //final private static String SERVER_URL = "http://192.168.1.2/taostyle";
     private static File file = null;
 
     /**
