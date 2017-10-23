@@ -60,19 +60,19 @@ public class WifiPrintService implements Runnable{
         public void handleMessage(Message msg){
             switch (msg.what){
                 case WifiCommunication.WFPRINTER_CONNECTED:
-                    L.d(TAG,"Connected with ip:" + WifiPrintService.curPrintIp);
+                    L.d(TAG,"connection generated with ip:" + WifiPrintService.curPrintIp);
 //                    Command.GS_ExclamationMark[2] = 0x11;
 //                    wifiCommunication.sndByte(Command.GS_ExclamationMark);//put it here will cause app exit in emulator(5x api 24)
                     printerConnectedFlag = true;
                     break;
                 case WifiCommunication.WFPRINTER_DISCONNECTED:
-                    L.d(TAG,"Disconnected with ip:" + WifiPrintService.curPrintIp);
+                    L.d(TAG,"connection stopped with ip:" + WifiPrintService.curPrintIp);
                     contentReadyForPrintFlag = false;
                     printerConnectedFlag = false;
                     curPrintIp = "";
                     break;
                 case WifiCommunication.WFPRINTER_CONNECTEDERR:
-                    L.d(TAG,"Connectederr with ip:" + WifiPrintService.curPrintIp);
+                    L.d(TAG,"connection error happened with ip:" + WifiPrintService.curPrintIp);
                     ToastUtil.showToast("Printer:" + curPrintIp + " connection error!");
 
                     AppUtils.sleep(1000);
@@ -80,7 +80,7 @@ public class WifiPrintService implements Runnable{
                     printerConnectedFlag = false;
                     break;
                 case WifiCommunication.SEND_FAILED:
-                    L.d(TAG, "printer message send_failed with ip:" + WifiPrintService.curPrintIp);
+                    L.d(TAG, "ERROR happenned when sending message to ip:" + WifiPrintService.curPrintIp);
                     contentReadyForPrintFlag = false;
                     printerConnectedFlag = false;
                     //发送失败对策暂无
@@ -120,9 +120,9 @@ public class WifiPrintService implements Runnable{
     }
 
     public String exePrintCommand(){
-        L.d(TAG,"exePrintCommand");
+        L.d(TAG,"start to translate selection into ipContent for printing.");
         if(!isIpContentMapEmpty()){
-            L.d(TAG,"current print job not finished yet!");
+            L.d(TAG,"ipContent not empty, means last print job not finished yet! returning not success flag.");
             return ERROR;                     //未打印完毕
         }
 
@@ -138,12 +138,13 @@ public class WifiPrintService implements Runnable{
                 }
 
                 String ip = printer.getIp();
-                L.d(TAG,"Adding to tmpqueueMap, ip:" + ip + " type:" + printer.getFirstPrint());
+                L.d(TAG,"Adding a dish to ipSelectionsMap, ip:" + ip);
                 ipSelectionsMap.get(ip).add(selectionDetail);
             }
         }
 
         //2、遍历ipSelectionsMap，如对应打印机type为0, 则对其后的value(dishes)按照类别进行排序
+        L.d(TAG,"checking how many dishes under each printer...");
         for(Map.Entry entry: ipSelectionsMap.entrySet()){
             String key = (String)entry.getKey();
             List<SelectionDetail> dishList = (List<SelectionDetail>) entry.getValue();
@@ -169,7 +170,7 @@ public class WifiPrintService implements Runnable{
 
             if(dishList.size() > 0){
                 if(ipSelectionsMap.get(printerIP) != dishList){
-                    L.d("Attenttion!", "the dishList are different from ipSelectionsMap.get(printerIP)!!!!");
+                    L.d("ERROR!", "the dishList are different from ipSelectionsMap.get(printerIP)!!!!");
                 }
                 if(ipPrinterMap.get(printerIP).getFirstPrint() == 1){  //全单封装
                     ipContentMap.get(printerIP).add(formatContentForPrint(dishList) + "\n\n\n\n\n");
@@ -185,7 +186,7 @@ public class WifiPrintService implements Runnable{
             ipSelectionsMap.get(printerIP).clear();
         }
 
-        L.d(TAG, "Order is ready and waiting for print.");
+        L.d(TAG, "Order is translated into ipContentMap map and ready for print.");
         ToastUtil.showToast("PRINTING...");
         return SUCCESS;
     }
@@ -222,14 +223,15 @@ public class WifiPrintService implements Runnable{
         while(true){
             //check if this round is a good time to reset a curPrintIp and load new contnet to print.
             if(printerConnectedFlag == false && contentReadyForPrintFlag == false) {
+                L.d(TAG,"loading bullet(changing current ip and setup two flags....");
                 //do initSocket for the first non-empty entry, (non-empty means the values hidden in this printerIp is non-empty.)
                 for(Map.Entry entry : ipContentMap.entrySet()){
                     List<String> contentList = (List<String>)entry.getValue();
                     if(contentList.size() > 0){
                         curPrintIp = (String)entry.getKey();
                         L.d(TAG,"ip changed to:" + curPrintIp + "the size of content to print is:" + contentList.size());
-                        L.d(TAG,"now initSocket to set up the printerConnectedFlag");
                         contentReadyForPrintFlag = true;                   //mark that we have found something to print, don't do init socket any more.
+                        L.d(TAG,"contentReadyForPrintFlag setted up! now waiting for initSocket to set up the printerConnectedFlag");
                         wifiCommunication.initSocket(curPrintIp,9100);   //this should result in the "printerConnectedFlag" become true .
                         break;  //stop for getting content for other printers, stop here, when one printer finished, open connection to an other printer and print again.
                     }
@@ -238,11 +240,11 @@ public class WifiPrintService implements Runnable{
 
             //chick if this round is a good time to do actual print work?
             if(contentReadyForPrintFlag == true && printerConnectedFlag == true){
+                L.d(TAG,"Flags both set, checking the content fllowing current ip:" + curPrintIp);
                 if(ipContentMap !=null && ipContentMap.get(curPrintIp) != null) {
-                    L.d(TAG,"Start print");
                     List<String> contentList = ipContentMap.get(curPrintIp);
+                    L.d(TAG,"out printing... content list size is:" + contentList.size());
                     for (String content : contentList) {
-                        L.d(TAG,"out printing...");
 
                         if(content.length()>0) {
                             if(!"silent".equals(AppData.getCustomData("mode"))) {
@@ -280,7 +282,7 @@ public class WifiPrintService implements Runnable{
                     contentReadyForPrintFlag = false;
                     //close the connectoion afer each print task.
                     wifiCommunication.close();
-
+                    L.d(TAG,"Print complete (ipcontent cleaned, flag set to false, connection closed!) for ip:" + curPrintIp);
                     isAllPrintedCheck();
                 }
             }
@@ -292,7 +294,7 @@ public class WifiPrintService implements Runnable{
 
     private void isAllPrintedCheck(){
         if(isIpContentMapEmpty()){
-            L.d(TAG,"All printed");
+            L.d(TAG,"All content in this order are printed, to comfirm app with OK.");
             OrderIdentifierFragment.comfirmPrintOK();
         }
     }
