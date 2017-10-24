@@ -36,7 +36,7 @@ public class OrderActivity extends BaseActivity {
         new StupidReflect(this).init();
         fragmentList.add(new OrderCategoryFragment());
         //fragmentList.add(new OrderMenuFragment());
-        fragmentList.add(new OrderIdentifierFragment());
+        fragmentList.add(OrderIdentifierFragment.getInstance());
         adapter = new MyPagerAdapter(getSupportFragmentManager(), fragmentList);
         try {
             if (viewPager != null) {
