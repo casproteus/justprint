@@ -101,10 +101,10 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 String result = WifiPrintService.getInstance().exePrintCommand();
                 if(WifiPrintService.ERROR.equals(result)){
                     if(times < 1) {
-                        showToast("The content was not printed well. please wait and try again.");
+                        showToast("Last print not done yet. Please wait.");
                         times++;
                     }else if(times < 2){
-                        showToast("Please restart the device which blocked the printer, then try again!");
+                        showToast("Last print not done yet. Press Send Again To Resend it!");
                         times++;
                     }else{
                         WifiPrintService.getInstance().reInitPrintRelatedMaps();
@@ -112,7 +112,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                             times = 0;
                             clearOrderMenu();
                         }
-                        showToast("Please check and make sure last order is printed out!");
+                        showToast("Order was re-send!");
                     }
                 }else {
                     times = 0;
@@ -123,13 +123,18 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 DelOneText();
                 break;
             case R.id.odIdOkBtn:
-                if(bkOfLastSelection != null){
-                    rollbackLastOrder();
-                    ToastUtil.showToast("last order was not printed yet, please check the printer and try again.");
-                    return;
-                }
-                if (odIdTableTbtn.isChecked() == false) {
-                    if (null != storedMenu) {
+                if (odIdTableTbtn.isChecked()) {    //waiting for input table num status. always allowed!
+                    odIdTableTbtn.setChecked(false);
+                    CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
+                } else {                            //inputting dishes status. need to check print status.
+
+                    if(bkOfLastSelection != null){      //content not all send to printer yet.
+                        //if last order has only one dish and it happened to be same
+                        //as the one selected this time, waiter will think the roll back is not happenning.
+                        //we decided to not display last order--- rollbackLastOrder();
+                        ToastUtil.showToast("Printing...Please wait.");
+                        return;
+                    }else if (storedMenu != null) {     //last order send to printer well.
                         addDish();
                         odIdInput.setText("");
                         odIdfrName.setText("");
@@ -137,9 +142,6 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                             loadOrderMenu();
                         }
                     }
-                } else {
-                    odIdTableTbtn.setChecked(false);
-                    CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
                 }
                 break;
         }
@@ -396,7 +398,6 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     }
 
     private void clearOrderMenu() {
-        waitForPrintSuccess();
         //bk and clear selected menu
         bkOfLastSelection = new ArrayList<SelectionDetail>();
         for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
@@ -412,6 +413,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
     }
 
+    /**no one is calling this mehtod now, because we not response feels like app goes wrong. and user might input again.
     //waiting 15 seconds or untile comfirmPrintOK() is called.
     private void waitForPrintSuccess(){
         int i = 0;
@@ -424,6 +426,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         }
     }
 
+    //no one is calling this mehtod now, because we relized the order will not lost, it stay in ipConentMap
+    //when connection come back, it will be printed out.
     private void rollbackLastOrder() {
         //save the menu into database.
         for(SelectionDetail selectionDetail : bkOfLastSelection){
@@ -435,7 +439,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         odIdTableTbtn.setChecked(false);
         loadOrderMenu();
 
-    }
+    }*/
 
     public static void comfirmPrintOK(){
 

@@ -72,15 +72,17 @@ public class WifiPrintService implements Runnable{
                     curPrintIp = "";
                     break;
                 case WifiCommunication.WFPRINTER_CONNECTEDERR:
-                    L.d(TAG,"connection error happened with ip:" + WifiPrintService.curPrintIp);
+                    L.d(TAG,"Connection Error! With ip:" + WifiPrintService.curPrintIp);
                     ToastUtil.showToast("Printer:" + curPrintIp + " connection error!");
 
                     AppUtils.sleep(1000);
+
                     contentReadyForPrintFlag = false;
                     printerConnectedFlag = false;
+
                     break;
                 case WifiCommunication.SEND_FAILED:
-                    L.d(TAG, "ERROR happenned when sending message to ip:" + WifiPrintService.curPrintIp);
+                    L.d(TAG, "ERROR! When sending msg to: " + WifiPrintService.curPrintIp);
                     contentReadyForPrintFlag = false;
                     printerConnectedFlag = false;
                     //发送失败对策暂无
@@ -275,12 +277,15 @@ public class WifiPrintService implements Runnable{
                             wifiCommunication.sndByte(Command.GS_V_m_n);
                         }
                     }
+                    //reset status
                     ipContentMap.get(curPrintIp).clear();
                     printerConnectedFlag = false;
                     contentReadyForPrintFlag = false;
+
                     //close the connectoion afer each print task.
                     wifiCommunication.close();
                     L.d(TAG,"Print complete (ipcontent cleaned, flag set to false, connection closed!) for ip:" + curPrintIp);
+
                     isAllPrintedCheck();
                 }
             }else{
