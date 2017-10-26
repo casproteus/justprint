@@ -220,9 +220,10 @@ public class WifiPrintService implements Runnable{
     }
 
     public void run(){
+        int timeCounter = 0;
         while(true){
             //check if this round is a good time to reset a curPrintIp and load new contnet to print.
-            if(printerConnectedFlag == false && contentReadyForPrintFlag == false) {
+            if(contentReadyForPrintFlag == false && printerConnectedFlag == false) {
                 L.d(TAG,"loading bullet(changing current ip and setup two flags....");
                 //do initSocket for the first non-empty entry, (non-empty means the values hidden in this printerIp is non-empty.)
                 for(Map.Entry entry : ipContentMap.entrySet()){
@@ -236,10 +237,7 @@ public class WifiPrintService implements Runnable{
                         break;  //stop for getting content for other printers, stop here, when one printer finished, open connection to an other printer and print again.
                     }
                 }
-            }
-
-            //chick if this round is a good time to do actual print work?
-            if(contentReadyForPrintFlag == true && printerConnectedFlag == true){
+            }else if(contentReadyForPrintFlag == true && printerConnectedFlag == true){//chick if this round is a good time to do actual print work?
                 L.d(TAG,"Flags both set, checking the content fllowing current ip:" + curPrintIp);
                 if(ipContentMap !=null && ipContentMap.get(curPrintIp) != null) {
                     List<String> contentList = ipContentMap.get(curPrintIp);
@@ -284,6 +282,13 @@ public class WifiPrintService implements Runnable{
                     wifiCommunication.close();
                     L.d(TAG,"Print complete (ipcontent cleaned, flag set to false, connection closed!) for ip:" + curPrintIp);
                     isAllPrintedCheck();
+                }
+            }else{
+                L.d(TAG,"printerConnectedFlag:" + printerConnectedFlag);
+                timeCounter++;
+                if(timeCounter == 5){
+                    timeCounter = 0;
+                    ToastUtil.showToast("Printer Error! Check " + curPrintIp);
                 }
             }
 

@@ -415,14 +415,13 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     //waiting 15 seconds or untile comfirmPrintOK() is called.
     private void waitForPrintSuccess(){
         int i = 0;
-        while (i < 15){
+        while (true){
             i++;
             AppUtils.sleep(1000);
             if( bkOfLastSelection == null && "TB".equals(bkOfLastTable)){
                 return;
             }
         }
-        ToastUtil.showToast("Check Printer....");
     }
 
     private void rollbackLastOrder() {
