@@ -9,6 +9,7 @@ import android.widget.ToggleButton;
 import android.content.Intent;
 
 import com.just.print.R;
+import com.just.print.app.AppData;
 import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
 import com.just.print.app.EventBus;
@@ -26,6 +27,7 @@ import com.just.print.ui.holder.OrderIdentifierMarkViewHolder;
 import com.just.print.ui.holder.OrderMenuViewHolder;
 import com.just.print.util.AppUtils;
 import com.just.print.util.L;
+import com.just.print.util.StringUtils;
 import com.just.print.util.ToastUtil;
 import com.stupid.method.adapter.IXOnItemClickListener;
 import com.stupid.method.adapter.OnClickItemListener;
@@ -84,6 +86,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     public static List<SelectionDetail> bkOfLastSelection;
     private static CharSequence bkOfLastTable;
     static int times = 0;
+    String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "F", "H", "+","togo"};
 
     @XClick({R.id.odIdConfigBtn, R.id.odIdSndBtn, R.id.odIdDelBtn, R.id.odIdOkBtn})
     private void exeControlCommand(View v) {
@@ -158,52 +161,29 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             switch (view.getId()) {
                 case R.id.buttonholder: //number buttons.
                     switch (i) {
-//                        in case the characters is not in order
-//                        case 0:
-//                            break;
-//                        case 1:
-//                            break;
-//                        case 2:
-//                            break;
-//                        case 3:
-//                            break;
-//                        case 4:
-//                            break;
-//                        case 5:
-//                            break;
-//                        case 6:
-//                            break;
-//                        case 7:
-//                            break;
-//                        case 8:
-//                            break;
-//                        case 9:
-//                            break;
-//                        case 10:
-//                            break;
-//                        case 11:
-//                            break;
-//                        case 12:
-//                            break;
-//                        case 13:
-//                            break;
                         case 14:
-                            odIdTableTbtn.setText("F");
+                            if(items.length == 18) {
+                                odIdTableTbtn.setText("F");
+                            }else{
+                                InputText(Character.toString((char) (i % 10 + 'A')));
+                            }
                             break;
                         case 15:
-                            odIdTableTbtn.setText("H");
+                            if(items.length == 18) {
+                                odIdTableTbtn.setText("H");
+                            }else{
+                                InputText(Character.toString((char) (i % 10 + 'A')));
+                            }
                             break;
-                        case 16:
-                            InputText("+");
-                            break;
-                        case 17:
-                            odIdTableTbtn.setText("TOGO");
-                            CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
-                            return;
                         default:
                             if (i < 10) {
                                 InputText(Integer.toString((i + 1) % 10));
-                            } else {
+                            } else if( i == items.length - 2){
+                                InputText("+");
+                            } else if (i == items.length - 1) {
+                                odIdTableTbtn.setText("TOGO");
+                                CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
+                            }else {
                                 InputText(Character.toString((char) (i % 10 + 'A')));
                             }
                             break;
@@ -261,7 +241,13 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         //设置餐桌号用
         //CustomerSelection.getInstance().setTableNumber(odIdTableNumEt.getText().toString());
         storedMenu = null;
-        String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "F", "H", "+","togo"};
+        if(!StringUtils.isBlank(AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR))) {
+            if(AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR).equalsIgnoreCase("P")){
+                items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F","G","H","I","J","K","L","M","N","O","P", "+", "togo"};
+            }else if(AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR).equalsIgnoreCase("N")){
+                items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F","G","H","I","J","K","L","M","N", "+", "togo"};
+            }
+        }
         itemXAdapter = new XAdapter2<String>(getActivity(), Arrays.asList(items), OrderIdentifierItemViewHolder.class);
         itemXAdapter.setClickItemListener(this.itemXAdapterClick);
         odIdLoutItemsGv.setAdapter(itemXAdapter);

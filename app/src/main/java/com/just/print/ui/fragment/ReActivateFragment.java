@@ -38,108 +38,78 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
             return;
         }
 
-        String inputedSN = String.valueOf(textView.getText());
-        int p = inputedSN.indexOf("-debug:");
-        if(p > -1){
-            inputedSN = inputedSN.substring(p + 7);
-            MainActivity.debug = Boolean.valueOf(inputedSN);
-            AppData.putCustomData("debug", String.valueOf(MainActivity.debug));
-            if(MainActivity.debug) {
-                showToast("App is in debug mode, when bug appears again, please write down the system time and report.");
+        String inputedSN = String.valueOf(textView.getText()).trim();
+        if(inputedSN.startsWith("-") && inputedSN.indexOf(":") > 1){
+            int p = inputedSN.indexOf(":");
+            String SettingType = inputedSN.substring(1,p);
+            inputedSN = inputedSN.substring(p + 1);
+            switch (SettingType) {
+                case "debug":
+                    MainActivity.debug = Boolean.valueOf(inputedSN);
+                    AppData.putCustomData("debug", String.valueOf(MainActivity.debug));
+                    if(MainActivity.debug) {
+                        showToast("App is in debug mode, when bug appears again, please write down the system time and report.");
 
-                StringBuilder sb = new StringBuilder();
-                sb.append("adminPassword:").append(AppData.getCustomData("adminPassword")).append("\n");
-                sb.append("debug mode:").append(AppData.getCustomData("debug")).append("\n");
-                sb.append("lastsuccess:").append(AppData.getCustomData("lastsuccess")).append("\n");
-                sb.append("limitation:").append(AppData.getCustomData("limitation")).append("\n");
-                sb.append("mode:").append(AppData.getCustomData("mode")).append("\n");
-                sb.append("number:").append(AppData.getCustomData("number")).append("\n");
-                sb.append("reportStartDate:").append(AppData.getCustomData("reportStartDate")).append("\n");
-                sb.append("userPassword:").append(AppData.getCustomData("userPassword")).append("\n");
-                sb.append("version:").append(AppData.getCustomData("version")).append("\n");
-                textView.setText(sb.toString());
-            }else{
-                showToast("debug mode turned off!");
-            }
-            return;
-        }else{
-            p = inputedSN.indexOf("-v:");
-            if(p > -1){
-                inputedSN = inputedSN.substring(p + 3);
-                AppData.putCustomData("version", inputedSN);
-                showToast("App is in switched to version : " + inputedSN);
-                return;
-            }else{
-                p = inputedSN.indexOf("-m:");
-                if(p > -1){
-                    inputedSN = inputedSN.substring(p + 3);
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("adminPassword:").append(AppData.getCustomData("adminPassword")).append("\n");
+                        sb.append("debug mode:").append(AppData.getCustomData("debug")).append("\n");
+                        sb.append("lastsuccess:").append(AppData.getCustomData("lastsuccess")).append("\n");
+                        sb.append("limitation:").append(AppData.getCustomData("limitation")).append("\n");
+                        sb.append("mode:").append(AppData.getCustomData("mode")).append("\n");
+                        sb.append("number:").append(AppData.getCustomData("number")).append("\n");
+                        sb.append("reportStartDate:").append(AppData.getCustomData("reportStartDate")).append("\n");
+                        sb.append("userPassword:").append(AppData.getCustomData("userPassword")).append("\n");
+                        sb.append("version:").append(AppData.getCustomData("version")).append("\n");
+                        textView.setText(sb.toString());
+                    }else{
+                        showToast("debug mode turned off!");
+                    }
+                    return;
+                case "v":
+                    AppData.putCustomData("version", inputedSN);
+                    showToast("App is in switched to version : " + inputedSN);
+                    return;
+                case "m":
                     AppData.putCustomData("mode", inputedSN);
                     showToast("App is in switched to mode : " + inputedSN);
                     return;
-                }else{
-                    p = inputedSN.indexOf("-l:");
-                    if(p > -1){
-                        inputedSN = inputedSN.substring(p + 3);
-                        AppData.putCustomData("limitation", inputedSN);
-                        showToast("App has switched limitation to: " + inputedSN);
-                        return;
-                    }else{
-                        p = inputedSN.indexOf("-f:");
-                        if(p > -1) {
-                            inputedSN = inputedSN.substring(p + 3);
-                            AppData.putCustomData("font", inputedSN);
-                            showToast("App has set font to: " + inputedSN);
-                            return;
-                        }else{
-                            p = inputedSN.indexOf("-w:");
-                            if(p > -1) {
-                                inputedSN = inputedSN.substring(p + 3);
-                                AppData.putCustomData("width", inputedSN);
-                                if("16".equals(inputedSN)){
-                                    AppData.putCustomData("font", "29, 33, 34");
-                                }
-                                showToast("App has set width to: " + inputedSN);
-                                return;
-                            }else{
-                                p = inputedSN.indexOf("-c:");
-                                if(p > -1) {
-                                    inputedSN = inputedSN.substring(p + 3);
-                                    AppData.putCustomData("code", inputedSN);
-                                    showToast("App has set code to: " + inputedSN);
-                                    return;
-                                }else{
-                                    p = inputedSN.indexOf("-p:");
-                                    if(p > -1){// means theres parameters
-                                        inputedSN = inputedSN.substring(p + 3).trim();
-                                        AppData.putCustomData("adminPassword", inputedSN);
-                                        showToast("App has set adminPassword to: " + inputedSN);
-                                    }else {
-                                        p = inputedSN.indexOf("-s1:");
-                                        if (p > -1) {
-                                            inputedSN = inputedSN.substring(p + 4);
-                                            AppData.putCustomData("sep_str1", inputedSN);
-                                            showToast("App has set sep_str1 to: " + inputedSN);
-                                            return;
-                                        } else {
-                                            p = inputedSN.indexOf("-s2:");
-                                            if (p > -1) {
-                                                inputedSN = inputedSN.substring(p + 4);
-                                                AppData.putCustomData("sep_str2", inputedSN);
-                                                showToast("App has set sep_str2 to: " + inputedSN);
-                                                return;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                        }
+                case "l":
+                    AppData.putCustomData("limitation", inputedSN);
+                    showToast("App has switched limitation to: " + inputedSN);
+                    return;
+                case "f":
+                    AppData.putCustomData("font", inputedSN);
+                    showToast("App has set font to: " + inputedSN);
+                    return;
+                case "w":
+                    AppData.putCustomData("width", inputedSN);
+                    if("16".equals(inputedSN)){
+                        AppData.putCustomData("font", "29, 33, 34");
                     }
-                }
+                    showToast("App has set width to: " + inputedSN);
+                    return;
+                case "c":
+                    AppData.putCustomData("code", inputedSN);
+                    showToast("App has set code to: " + inputedSN);
+                    return;
+                case "p":   // means theres parameters
+                    AppData.putCustomData("adminPassword", inputedSN);
+                    showToast("App has set adminPassword to: " + inputedSN);
+                    return;
+                case "s1":
+                    AppData.putCustomData("sep_str1", inputedSN);
+                    showToast("App has set sep_str1 to: " + inputedSN);
+                    return;
+                case "s2":
+                    AppData.putCustomData("sep_str2", inputedSN);
+                    showToast("App has set sep_str2 to: " + inputedSN);
+                    return;
+                case "lastchar":
+                    AppData.putCustomData(AppData.KEY_CUST_LAST_CHAR, inputedSN);
+                    showToast("Please restart app to apply new layout.");
+                    return;
             }
-        }
-
-        if (inputedSN.length() != 6) {
+        }else if (inputedSN.length() != 6) {
             showToast("Please input correct license code");
             return;
         }
