@@ -52,7 +52,7 @@ public final class DaoExpand {
      * 模糊查询
      */
     static public List<Menu> queryFuzzyMenu(MenuDao menuDao, String ID) {
-        return menuDao.queryBuilder().where(MenuDao.Properties.ID.like("%" + ID + "%")).list();
+        return menuDao.queryBuilder().where(MenuDao.Properties.ID.like(ID + "%")).list();
     }
 
     static public long queryMaxVersion(AbstractDao dao) {
