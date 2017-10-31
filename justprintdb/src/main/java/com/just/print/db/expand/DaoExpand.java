@@ -52,7 +52,14 @@ public final class DaoExpand {
      * 模糊查询
      */
     static public List<Menu> queryFuzzyMenu(MenuDao menuDao, String ID) {
-        return menuDao.queryBuilder().where(MenuDao.Properties.ID.like(ID + "%")).list();
+        List<Menu> lists = menuDao.queryBuilder().where(MenuDao.Properties.ID.eq(ID)).list();
+        if(lists == null || lists.size() == 0){
+            lists = menuDao.queryBuilder().where(MenuDao.Properties.ID.like(ID + "%")).list();
+        }
+        if(lists == null || lists.size() == 0){
+            lists = menuDao.queryBuilder().where(MenuDao.Properties.ID.like("%" + ID + "%")).list();
+        }
+        return lists;
     }
 
     static public long queryMaxVersion(AbstractDao dao) {
