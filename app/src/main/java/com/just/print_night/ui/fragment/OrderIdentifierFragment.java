@@ -9,6 +9,7 @@ import android.widget.ToggleButton;
 import android.content.Intent;
 
 import com.just.print_night.R;
+import com.just.print_night.app.AppData;
 import com.just.print_night.app.Applic;
 import com.just.print_night.app.BaseFragment;
 import com.just.print_night.app.EventBus;
@@ -25,6 +26,7 @@ import com.just.print_night.ui.holder.OrderIdentifierItemViewHolder;
 import com.just.print_night.ui.holder.OrderIdentifierMarkViewHolder;
 import com.just.print_night.ui.holder.OrderMenuViewHolder;
 import com.just.print_night.util.L;
+import com.just.print_night.util.StringUtils;
 import com.just.print_night.util.ToastUtil;
 import com.stupid.method.adapter.IXOnItemClickListener;
 import com.stupid.method.adapter.OnClickItemListener;
@@ -44,6 +46,14 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String EVENT_ADD_MENU = "EVENT_ADD_MENU=";
     private static final String TAG = "OrderIdentifierFragment";
+
+    private static OrderIdentifierFragment instance = null;
+    public static OrderIdentifierFragment getInstance(){
+        if(instance == null){
+            instance = new OrderIdentifierFragment();
+        }
+        return instance;
+    }
 
     @XViewByID(R.id.odIdFrLoutMenuList)
     private ListView odIdFrLoutMenuList;
@@ -75,6 +85,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     public static List<SelectionDetail> bkOfLastSelection;
     private static CharSequence bkOfLastTable;
     static int times = 0;
+    String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "F", "H", "+","togo"};
 
     @XClick({R.id.odIdConfigBtn, R.id.odIdSndBtn, R.id.odIdDelBtn, R.id.odIdOkBtn})
     private void exeControlCommand(View v) {
@@ -83,21 +94,27 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 startActivity(new Intent(getContext(), ConfigActivity.class));
                 break;
             case R.id.odIdSndBtn:
+                List<SelectionDetail> selectionDetails = CustomerSelection.getInstance().getSelectedDishes();
+                if(selectionDetails == null || selectionDetails.size() == 0){
+                    showToast("Nothing selected!");
+                    return;
+                }
+
                 String result = WifiPrintService.getInstance().exePrintCommand();
-                if("2".equals(result)){
+                if(WifiPrintService.ERROR.equals(result)){
                     if(times < 1) {
-                        showToast("The content was not printed well. please wait and try again.");
+                        showToast("Last print not done yet. Please wait.");
                         times++;
                     }else if(times < 2){
-                        showToast("Please restart the device which blocked the printer, then try again!");
+                        showToast("Last print not done yet. Press Send Again To Resend it!");
                         times++;
                     }else{
                         WifiPrintService.getInstance().reInitPrintRelatedMaps();
-                        if("0".equals(WifiPrintService.getInstance().exePrintCommand())){
+                        if(WifiPrintService.SUCCESS.equals(WifiPrintService.getInstance().exePrintCommand())){
                             times = 0;
                             clearOrderMenu();
                         }
-                        showToast("Please check and make sure last order is printed out!");
+                        showToast("Order was re-send!");
                     }
                 }else {
                     times = 0;
@@ -108,13 +125,18 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 DelOneText();
                 break;
             case R.id.odIdOkBtn:
-                if(bkOfLastSelection != null){
-                    rollbackLastOrder();
-                    ToastUtil.showToast("last order was not printed yet, please check the printer and try again.");
-                    return;
-                }
-                if (odIdTableTbtn.isChecked() == false) {
-                    if (null != storedMenu) {
+                if (odIdTableTbtn.isChecked()) {    //waiting for input table num status. always allowed!
+                    odIdTableTbtn.setChecked(false);
+                    CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
+                } else {                            //inputting dishes status. need to check print status.
+
+                    if(bkOfLastSelection != null){      //content not all send to printer yet.
+                        //if last order has only one dish and it happened to be same
+                        //as the one selected this time, waiter will think the roll back is not happenning.
+                        //we decided to not display last order--- rollbackLastOrder();
+                        ToastUtil.showToast("Printing...Please wait.");
+                        return;
+                    }else if (storedMenu != null) {     //last order send to printer well.
                         addDish();
                         odIdInput.setText("");
                         odIdfrName.setText("");
@@ -122,87 +144,45 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                             loadOrderMenu();
                         }
                     }
-                } else {
-                    odIdTableTbtn.setChecked(false);
-                    CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
                 }
                 break;
         }
 
     }
 
+    //currently it's used by number buttons and the note tag buttons. both types are buttons in holder.
     IXOnItemClickListener itemXAdapterClick = new IXOnItemClickListener() {
         @Override
         public void onClickItem(View view, int i) {
-            L.d(TAG, "onClickItem1");
+            L.d(TAG, "onClickItem");
             Menu tmpMenu;
             L.d(TAG, String.valueOf(view.getId()) + String.valueOf(i));
             switch (view.getId()) {
-                case R.id.buttonholder:
+                case R.id.buttonholder: //number buttons.
                     switch (i) {
-//                        in case the characters is not in order
-//                        case 0:
-//                            break;
-//                        case 1:
-//                            break;
-//                        case 2:
-//                            break;
-//                        case 3:
-//                            break;
-//                        case 4:
-//                            break;
-//                        case 5:
-//                            break;
-//                        case 6:
-//                            break;
-//                        case 7:
-//                            break;
-//                        case 8:
-//                            break;
-//                        case 9:
-//                            break;
-//                        case 10:
-//                            break;
-//                        case 11:
-//                            break;
-//                        case 12:
-//                            break;
-//                        case 13:
-//                            break;
-//                        case 14:
-//                            break;
-//                        case 15:
-//                            break;
-                        case 16:
-                            InputText("+");
-                            break;
-                        case 17:
-                            odIdTableTbtn.setText("Delivery");
-                            CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
-                            return;
-                        case 18:
-                            DelOneText();
-                            break;
-                        case 19:
-                            if (null != storedMenu) {
-                                addDish();
-                                if (dishesXAdapter != null) {
-                                    loadOrderMenu();
-                                }
+                        case 14:
+                            if(items.length == 18) {
+                                InputText("F");
+                            }else{
+                                InputText(Character.toString((char) (i % 10 + 'A')));
                             }
                             break;
-                        case 20:
-                            String result = WifiPrintService.getInstance().exePrintCommand();
-                            if ("2".equals(result)) {
-                                showToast("The content of last time is not printed yet. please wait and try again.");
-                            } else{
-                                clearOrderMenu();
+                        case 15:
+                            if(items.length == 18) {
+                                InputText("H");
+                            }else{
+                                InputText(Character.toString((char) (i % 10 + 'A')));
                             }
                             break;
                         default:
                             if (i < 10) {
                                 InputText(Integer.toString((i + 1) % 10));
-                            } else {
+                            } else if( i == items.length - 2){
+                                InputText("+");
+                            } else if (i == items.length - 1) {
+                                odIdTableTbtn.setText("TOGO");
+                                CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
+                            }else {
                                 InputText(Character.toString((char) (i % 10 + 'A')));
                             }
                             break;
@@ -216,7 +196,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         }
                     }
                     break;
-                case R.id.tagid:
+                case R.id.tagid:            //not tag buttons.
                     L.d(TAG, "case tag");
                     //Mark Press
                     Mark m = markXAdapter.getItem(i);
@@ -234,13 +214,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         CustomerSelection.getInstance().getSelectedDishes().get(size - 1).setMarkList(markselect);
                         loadOrderMenu();
                     }
-
-
             }
 
-
             //odIdfrName.setText(menuXAdapter.get(i).getMname());
-
         }
     };
 
@@ -264,7 +240,13 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         //设置餐桌号用
         //CustomerSelection.getInstance().setTableNumber(odIdTableNumEt.getText().toString());
         storedMenu = null;
-        String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "+","DELI"};
+        if(!StringUtils.isBlank(AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR))) {
+            if(AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR).equalsIgnoreCase("P")){
+                items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F","G","H","I","J","K","L","M","N","O","P", "+", "togo"};
+            }else if(AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR).equalsIgnoreCase("N")){
+                items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F","G","H","I","J","K","L","M","N", "+", "togo"};
+            }
+        }
         itemXAdapter = new XAdapter2<String>(getActivity(), Arrays.asList(items), OrderIdentifierItemViewHolder.class);
         itemXAdapter.setClickItemListener(this.itemXAdapterClick);
         odIdLoutItemsGv.setAdapter(itemXAdapter);
@@ -350,7 +332,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         switch (view.getId()) {
             case R.id.oddelDish:
                 SelectionDetail a = dishesXAdapter.get(i);
-                dishesXAdapter.remove(a);
+                //dishesXAdapter.remove(a);
                 CustomerSelection.getInstance().deleteSelectedDish(a);
                 loadOrderMenu();
                 break;
@@ -416,6 +398,21 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
     }
 
+    /**no one is calling this mehtod now, because we not response feels like app goes wrong. and user might input again.
+    //waiting 15 seconds or untile comfirmPrintOK() is called.
+    private void waitForPrintSuccess(){
+        int i = 0;
+        while (true){
+            i++;
+            AppUtils.sleep(1000);
+            if( bkOfLastSelection == null && "TB".equals(bkOfLastTable)){
+                return;
+            }
+        }
+    }
+
+    //no one is calling this mehtod now, because we relized the order will not lost, it stay in ipConentMap
+    //when connection come back, it will be printed out.
     private void rollbackLastOrder() {
         //save the menu into database.
         for(SelectionDetail selectionDetail : bkOfLastSelection){
@@ -427,7 +424,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         odIdTableTbtn.setChecked(false);
         loadOrderMenu();
 
-    }
+    }*/
 
     public static void comfirmPrintOK(){
 

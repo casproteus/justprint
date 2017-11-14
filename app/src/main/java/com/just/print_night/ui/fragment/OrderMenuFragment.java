@@ -147,7 +147,7 @@ public class OrderMenuFragment extends BaseFragment implements View.OnClickListe
             case R.id.printBtn:
                 System.out.println("Unexpected code executed!!!!!!");
                 Thread.dumpStack();
-                L.d(TAG, "print_night Start");
+                L.d(TAG, "print Start");
                 //WifiPrintService.getInstance().exePrintCommand(CustomerSelection.getInstance().getSelectedDishes());
                 break;
         }

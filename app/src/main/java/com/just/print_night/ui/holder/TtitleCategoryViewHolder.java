@@ -43,7 +43,7 @@ public class TtitleCategoryViewHolder extends XExpadnViewHolder<Category> {
         code.setVisibility(View.GONE);
         button.setVisibility(View.GONE);
         title.setGravity(Gravity.CENTER);
-        title.setTextColor(Color.rgb(000, 000,255));
+        title.setTextColor(Color.rgb(000, 145,213));
         int size = (int) title.getTextSize();
         title.setTextSize(TypedValue.COMPLEX_UNIT_PX,size + 20);
     }

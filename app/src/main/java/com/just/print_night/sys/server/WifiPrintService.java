@@ -36,9 +36,12 @@ import java.util.concurrent.Executors;
 public class WifiPrintService implements Runnable{
     private final String TAG = "WifiPrintService";
 
-    private HashMap<String,Printer> ipMap;
-    private HashMap<String,List<SelectionDetail>> tmpralQueueMap;
-    private HashMap<String,List<String>> contentForPrintMap;
+    public static String SUCCESS = "0";
+    public static String ERROR = "2";
+
+    private HashMap<String,Printer> ipPrinterMap;
+    private HashMap<String,List<SelectionDetail>> ipSelectionsMap;
+    private HashMap<String,List<String>> ipContentMap;
 
     private static String curPrintIp = "";
     private int width = 24;
@@ -48,8 +51,8 @@ public class WifiPrintService implements Runnable{
 
 
     private WifiCommunication wifiCommunication;
-    private boolean isConnected;
-    private boolean nonEmptyListFound;
+    private boolean printerConnectedFlag;
+    private boolean contentReadyForPrintFlag;
 
     @SuppressLint("HandlerLeak")
     private final Handler handler = new Handler() {
@@ -57,36 +60,38 @@ public class WifiPrintService implements Runnable{
         public void handleMessage(Message msg){
             switch (msg.what){
                 case WifiCommunication.WFPRINTER_CONNECTED:
-                    L.d(TAG,"Connected ip#" + WifiPrintService.curPrintIp);
+                    L.d(TAG,"connection generated with ip:" + WifiPrintService.curPrintIp);
 //                    Command.GS_ExclamationMark[2] = 0x11;
 //                    wifiCommunication.sndByte(Command.GS_ExclamationMark);//put it here will cause app exit in emulator(5x api 24)
-                    isConnected = true;
+                    printerConnectedFlag = true;
                     break;
                 case WifiCommunication.WFPRINTER_DISCONNECTED:
-                    L.d(TAG,"Disconnected");
-                    nonEmptyListFound = false;
-                    isConnected = false;
+                    L.d(TAG,"connection stopped with ip:" + WifiPrintService.curPrintIp);
+                    contentReadyForPrintFlag = false;
+                    printerConnectedFlag = false;
                     curPrintIp = "";
                     break;
                 case WifiCommunication.WFPRINTER_CONNECTEDERR:
-                    L.d(TAG,"Connectederr");
-                    showStatus(curPrintIp,2);
+                    L.d(TAG,"Connection Error! With ip:" + WifiPrintService.curPrintIp);
+                    ToastUtil.showToast("Printer:" + curPrintIp + " connection error!");
 
                     AppUtils.sleep(1000);
-                    nonEmptyListFound = false;
-                    isConnected = false;
+
+                    contentReadyForPrintFlag = false;
+                    printerConnectedFlag = false;
+
                     break;
                 case WifiCommunication.SEND_FAILED:
-                    L.d(TAG, "printer message send_failed");
-                    nonEmptyListFound = false;
-                    isConnected = false;
+                    L.d(TAG, "ERROR! When sending msg to: " + WifiPrintService.curPrintIp);
+                    contentReadyForPrintFlag = false;
+                    printerConnectedFlag = false;
                     //发送失败对策暂无
                     break;
             }
         }
     };
 
-    private ExecutorService pool = Executors.newSingleThreadExecutor();
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     private static WifiPrintService instance = null;
     public static WifiPrintService getInstance(){
@@ -99,56 +104,57 @@ public class WifiPrintService implements Runnable{
         wifiCommunication = new WifiCommunication(handler);
         reInitPrintRelatedMaps();
 
-        pool.execute(this);
+        executorService.execute(this);
         L.d(TAG,"Create Service Successful");
     }
 
     public void reInitPrintRelatedMaps(){
-        ipMap = new HashMap<String,Printer>();
-        contentForPrintMap = new HashMap<String,List<String>>();
-        tmpralQueueMap = new HashMap<String,List<SelectionDetail>>();
+        ipPrinterMap = new HashMap<String,Printer>();
+        ipContentMap = new HashMap<String,List<String>>();
+        ipSelectionsMap = new HashMap<String,List<SelectionDetail>>();
 
         List<Printer> printerList = DaoExpand.queryNotDeletedAll(Applic.app.getDaoMaster().newSession().getPrinterDao());//读取打印机位置
         for(Printer printer:printerList){
-            ipMap.put(printer.getIp(),printer);
-            contentForPrintMap.put(printer.getIp(),new ArrayList<String>());
-            tmpralQueueMap.put(printer.getIp(),new ArrayList<SelectionDetail>());
+            ipPrinterMap.put(printer.getIp(),printer);
+            ipContentMap.put(printer.getIp(),new ArrayList<String>());
+            ipSelectionsMap.put(printer.getIp(),new ArrayList<SelectionDetail>());
         }
     }
 
     public String exePrintCommand(){
-        L.d(TAG,"exePrintCommand");
-        if(!isContentForPrintMapEmpty()){
-            showStatus("current print_night job not finished yet!",4);
-            return "2";                     //未打印完毕
+        L.d(TAG,"start to translate selection into ipContent for printing.");
+        if(!isIpContentMapEmpty()){
+            L.d(TAG,"ipContent not empty, means last print job not finished yet! returning not success flag.");
+            return ERROR;                     //未打印完毕
         }
 
-        //1、遍历每个选中的菜，并分别遍历加在其上的打印机。并在queueMap上对应IP后面增加菜品
+
+        //1、遍历每个选中的菜，并分别遍历加在其上的打印机。并在ipSelectionsMap上对应IP后面增加菜品
         for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
             List<M2M_MenuPrint> printerList = selectionDetail.getDish().getM2M_MenuPrintList();
             for(M2M_MenuPrint m2m: printerList) {
-                //should never happen, jist in case someone changed db.
                 Printer printer = m2m.getPrint();
-                if(printer == null) {
-                    showStatus("Selected item not connected with printer yet.",4);
-                    return "2";
+                if(printer == null) {                   //should never happen, jist in case someone changed db.
+                    ToastUtil.showToast("Selected dish not connected with any printer yet.");
+                    return ERROR;
                 }
 
                 String ip = printer.getIp();
-                L.d(TAG,"ip#" + ip + " type:" + printer.getFirstPrint());
-                tmpralQueueMap.get(ip).add(selectionDetail);
+                L.d(TAG,"Adding a dish to ipSelectionsMap, ip:" + ip);
+                ipSelectionsMap.get(ip).add(selectionDetail);
             }
         }
 
-        //2、遍历queueMap，如对应打印机type为0, 则对其后的value(dishes)按照类别进行排序
-        for(Map.Entry entry: tmpralQueueMap.entrySet()){
+        //2、遍历ipSelectionsMap，如对应打印机type为0, 则对其后的value(dishes)按照类别进行排序
+        L.d(TAG,"checking how many dishes under each printer...");
+        for(Map.Entry entry: ipSelectionsMap.entrySet()){
             String key = (String)entry.getKey();
-            List<SelectionDetail> value = (List<SelectionDetail>) entry.getValue();
+            List<SelectionDetail> dishList = (List<SelectionDetail>) entry.getValue();
 
-            L.d(TAG,"ip#" + key + "list size#" + value.size());
-            if(ipMap.get(key).getType() == 0 && value.size() > 0){
+            L.d(TAG,"ip:" + key + ", list size:" + dishList.size());
+            if(ipPrinterMap.get(key).getType() == 0 && dishList.size() > 0){
                 //订单排序
-                Collections.sort(tmpralQueueMap.get(key), new Comparator<SelectionDetail>() {
+                Collections.sort(ipSelectionsMap.get(key), new Comparator<SelectionDetail>() {
                     @Override
                     public int compare(SelectionDetail dishesDetailModel, SelectionDetail t1) {
                         Category c1 = Applic.app.getDaoMaster().newSession().getCategoryDao().load(dishesDetailModel.getDish().getCid());
@@ -160,34 +166,34 @@ public class WifiPrintService implements Runnable{
         }
 
         //3、再次遍历queueMap, 封装打印信息
-        for(Map.Entry entry: tmpralQueueMap.entrySet()){
+        for(Map.Entry entry: ipSelectionsMap.entrySet()){
             String printerIP = (String)entry.getKey();
             List<SelectionDetail> dishList = (List<SelectionDetail>) entry.getValue();
 
-            L.d(TAG,"ip#" + printerIP + "list size#" + dishList.size());
             if(dishList.size() > 0){
-                if(tmpralQueueMap.get(printerIP) != dishList){
-                    L.d("Attenttion!", "the dishList are different from tmpralQueueMap.get(printerIP)!!!!");
+                if(ipSelectionsMap.get(printerIP) != dishList){
+                    L.d("ERROR!", "the dishList are different from ipSelectionsMap.get(printerIP)!!!!");
                 }
-                if(ipMap.get(printerIP).getFirstPrint() == 1){  //全单封装
-                    contentForPrintMap.get(printerIP).add(formatContentForPrint(dishList));
+                if(ipPrinterMap.get(printerIP).getFirstPrint() == 1){  //全单封装
+                    ipContentMap.get(printerIP).add(formatContentForPrint(dishList) + "\n\n\n\n\n");
                 }else{                                          //分单封装
                     for(SelectionDetail selectionDetail : dishList){
                         List<SelectionDetail> tlist = new ArrayList<SelectionDetail>();
                         tlist.add(selectionDetail);
-                        contentForPrintMap.get(printerIP).add(formatContentForPrint(tlist));
+                        ipContentMap.get(printerIP).add(formatContentForPrint(tlist) + "\n\n");
                     }
                 }
             }
             //clear the queueMap immediately
-            tmpralQueueMap.get(printerIP).clear();
+            ipSelectionsMap.get(printerIP).clear();
         }
 
-        showStatus("SelectionDetail has been send to printer",4);
-        return "0";
+        L.d(TAG, "Order is translated into ipContentMap map and ready for print.");
+        ToastUtil.showToast("PRINTING...");
+        return SUCCESS;
     }
 
-    //The start time and end time are long format, need to be translate for print_night.
+    //The start time and end time are long format, need to be translate for print.
     public String exePrintReportCommand(List<SaleRecord> saleRecords, String startTime, String endTime){
         L.d("ConfigPrintReportFragment","exePrintCommand");
         List<Printer> printers = Applic.app.getDaoMaster().newSession().getPrinterDao().loadAll();
@@ -209,40 +215,36 @@ public class WifiPrintService implements Runnable{
             combinedSaleRecords.add(entry.getValue());
         }
 
-        contentForPrintMap.get(printerIP).add(formatContentForPrintReport(combinedSaleRecords, startTime, endTime));
+        ipContentMap.get(printerIP).add(formatContentForPrintReport(combinedSaleRecords, startTime, endTime));
 
-        ToastUtil.showToast("salesReport has been send to printer: " + printerIP);
-        return "0";
+        ToastUtil.showToast("PRINTING REPORT ON " + printerIP);
+        return SUCCESS;
     }
 
     public void run(){
+        int timeCounter = 0;
         while(true){
-            //when shall we do the init socket work? not connected to any one and didn't fond any content to print_night.
-            if(isConnected == false && nonEmptyListFound == false) {
+            //check if this round is a good time to reset a curPrintIp and load new contnet to print.
+            if(contentReadyForPrintFlag == false && printerConnectedFlag == false) {
+                L.d(TAG,"loading bullet(changing current ip and setup two flags....");
                 //do initSocket for the first non-empty entry, (non-empty means the values hidden in this printerIp is non-empty.)
-                for(Map.Entry entry : contentForPrintMap.entrySet()){
+                for(Map.Entry entry : ipContentMap.entrySet()){
                     List<String> contentList = (List<String>)entry.getValue();
                     if(contentList.size() > 0){
-                        nonEmptyListFound = true;                   //mark that we have found something to print_night, don't do init socket any more.
-
                         curPrintIp = (String)entry.getKey();
-                        L.d(TAG,"ip#" + curPrintIp + "list size#" + contentList.size());
-                        L.d(TAG,"initSocket");
-                        wifiCommunication.initSocket(curPrintIp,9100);   //this should result in the "isConnected" become true .
-                        break;  //stop for getting content for other printers, stop here, when one printer finished, open connection to an other printer and print_night again.
+                        L.d(TAG,"ip changed to:" + curPrintIp + "the size of content to print is:" + contentList.size());
+                        contentReadyForPrintFlag = true;                   //mark that we have found something to print, don't do init socket any more.
+                        L.d(TAG,"contentReadyForPrintFlag setted up! now waiting for initSocket to set up the printerConnectedFlag");
+                        wifiCommunication.initSocket(curPrintIp,9100);   //this should result in the "printerConnectedFlag" become true .
+                        break;  //stop for getting content for other printers, stop here, when one printer finished, open connection to an other printer and print again.
                     }
                 }
-            }
-
-            //if find some "non-empty" value behind any printerIp in the map, and the isConnected is happened set to true then execute print_night.
-            //while if nonEmptyListFound is set, isConnected not set, then jump over this part.
-            if(nonEmptyListFound == true && isConnected == true){
-                if(contentForPrintMap !=null && contentForPrintMap.get(curPrintIp) != null) {
-                    L.d(TAG,"Start print_night");
-                    List<String> contentList = contentForPrintMap.get(curPrintIp);
+            }else if(contentReadyForPrintFlag == true && printerConnectedFlag == true){//chick if this round is a good time to do actual print work?
+                L.d(TAG,"Flags both set, checking the content fllowing current ip:" + curPrintIp);
+                if(ipContentMap !=null && ipContentMap.get(curPrintIp) != null) {
+                    List<String> contentList = ipContentMap.get(curPrintIp);
+                    L.d(TAG,"out printing... content list size is:" + contentList.size());
                     for (String content : contentList) {
-                        L.d(TAG,"out#");
-                        L.d(TAG,content);
 
                         if(content.length()>0) {
                             if(!"silent".equals(AppData.getCustomData("mode"))) {
@@ -275,32 +277,37 @@ public class WifiPrintService implements Runnable{
                             wifiCommunication.sndByte(Command.GS_V_m_n);
                         }
                     }
-                    contentForPrintMap.get(curPrintIp).clear();
-                    isConnected = false;
-                    nonEmptyListFound = false;
-                    //close the connectoion afer each print_night task.
-                    wifiCommunication.close();
+                    //reset status
+                    ipContentMap.get(curPrintIp).clear();
+                    printerConnectedFlag = false;
+                    contentReadyForPrintFlag = false;
 
-                    //if all content printed, then clean the selection interface
-                    boolean isAllPrinted = true;
-                    for(Map.Entry entry : contentForPrintMap.entrySet()) {
-                        List<String> tContentList = (List<String>) entry.getValue();
-                        if (tContentList.size() > 0) {
-                            isAllPrinted = false;
-                            break;
-                        }
-                    }
-                    if(isAllPrinted){
-                        OrderIdentifierFragment.comfirmPrintOK();
-                    }
+                    //close the connectoion afer each print task.
+                    wifiCommunication.close();
+                    L.d(TAG,"Print complete (ipcontent cleaned, flag set to false, connection closed!) for ip:" + curPrintIp);
+
+                    isAllPrintedCheck();
+                }
+            }else{
+                L.d(TAG,"printerConnectedFlag:" + printerConnectedFlag);
+                timeCounter++;
+                if(timeCounter == 5){
+                    timeCounter = 0;
+                    ToastUtil.showToast("Printer Error! Check " + curPrintIp);
                 }
             }
 
-            //if nonEmptyListFound = true, then keep waiting for isConnected being set to true.
+            //did any work or didn't do any work, each round should rest for 1 second.
             AppUtils.sleep(1000);
         }
     }
 
+    private void isAllPrintedCheck(){
+        if(isIpContentMapEmpty()){
+            L.d(TAG,"All content in this order are printed, to comfirm app with OK.");
+            OrderIdentifierFragment.comfirmPrintOK();
+        }
+    }
 //    public void closeWifiService(){
 //        L.d(TAG,"closeService");
 //        if(wifiCommunication !=null) {
@@ -456,7 +463,7 @@ public class WifiPrintService implements Runnable{
             }
             content.append(generateString(width, sep_str2)).append("\n");
         }
-        return content.substring(0, content.length() - (width + 1)) + "\n\n\n\n\n";
+        return content.substring(0, content.length() - (width + 1));
     }
 
     private int getLengthOfString(String content){
@@ -479,8 +486,8 @@ public class WifiPrintService implements Runnable{
         return sb.toString();
     }
 
-    private boolean isContentForPrintMapEmpty(){
-        for(Map.Entry entry : contentForPrintMap.entrySet()){
+    private boolean isIpContentMapEmpty(){
+        for(Map.Entry entry : ipContentMap.entrySet()){
             List<String> listTypeValue = (List<String>)entry.getValue();
             if(listTypeValue.size() > 0){
                 return false;
@@ -489,14 +496,4 @@ public class WifiPrintService implements Runnable{
         return true;
     }
 
-    private void showStatus(String src, int i) {
-        switch (i) {
-            case 2:     //WFPRINTER_CONNECTEDERR
-                ToastUtil.showToast("Printer:" + src + " connection error!");
-                break;
-            case 4:     //COMMON
-                ToastUtil.showToast(src);
-        }
-
-    }
 }

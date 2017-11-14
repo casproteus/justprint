@@ -376,7 +376,7 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
 
     private void loadCategory() {
 
-        List<Category> list = DaoExpand.queryNotDeletedAllQuery(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.DisplayIdx).list();
+        List<Category> list = DaoExpand.queryAllNotDeleted(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.DisplayIdx).list();
         categoryXAdapter.setData(list);
         categoryXAdapter.notifyDataSetChanged();
 

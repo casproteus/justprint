@@ -30,9 +30,9 @@ public final class DaoExpand {
     }
 
     static public <T, K> List<T> queryNotDeletedAll(AbstractDao<T, K> dao) {
-        return queryNotDeletedAllQuery(dao).list();
+        return queryAllNotDeleted(dao).list();
     }
-    static public <T, K> QueryBuilder<T> queryNotDeletedAllQuery(AbstractDao<T, K> dao) {
+    static public <T, K> QueryBuilder<T> queryAllNotDeleted(AbstractDao<T, K> dao) {
         return dao.queryBuilder().where(MenuDao.Properties.State.notEq(State.delete));
     }
 
@@ -52,7 +52,14 @@ public final class DaoExpand {
      * 模糊查询
      */
     static public List<Menu> queryFuzzyMenu(MenuDao menuDao, String ID) {
-        return menuDao.queryBuilder().where(MenuDao.Properties.ID.like("%" + ID + "%")).list();
+        List<Menu> lists = menuDao.queryBuilder().where(MenuDao.Properties.ID.eq(ID)).list();
+        if(lists == null || lists.size() == 0){
+            lists = menuDao.queryBuilder().where(MenuDao.Properties.ID.like(ID + "%")).list();
+        }
+        if(lists == null || lists.size() == 0){
+            lists = menuDao.queryBuilder().where(MenuDao.Properties.ID.like("%" + ID + "%")).list();
+        }
+        return lists;
     }
 
     static public long queryMaxVersion(AbstractDao dao) {
@@ -66,7 +73,7 @@ public final class DaoExpand {
     }
 
     /**
-     * \
+     *
      * 获得主打印机 没有 则返回null
      */
     public static Printer getFirstPrint(PrinterDao printerDao) {

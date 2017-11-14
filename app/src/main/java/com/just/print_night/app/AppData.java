@@ -27,6 +27,7 @@ public class AppData extends Thread{
     public static final String KEY_SHOP_ID = "KEY_SHOP_ID";
     private static final String KEY_PREFIX_SHOP_ID_ = "KEY_SHOP_ID_";
     private static final String KEY_SHOP_NAME = "shopName";
+    public static final String KEY_CUST_LAST_CHAR = "KEY_CUST_LAST_CHAR";
 
     public static SharedPreferencesHelper getShopData(Context context) {
         return SharedPreferencesHelper.getCache(context, KEY_SHOP_XML);
@@ -55,6 +56,14 @@ public class AppData extends Thread{
             getShopData(context).putString(KEY_SHOP_LIST, shoplist + "," + shopName);
         }
         Applic.app.initDaoMaster(shopName);
+    }
+
+    public static void saveCustomizedLastCharOnPanel(Context context, String character) {
+        getShopData(context).putString(KEY_CUST_LAST_CHAR, character);
+    }
+
+    public static String getCustomizedLastCharOnPanel(Context context){
+        return getShopData(context).getString(KEY_CUST_LAST_CHAR, "");
     }
 
     public static void saveShopName(Context context, String shopName) {
@@ -152,7 +161,7 @@ public class AppData extends Thread{
             HttpURLConnection urlConnection = null;
             try {
                 urlConnection = prepareConnection("http://test.sharethegoodones.com/activeJustPrintAccount");
-                //urlConnection = prepareConnection("http://192.168.1.14/taostyle/activeJustPrintAccount");
+                //urlConnection = prepareConnection("http://192.168.1.2/taostyle/activeJustPrintAccount");
 
                 StringBuilder content = new StringBuilder(AppData.getLicense());
                 content.append(",");

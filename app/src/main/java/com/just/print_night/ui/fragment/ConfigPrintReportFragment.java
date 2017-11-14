@@ -60,7 +60,7 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
         List<SaleRecord> orders = saleRecordDao.loadAll();
 
         if(orders == null || orders.size() == 0){
-            showToast("No report to print_night! The sales record has been cleaned!");
+            showToast("No report to print! The sales record has been cleaned!");
             return;
         }
 
@@ -71,7 +71,7 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
 
         long now = new Date().getTime();
 
-        //print_night code:
+        //print code:
         String result = WifiPrintService.getInstance().exePrintReportCommand(orders, reportStartDate, String.valueOf(now));
         if("0".equals(result)) {
             //when printed succcesfully, clean all records, and update now as the next reportStartDate

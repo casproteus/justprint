@@ -21,21 +21,32 @@ public class OrderActivity extends BaseActivity {
     private ViewPager viewPager;  //对应的viewPager
     private PagerAdapter adapter = null;
 
+    //List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
+    private static List<Fragment> fragmentList = new ArrayList<Fragment>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.order_activity);
         new StupidReflect(this).init();
-        //List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
-        List<Fragment> fragmentList = new ArrayList<Fragment>();
         fragmentList.add(new OrderCategoryFragment());
         //fragmentList.add(new OrderMenuFragment());
-        fragmentList.add(new OrderIdentifierFragment());
+        fragmentList.add(OrderIdentifierFragment.getInstance());
         adapter = new MyPagerAdapter(getSupportFragmentManager(), fragmentList);
         try {
             if (viewPager != null) {
                 viewPager.setAdapter(adapter);
                 viewPager.setCurrentItem(1);
+                viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                    public void onPageScrollStateChanged(int state) {}
+                    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+
+                    public void onPageSelected(int position) {
+                        if(position == 0){
+                            ((OrderCategoryFragment)fragmentList.get(0)).categoryExXAdapter.notifyDataSetChanged();
+                       }
+                    }
+                });
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -45,7 +45,7 @@ public class OrderCategoryFragment extends BaseFragment {
     }
 
 
-    XExpadnAdapter<Category, Menu> categoryExXAdapter;
+    public XExpadnAdapter<Category, Menu> categoryExXAdapter;
 
     @Override
     public void onCreated(Bundle savedInstanceState) {
@@ -54,7 +54,7 @@ public class OrderCategoryFragment extends BaseFragment {
                 SubTitleMenuExpandViewHolder.class);
         odExCategory.setAdapter(categoryExXAdapter);
         Map<Category, List<Menu>> mdata = new LinkedHashMap<>();
-        List<Category> list = DaoExpand.queryNotDeletedAllQuery(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.DisplayIdx).list();
+        List<Category> list = DaoExpand.queryAllNotDeleted(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.DisplayIdx).list();
         MenuDao dao = Applic.app.getDaoMaster().newSession().getMenuDao();
         for (Category ca : list) {
             mdata.put(ca, DaoExpand.queryMenuByCategory(ca, dao));
