@@ -3,7 +3,6 @@ package com.just.print.app;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.just.print.Activate;
 import com.just.print.util.AppUtils;
 import com.just.print.util.SharedPreferencesHelper;
 import com.just.print.util.ToastUtil;
@@ -20,7 +19,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Date;
 
 public class AppData extends Thread{

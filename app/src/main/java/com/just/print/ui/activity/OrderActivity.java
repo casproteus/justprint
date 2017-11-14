@@ -1,21 +1,16 @@
 package com.just.print.ui.activity;
 
-import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 
 import com.just.print.R;
-import com.just.print.app.AppData;
 import com.just.print.app.BaseActivity;
 import com.just.print.ui.adapter.MyPagerAdapter;
 import com.just.print.ui.fragment.OrderCategoryFragment;
 import com.just.print.ui.fragment.OrderIdentifierFragment;
-import com.just.print.ui.fragment.OrderMenuFragment;
-import com.stupid.method.adapter.XViewHolder;
 import com.stupid.method.reflect.StupidReflect;
-import com.stupid.method.reflect.annotation.XClick;
 import com.stupid.method.reflect.annotation.XViewByID;
 
 import java.util.ArrayList;

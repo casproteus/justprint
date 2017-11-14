@@ -5,7 +5,6 @@ import android.widget.ToggleButton;
 
 import com.just.print.R;
 import com.just.print.db.bean.Mark;
-import com.just.print.util.L;
 import com.stupid.method.adapter.XViewHolder;
 
 /**

@@ -1,24 +1,16 @@
 package com.just.print.ui.activity;
 
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.widget.ListView;
 
 import com.just.print.Activate;
 import com.just.print.R;
 import com.just.print.app.AppData;
-import com.just.print.app.Applic;
 import com.just.print.app.BaseActivity;
-import com.just.print.ui.holder.ActivityViewHolder;
 import com.just.print.util.L;
 import com.just.print.util.ToastUtil;
-import com.stupid.method.adapter.XAdapter2;
 import com.stupid.method.reflect.StupidReflect;
 
-import java.util.Arrays;
 import java.util.Date;
 
 public class MainActivity extends BaseActivity {

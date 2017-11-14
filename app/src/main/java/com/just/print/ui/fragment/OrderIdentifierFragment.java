@@ -25,7 +25,6 @@ import com.just.print.ui.activity.ConfigActivity;
 import com.just.print.ui.holder.OrderIdentifierItemViewHolder;
 import com.just.print.ui.holder.OrderIdentifierMarkViewHolder;
 import com.just.print.ui.holder.OrderMenuViewHolder;
-import com.just.print.util.AppUtils;
 import com.just.print.util.L;
 import com.just.print.util.StringUtils;
 import com.just.print.util.ToastUtil;

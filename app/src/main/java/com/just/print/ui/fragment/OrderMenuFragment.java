@@ -13,7 +13,6 @@ import com.just.print.app.BaseFragment;
 import com.just.print.app.EventBus;
 import com.just.print.sys.model.SelectionDetail;
 import com.just.print.sys.server.CustomerSelection;
-import com.just.print.sys.server.WifiPrintService;
 import com.just.print.ui.holder.OrderMenuViewHolder;
 import com.just.print.util.L;
 import com.stupid.method.adapter.IXDataListener;

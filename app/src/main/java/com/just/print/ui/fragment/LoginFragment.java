@@ -7,11 +7,9 @@ import android.widget.EditText;
 
 import com.just.print.R;
 import com.just.print.app.AppData;
-import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
 import com.just.print.net.UDPService;
 import com.just.print.sys.model.AbsModel;
-import com.just.print.sys.model.QueryShopRequest;
 import com.just.print.sys.model.QueryShopResult;
 import com.just.print.ui.activity.OrderActivity;
 import com.just.print.util.Base64Util;
@@ -21,8 +19,6 @@ import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
 import com.stupid.method.reflect.annotation.XGetValueByView;
 import com.stupid.method.reflect.annotation.XViewByID;
-
-import java.util.Date;
 
 public class LoginFragment extends BaseFragment implements UDPService.UDPCallback {
     @Override

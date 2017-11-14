@@ -1,16 +1,10 @@
 package com.just.print.util;
 
-import android.content.Context;
-import android.os.Environment;
 import android.util.Base64;
-import android.util.Log;
 
 import com.just.print.app.AppData;
 import com.just.print.app.Applic;
 
-import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -24,10 +18,8 @@ import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
 import java.sql.Date;
 
 public class DatabaseUtil extends Thread{

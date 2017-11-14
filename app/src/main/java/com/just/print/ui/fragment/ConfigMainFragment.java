@@ -1,11 +1,9 @@
 package com.just.print.ui.fragment;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.just.print.Activate;
 import com.just.print.R;
 import com.just.print.app.BaseFragment;
 import com.just.print.ui.activity.ConfigActivity;

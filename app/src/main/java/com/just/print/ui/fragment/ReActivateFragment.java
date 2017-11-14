@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.just.print.Activate;
 import com.just.print.R;
 import com.just.print.app.AppData;
 import com.just.print.app.Applic;

@@ -1,18 +1,10 @@
 package com.just.print.ui.holder;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.view.Gravity;
-import android.view.View;
 import android.widget.Button;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.just.print.R;
-import com.just.print.ui.SquareLayout;
 import com.stupid.method.adapter.XViewHolder;
-
-import static android.R.attr.alpha;
 
 /**
  * Created by qiqi on 2016/11/23.

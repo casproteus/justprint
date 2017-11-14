@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 
-import com.just.print.db.dao.DaoMaster;
 import com.just.print.util.ToastUtil;
 
 /**
