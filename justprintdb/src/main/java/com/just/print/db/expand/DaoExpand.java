@@ -73,7 +73,7 @@ public final class DaoExpand {
     }
 
     /**
-     * \
+     *
      * 获得主打印机 没有 则返回null
      */
     public static Printer getFirstPrint(PrinterDao printerDao) {

@@ -163,14 +163,14 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                     switch (i) {
                         case 14:
                             if(items.length == 18) {
-                                odIdTableTbtn.setText("F");
+                                InputText("F");
                             }else{
                                 InputText(Character.toString((char) (i % 10 + 'A')));
                             }
                             break;
                         case 15:
                             if(items.length == 18) {
-                                odIdTableTbtn.setText("H");
+                                InputText("H");
                             }else{
                                 InputText(Character.toString((char) (i % 10 + 'A')));
                             }
