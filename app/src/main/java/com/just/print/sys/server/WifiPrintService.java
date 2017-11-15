@@ -250,7 +250,10 @@ public class WifiPrintService implements Runnable{
                             if(!"silent".equals(AppData.getCustomData("mode"))) {
                                 wifiCommunication.sndByte(Command.BEEP);
                             }
-                            String font = AppData.getCustomData("font");
+                            String font = AppData.getCustomData(curPrintIp + "font");
+                            if(StringUtils.isBlank(font)) {
+                                font = AppData.getCustomData("font");
+                            }
                             if(StringUtils.isBlank(font)) {
                                 wifiCommunication.sndByte(Command.GS_ExclamationMark);
                             }else{
@@ -336,10 +339,17 @@ public class WifiPrintService implements Runnable{
         }
 
         //determin the width of paper.
-        String font = AppData.getCustomData("font");
+        String font = AppData.getCustomData(curPrintIp + "font");
+        if(StringUtils.isBlank(font)) {
+            font = AppData.getCustomData("font");
+        }
         if(!StringUtils.isBlank(font)){
+            String w = AppData.getCustomData(curPrintIp + "width");
+            if(StringUtils.isBlank(w)) {
+                w = AppData.getCustomData("width");
+            }
             try {
-                width = Integer.valueOf(AppData.getCustomData("width"));
+                width = Integer.valueOf(w);
             }catch(Exception e){
 
             }
@@ -412,10 +422,17 @@ public class WifiPrintService implements Runnable{
 
     private String formatContentForPrint(List<SelectionDetail> list){
         L.d(TAG,"formatContentForPrint");
-        String font = AppData.getCustomData("font");
+        String font = AppData.getCustomData(curPrintIp + "font");
+        if(StringUtils.isBlank(font)) {
+            font = AppData.getCustomData("font");
+        }
         if(!StringUtils.isBlank(font)){
+            String w = AppData.getCustomData(curPrintIp + "width");
+            if(StringUtils.isBlank(w)) {
+                w = AppData.getCustomData("width");
+            }
             try {
-                width = Integer.valueOf(AppData.getCustomData("width"));
+                width = Integer.valueOf(w);
             }catch(Exception e){
 
             }

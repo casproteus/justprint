@@ -107,6 +107,9 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
                     AppData.putCustomData(AppData.KEY_CUST_LAST_CHAR, inputedSN);
                     showToast("Please restart app to apply new layout.");
                     return;
+                default:
+                    AppData.putCustomData(SettingType, inputedSN);
+                    showToast(SettingType + " is set to " + inputedSN);
             }
         }else if (inputedSN.length() != 6) {
             showToast("Please input correct license code");
