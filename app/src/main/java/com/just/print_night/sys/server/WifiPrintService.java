@@ -398,7 +398,7 @@ public class WifiPrintService implements Runnable{
                 content.append(generateString(spaceLeft, " "));
             }
 
-            content.append("$");
+            content.append("=");
             content.append(price);
             content.append("\n");
 
@@ -413,7 +413,7 @@ public class WifiPrintService implements Runnable{
         String space = generateString(width - 7 - String.valueOf(item).length() - totalStr.length(), " ");
         content.append(space);
 
-        content.append("$");
+        content.append("=");
         content.append(totalStr);
         //content.append(generateSpaceString(5)).append("* ").append(str.getName()).append(" *\n");
         content.append("\n\n\n\n\n");
