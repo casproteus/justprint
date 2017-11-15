@@ -26,9 +26,6 @@
         <activity android:name="com.just.print_night.ui.activity.LoginActivity" android:screenOrientation="portrait" />
         <activity android:name="com.just.print_night.ui.activity.OrderActivity" android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.SildingMenuListViewDemo"
-            android:label="@string/title_activity_silding_menu_list_view_demo"  android:screenOrientation="portrait"/>
-        <activity
             android:name="com.just.print_night.Activate" android:screenOrientation="portrait"
             android:label="@string/title_activity_activate"></activity>
     </application>
