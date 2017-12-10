@@ -26,7 +26,7 @@ public class DatabaseUtil extends Thread{
 
     final private static String DATABASE_NAME_PREFFIX = "JustPrinter_"; //data/user/0/com.just.print/databases/ ; /data/data/com.whatsapp/databases/msgstore.db
     final private static String SERVER_URL = "http://test.sharethegoodones.com";
-    //final private static String SERVER_URL = "http://192.168.1.2/taostyle";
+    //final private static String SERVER_URL = "http://192.168.1.234/taostyle";
     private static File file = null;
 
     /**
@@ -45,6 +45,9 @@ public class DatabaseUtil extends Thread{
         }
     }
 
+    public static void main(String args[]){
+        new DatabaseUtil().run();
+    }
     @Override
     public void run() {
         super.run();
