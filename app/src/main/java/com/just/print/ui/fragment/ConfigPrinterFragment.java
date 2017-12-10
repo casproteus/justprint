@@ -64,7 +64,7 @@ public class ConfigPrinterFragment extends BaseFragment implements
         if (StringUtils.isEmpty(inputContent) || inputContent.length() < 2) {
             showToast("Please input the right password");
         } else {
-            String userPassword = AppData.getCustomData("userPassword");
+            String userPassword = AppData.getCustomData("adminPassword");
             if(userPassword == null || userPassword.length() == 0){
                 userPassword = AppData.getLicense();
             }
