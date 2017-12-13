@@ -197,7 +197,10 @@ public class WifiPrintService implements Runnable{
     public String exePrintReportCommand(List<SaleRecord> saleRecords, String startTime, String endTime){
         L.d("ConfigPrintReportFragment","exePrintCommand");
         List<Printer> printers = Applic.app.getDaoMaster().newSession().getPrinterDao().loadAll();
-        String printerIP = printers.get(0).getIp();
+        String printerIP = AppData.getCustomData("reportPrinter");
+        if(printerIP == null || printerIP.length() < 8 || printerIP.indexOf(".") < 1 || printerIP.indexOf(".") > 3) {
+            printerIP = printers.get(0).getIp();
+        }
 
         HashMap<String, SaleRecord> map = new HashMap<String, SaleRecord>();
         //combine the records

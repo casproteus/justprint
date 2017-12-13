@@ -43,6 +43,14 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
             String SettingType = inputedSN.substring(1,p);
             inputedSN = inputedSN.substring(p + 1);
             switch (SettingType) {
+                case "ap":   // means theres parameters
+                    AppData.putCustomData("adminPassword", inputedSN);
+                    showToast("App has set adminPassword to: " + inputedSN);
+                    return;
+                case "c":
+                    AppData.putCustomData("code", inputedSN);
+                    showToast("App has set code to: " + inputedSN);
+                    return;
                 case "debug":
                     MainActivity.debug = Boolean.valueOf(inputedSN);
                     AppData.putCustomData("debug", String.valueOf(MainActivity.debug));
@@ -64,36 +72,25 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
                         showToast("debug mode turned off!");
                     }
                     return;
-                case "v":
-                    AppData.putCustomData("version", inputedSN);
-                    showToast("App is in switched to version : " + inputedSN);
+                case "f":
+                    AppData.putCustomData("font", inputedSN);
+                    showToast("App has set font to: " + inputedSN);
                     return;
-                case "m":
-                    AppData.putCustomData("mode", inputedSN);
-                    showToast("App is in switched to mode : " + inputedSN);
+                case "lastchar":
+                    AppData.putCustomData(AppData.KEY_CUST_LAST_CHAR, inputedSN);
+                    showToast("Please restart app to apply new layout.");
                     return;
                 case "l":
                     AppData.putCustomData("limitation", inputedSN);
                     showToast("App has switched limitation to: " + inputedSN);
                     return;
-                case "f":
-                    AppData.putCustomData("font", inputedSN);
-                    showToast("App has set font to: " + inputedSN);
+                case "m":
+                    AppData.putCustomData("mode", inputedSN);
+                    showToast("App is in switched to mode : " + inputedSN);
                     return;
-                case "w":
-                    AppData.putCustomData("width", inputedSN);
-                    if("16".equals(inputedSN)){
-                        AppData.putCustomData("font", "29, 33, 34");
-                    }
-                    showToast("App has set width to: " + inputedSN);
-                    return;
-                case "c":
-                    AppData.putCustomData("code", inputedSN);
-                    showToast("App has set code to: " + inputedSN);
-                    return;
-                case "p":   // means theres parameters
-                    AppData.putCustomData("adminPassword", inputedSN);
-                    showToast("App has set adminPassword to: " + inputedSN);
+                case "r":
+                    AppData.putCustomData("reportPrinter", inputedSN);
+                    showToast("reportPrinter is set to : " + inputedSN);
                     return;
                 case "s1":
                     AppData.putCustomData("sep_str1", inputedSN);
@@ -103,9 +100,20 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
                     AppData.putCustomData("sep_str2", inputedSN);
                     showToast("App has set sep_str2 to: " + inputedSN);
                     return;
-                case "lastchar":
-                    AppData.putCustomData(AppData.KEY_CUST_LAST_CHAR, inputedSN);
-                    showToast("Please restart app to apply new layout.");
+                case "up":
+                    AppData.putCustomData("userPassword", inputedSN);
+                    showToast("userPassword is set to: " + inputedSN);
+                    return;
+                case "v":
+                    AppData.putCustomData("version", inputedSN);
+                    showToast("App is in switched to version : " + inputedSN);
+                    return;
+                case "w":
+                    AppData.putCustomData("width", inputedSN);
+                    if("16".equals(inputedSN)){
+                        AppData.putCustomData("font", "29, 33, 34");
+                    }
+                    showToast("App has set width to: " + inputedSN);
                     return;
                 default:
                     AppData.putCustomData(SettingType, inputedSN);
