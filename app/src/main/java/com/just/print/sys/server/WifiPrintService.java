@@ -165,7 +165,7 @@ public class WifiPrintService implements Runnable{
             }
         }
 
-        //3、再次遍历queueMap, 封装打印信息
+        //3、再次遍历ipSelectionsMap, 封装打印信息
         for(Map.Entry entry: ipSelectionsMap.entrySet()){
             String printerIP = (String)entry.getKey();
             List<SelectionDetail> dishList = (List<SelectionDetail>) entry.getValue();
@@ -184,7 +184,7 @@ public class WifiPrintService implements Runnable{
                     }
                 }
             }
-            //clear the queueMap immediately
+            //clear the ipSelectionsMap immediately
             ipSelectionsMap.get(printerIP).clear();
         }
 
@@ -293,6 +293,9 @@ public class WifiPrintService implements Runnable{
                     L.d(TAG,"Print complete (ipcontent cleaned, flag set to false, connection closed!) for ip:" + curPrintIp);
 
                     isAllPrintedCheck();
+                }else{
+                    L.d(TAG,"Unexpected empty Content found when printing to printer: :" + curPrintIp);
+                    ToastUtil.showToast("Unexpected empty Content found! when printing to printer: " + curPrintIp);
                 }
             }else{
                 L.d(TAG,"printerConnectedFlag:" + printerConnectedFlag);
