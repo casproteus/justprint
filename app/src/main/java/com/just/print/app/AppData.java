@@ -160,8 +160,8 @@ public class AppData extends Thread{
         if(AppUtils.hasInternet(Applic.app.getApplicationContext())){
             HttpURLConnection urlConnection = null;
             try {
-                urlConnection = prepareConnection("http://test.sharethegoodones.com/activeJustPrintAccount");
-                //urlConnection = prepareConnection("http://192.168.1.2/taostyle/activeJustPrintAccount");
+                //urlConnection = prepareConnection("http://stgo.giize.com:81/activeJustPrintAccount");
+                urlConnection = prepareConnection("http://192.168.1.6:81/activeJustPrintAccount");
 
                 StringBuilder content = new StringBuilder(AppData.getLicense());
                 content.append(",");
@@ -187,10 +187,10 @@ public class AppData extends Thread{
 
                             ToastUtil.showToast("Application is activated successfully!");
                         }else{
-                            ToastUtil.showToast("Please provide valid information!");
+                            ToastUtil.showToast("No time left on server: "+ time);
                         }
                     }catch (Exception e){
-                        ToastUtil.showToast("Please provide valid information!");
+                        ToastUtil.showToast("Please provide valid information! time left on server is:" + responseString);
                     }
                 }else{
                     ToastUtil.showToast("Please provide valid shop name, user name and license number!");

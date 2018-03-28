@@ -59,7 +59,6 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
 
                         StringBuilder sb = new StringBuilder();
                         sb.append("adminPassword:").append(AppData.getCustomData("adminPassword")).append("\n");
-                        sb.append("debug mode:").append(AppData.getCustomData("debug")).append("\n");
                         sb.append("lastsuccess:").append(AppData.getCustomData("lastsuccess")).append("\n");
                         sb.append("limitation:").append(AppData.getCustomData("limitation")).append("\n");
                         sb.append("mode:").append(AppData.getCustomData("mode")).append("\n");

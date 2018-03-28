@@ -139,4 +139,21 @@ public class Command {
     //二维码相关指令
     public static byte[] GS_k_m_v_r_nL_nH = new byte[] { 0x1b, 0x5a, 0x03, 0x03, 0x08, 0x00, 0x00 };
 
+    //bei yang print controll commands====================================================
+    public static byte[] active_auto_status_return = new byte[] { 0x1d, 0x61, (byte)0xff};
+    //clear printting-forbidden flag
+    public static byte[] clear_print_forbidden_flag = new byte[] {0x1b, 0x41,};
+    //dont know what
+    public static byte[] clear_print_forbidden_flag2 = new byte[] {0x10, 0x06, 0x07, 0x08, 0x04};
+    public static byte[] clear_print_forbidden_flag3 = new byte[] {0x10, 0x06, 0x07, 0x08, 0x08};
+
+    //printer status:
+    //ok
+    public static byte[] OK = new byte[] {0x14, 0x00, 0x00, 0x0f};
+    //printing
+    public static byte[] printing = new byte[] {0x14, 0x00, 0x00, 0x0f};
+    //printer lack of paper
+    public static byte[] printer_need_papper = new byte[] {0x1c, 0x00, 0x2c, 0x4f};
+    //printer recovered from lacking of paper
+    public static byte[] recovered_from_need_papper = new byte[] {0x14, 0x00, 0x20, 0x4f};
 }
