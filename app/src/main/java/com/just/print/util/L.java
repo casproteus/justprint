@@ -17,6 +17,7 @@ import java.util.Vector;
  */
 
 public class L extends Thread{
+    private static final String ErrorLogURL = "http://stgo.giize.com:81";
     private static int index = 0;
 
     private static L instance = null;
@@ -62,7 +63,7 @@ public class L extends Thread{
                 String msg = msgs.get(0);
                 msgs.remove(0);
                 try {
-                    urlConnection = AppData.prepareConnection("http://team.sharethegoodones.com/useraccounts/loglog");
+                    urlConnection = AppData.prepareConnection(ErrorLogURL +"/useraccounts/loglog");
 
                     JSONObject json = new JSONObject();//创建json对象
                     json.put("tag", URLEncoder.encode(AppData.getUserName(), "UTF-8"));//使用URLEncoder.encode对特殊和不可见字符进行编码

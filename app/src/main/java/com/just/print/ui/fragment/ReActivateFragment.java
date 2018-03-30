@@ -117,6 +117,7 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
                 default:
                     AppData.putCustomData(SettingType, inputedSN);
                     showToast(SettingType + " is set to " + inputedSN);
+                    return;
             }
         }else if (inputedSN.length() != 6) {
             showToast("Please input correct license code");

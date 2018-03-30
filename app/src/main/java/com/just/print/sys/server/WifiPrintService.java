@@ -76,7 +76,7 @@ public class WifiPrintService implements Runnable{
     private POSInterfaceAPI interface_wifi = null;
     private POSInterfaceAPI	interface_state = null;
 
-    private static final int SearchPortMAX = 10;
+    private static final int SearchPortMAX = 5;
     private SearchPortInfo port_info[] = new SearchPortInfo[SearchPortMAX];
     private int return_code = 0;
     private String beiYangPrinters = "";
@@ -154,6 +154,8 @@ public class WifiPrintService implements Runnable{
             ipContentMap.put(printer.getIp(),new ArrayList<String>());
             ipSelectionsMap.put(printer.getIp(),new ArrayList<SelectionDetail>());
         }
+
+        beiYangPrinters = prepareBeiYangPrinterStr();
     }
 
     public String exePrintCommand(){
@@ -259,151 +261,163 @@ public class WifiPrintService implements Runnable{
         return SUCCESS;
     }
 
+    private boolean isReadyToInitNewPrintJob(){
+        return contentReadyForPrintFlag == false && printerConnectedFlag == false;
+    }
+
+    private boolean isBeiYangPrinter(String printerIP){
+        return beiYangPrinters.contains(printerIP);
+    }
+
+    private void connectToThePrinter(String printerIP){
+
+        if(isBeiYangPrinter(printerIP)){
+
+            return_code = interface_wifi.OpenDevice(printerIP, POSPORT);
+            if(return_code != POS_SUCCESS){
+                L.e(TAG, "Open PosPort Failed", null);
+                ToastUtil.showToast("Open PosPort Failed. Check Printer!");
+                return;
+            }else{
+                if(pos_wifi != null){
+                    pos_wifi = null;
+                }
+                pos_wifi = new POSSDK(interface_wifi);
+            }
+
+            return_code = interface_state.OpenDevice(printerIP, STATEPORT);
+            if(return_code != POS_SUCCESS){
+                L.e(TAG, "STATEPORT Open Failed!", null);
+                ToastUtil.showToast("State Port Open Failed! Check Printer!");
+            }else{
+                if(pos_state != null){
+                    pos_state = null;
+                }
+                pos_state = new POSSDK(interface_state);
+            }
+
+            if (return_code != POS_SUCCESS) {
+                ToastUtil.showToast("Failed to connect device, please try again.");
+            }
+
+        }else {
+            wifiCommunication.initSocket(printerIP, POSPORT);   //this should result in the "printerConnectedFlag" become true .
+        }
+    }
+
+    private boolean isReadyToPrint(){
+        return contentReadyForPrintFlag == true && printerConnectedFlag == true;
+    }
+
+    private void printContent(String content){
+        //check if it's nbna printer, check printer status
+        if(isBeiYangPrinter(curPrintIp)){
+
+            TestPrintInfo testprint = new TestPrintInfo();
+            int FontStyle = 0;
+
+            //Get FontStyle
+            //if(TogStyleReverse == true){ FontStyle |= 0x400; }  //choose StyleReverse
+            //if(TogStyleBold == true){ FontStyle |= 0x08; }      //choose StyleBold
+            //if(TogStyleUnderline == true){ FontStyle |= 0x80; } //choose StyleUnderline
+
+            int FontType = 0; //Get FontType
+            int Alignment = 0;//Get Alignmenttype
+            int HorStartingPosition = 100;//Get HorStartingPosition
+            int VerStartingPosition = 20;//Get VerStartingPosition
+            int LineHeight = 10;//Get LineHeight
+            int HorizontalTimes = 6;//Get HorizontalTimes
+            int VerticalTimes = 6;//Get VerticalTimes
+
+            return_code = testprint.TestPrintText(pos_wifi, printMode, content, content.length(), FontType, FontStyle,
+                    Alignment,HorStartingPosition, VerStartingPosition, LineHeight, HorizontalTimes, VerticalTimes);
+            if(return_code != POS_SUCCESS){
+                ToastUtil.showToast("Failed to print Text.");
+            }
+        }else {
+            if (!"silent".equals(AppData.getCustomData("mode"))) {
+                wifiCommunication.sndByte(Command.BEEP);
+            }
+            String font = AppData.getCustomData(curPrintIp + "font");
+            if (StringUtils.isBlank(font)) {
+                font = AppData.getCustomData("font");
+            }
+            if (StringUtils.isBlank(font)) {
+                wifiCommunication.sndByte(Command.GS_ExclamationMark);
+            } else {
+                //default: "27, 33, 48" because it works for both thermal and non-thermal
+                String[] pieces = font.split(",");
+                if (pieces.length != 3) {
+                    wifiCommunication.sndByte(Command.GS_ExclamationMark);
+                } else {
+                    for (int i = 0; i < 3; i++) {
+                        Command.GS_ExclamationMark[i] = Integer.valueOf(pieces[i].trim()).byteValue();
+                    }
+                    wifiCommunication.sndByte(Command.GS_ExclamationMark);
+                }
+            }
+
+            //code can be customzed
+            String tCode = AppData.getCustomData("code");
+            if (tCode != null && tCode.length() > 2) {
+                code = tCode;
+            }
+            wifiCommunication.sendMsg(content, code);
+
+            //cut the paper.
+            wifiCommunication.sndByte(Command.GS_V_m_n);
+
+            //close the connectoion afer each print task.
+            wifiCommunication.close();
+        }
+    }
+
     public void run(){
-        beiYangPrinters = prepareBeiYangPrinterStr();
+
         int timeCounter = 0;
         while(true){
             //check if this round is a good time to reset a curPrintIp and load new contnet to print.
-            if(contentReadyForPrintFlag == false && printerConnectedFlag == false) {
+            if(isReadyToInitNewPrintJob()) {
                 L.d(TAG,"loading bullet(changing current ip and setup two flags....");
-                //do initSocket for the first non-empty entry, (non-empty means the values hidden in this printerIp is non-empty.)
+                //stop at the first non-empty entry, (non-empty means the values hidden in this printerIp is non-empty.)
+                //and initSocket to the printer key pointing to.
                 for(Map.Entry entry : ipContentMap.entrySet()){
+
                     List<String> contentList = (List<String>)entry.getValue();
+
                     if(contentList.size() > 0){
+                        contentReadyForPrintFlag = true; //mark that we have found something to print, don't come into here and do init socket any more.
                         curPrintIp = (String)entry.getKey();
                         L.d(TAG,"ip changed to:" + curPrintIp + "the size of content to print is:" + contentList.size());
-                        contentReadyForPrintFlag = true;                   //mark that we have found something to print, don't do init socket any more.
                         L.d(TAG,"contentReadyForPrintFlag setted up! now waiting for initSocket to set up the printerConnectedFlag");
-                        if(beiYangPrinters.contains(curPrintIp)){
-                            return_code = interface_wifi.OpenDevice(curPrintIp, POSPORT);
-                            if(return_code != POS_SUCCESS){
-                                L.d(TAG, "interface_wifi Open Port Failed!");
-                                ToastUtil.showToast("interface_wifi Open Port Fail.");
-                                return;
-                            }else{
-                                if(pos_wifi != null){
-                                    pos_wifi = null;
-                                }
-                                pos_wifi = new POSSDK(interface_wifi);
-                            }
-                            return_code = interface_state.OpenDevice(curPrintIp, STATEPORT);
-                            if(return_code != POS_SUCCESS){
-                                L.d(TAG, "interface_state Open Port Failed!");
-                                ToastUtil.showToast("interface_state Open Port Fail.");
-                            }else{
-                                if(pos_state != null){
-                                    pos_state = null;
-                                }
-                                pos_state = new POSSDK(interface_state);
-                            }
 
-                            if (return_code == POS_SUCCESS) {
-                                L.d(TAG, "Connection has been established ");
-                                ToastUtil.showToast("Connection has been established ，you can send the data.");
-                            }else{
-                                L.d(TAG, "Failed to connect device, please try agai");
-                                ToastUtil.showToast("Failed to connect device, please try again.");
-                            }
-                        }else {
-                            wifiCommunication.initSocket(curPrintIp, POSPORT);   //this should result in the "printerConnectedFlag" become true .
-                        }
+                        connectToThePrinter(curPrintIp); //if success, an other flag (printerConnectedFlag) will be set up
                         break;  //stop for getting content for other printers, stop here, when one printer finished, open connection to an other printer and print again.
                     }
                 }
-            }else if(contentReadyForPrintFlag == true && printerConnectedFlag == true){//chick if this round is a good time to do actual print work?
+
+            }else if(isReadyToPrint()){//chick if this round is a good time to do actual print work?
+
                 L.d(TAG,"Flags both set, checking the content fllowing current ip:" + curPrintIp);
+
                 if(ipContentMap !=null && ipContentMap.get(curPrintIp) != null) {
-                    List<String> contentList = ipContentMap.get(curPrintIp);
-                    L.d(TAG,"out printing... content list size is:" + contentList.size());
-                    for (String content : contentList) {
+
+                    List<String> contentList = ipContentMap.get(curPrintIp); L.d(TAG,"out printing... content list size is:" + contentList.size());
+                    for (String content : contentList) {    //might print several times, if the printer is setted as "DanDa"
                         if(content.length()>0) {
-                            //check if it's nbna printer, check printer status
-                            if(beiYangPrinters.contains(curPrintIp)){
-                                pos_wifi = new POSSDK(interface_wifi);
-                                /**wifiCommunication.sndByte(Command.active_auto_status_return);
-                                byte[] status = wifiCommunication.revMsg();
-                                if(!Command.OK.equals(status)){
-                                    L.d(TAG,"printer is not ready for work:" + curPrintIp);
-                                    ToastUtil.showToast("Printer status is not ready for print! Please try again, the IP is: " + curPrintIp);
-                                    wifiCommunication.sndByte(Command.clear_print_forbidden_flag);
-                                    wifiCommunication.sndByte(Command.clear_print_forbidden_flag2);
-                                    wifiCommunication.sndByte(Command.clear_print_forbidden_flag3);
-                                }**/
-
-                                TestPrintInfo testprint = new TestPrintInfo();
-                                int FontStyle = 0;
-
-                                //Get FontStyle
-                                //if(TogStyleReverse == true){//choose StyleReverse
-                                //    FontStyle |= 0x400;
-                                //}
-                                //if(TogStyleBold == true){//choose StyleBold
-                                //    FontStyle |= 0x08;
-                                //}
-                                //if(TogStyleUnderline == true){//choose StyleUnderline
-                                //    FontStyle |= 0x80;
-                                //}
-
-                                int FontType = 0; //Get FontType
-                                int Alignment = 0;//Get Alignmenttype
-                                int HorStartingPosition = 100;//Get HorStartingPosition
-                                int VerStartingPosition = 20;//Get VerStartingPosition
-                                int LineHeight = 10;//Get LineHeight
-                                int HorizontalTimes = 4;//Get HorizontalTimes
-                                int VerticalTimes = 4;//Get VerticalTimes
-
-                                return_code = testprint.TestPrintText(pos_wifi, printMode, content, content.length(), FontType, FontStyle,
-                                            Alignment,HorStartingPosition, VerStartingPosition, LineHeight, HorizontalTimes, VerticalTimes);
-                                if(return_code != POS_SUCCESS){
-                                    ToastUtil.showToast("Failed to print Text.");
-                                }
-                            }else {
-                                if (!"silent".equals(AppData.getCustomData("mode"))) {
-                                    wifiCommunication.sndByte(Command.BEEP);
-                                }
-                                String font = AppData.getCustomData(curPrintIp + "font");
-                                if (StringUtils.isBlank(font)) {
-                                    font = AppData.getCustomData("font");
-                                }
-                                if (StringUtils.isBlank(font)) {
-                                    wifiCommunication.sndByte(Command.GS_ExclamationMark);
-                                } else {
-                                    //default: "27, 33, 48" because it works for both thermal and non-thermal
-                                    String[] pieces = font.split(",");
-                                    if (pieces.length != 3) {
-                                        wifiCommunication.sndByte(Command.GS_ExclamationMark);
-                                    } else {
-                                        for (int i = 0; i < 3; i++) {
-                                            Command.GS_ExclamationMark[i] = Integer.valueOf(pieces[i].trim()).byteValue();
-                                        }
-                                        wifiCommunication.sndByte(Command.GS_ExclamationMark);
-                                    }
-                                }
-
-                                //code can be customzed
-                                String tCode = AppData.getCustomData("code");
-                                if (tCode != null && tCode.length() > 2) {
-                                    code = tCode;
-                                }
-                                wifiCommunication.sendMsg(content, code);
-
-                                //cut the paper.
-                                wifiCommunication.sndByte(Command.GS_V_m_n);
-                            }
+                            printContent(content);
                         }
                     }
-                    //reset status
+
+                    //reset status and get ready for a new print job( a print job = connecting to a printer + print content + reset)
                     ipContentMap.get(curPrintIp).clear();
                     printerConnectedFlag = false;
                     contentReadyForPrintFlag = false;
 
-                    //close the connectoion afer each print task.
-                    wifiCommunication.close();
-                    L.d(TAG,"Print complete (ipcontent cleaned, flag set to false, connection closed!) for ip:" + curPrintIp);
-
                     isAllPrintedCheck();
+                    L.d(TAG,"Print complete (ipcontent cleaned, flag set to false, connection closed!) for ip:" + curPrintIp);
                 }else{
-                    L.d(TAG,"Unexpected empty Content found when printing to printer: :" + curPrintIp);
+                    L.e(TAG,"Unexpected empty Content found when printing to printer: :" + curPrintIp, null);
                     ToastUtil.showToast("Unexpected empty Content found! when printing to printer: " + curPrintIp);
                 }
             }else{
@@ -422,7 +436,7 @@ public class WifiPrintService implements Runnable{
 
     private String prepareBeiYangPrinterStr(){
         String beiYangPrinter = AppData.getCustomData("BeiYangPrinter");
-        if(beiYangPrinter != null){
+        if(beiYangPrinter != null && beiYangPrinter.length() > 7){
             return beiYangPrinter;
         }
 
