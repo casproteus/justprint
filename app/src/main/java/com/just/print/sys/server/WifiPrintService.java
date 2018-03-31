@@ -154,8 +154,6 @@ public class WifiPrintService implements Runnable{
             ipContentMap.put(printer.getIp(),new ArrayList<String>());
             ipSelectionsMap.put(printer.getIp(),new ArrayList<SelectionDetail>());
         }
-
-        beiYangPrinters = prepareBeiYangPrinterStr();
     }
 
     public String exePrintCommand(){
@@ -373,6 +371,8 @@ public class WifiPrintService implements Runnable{
     }
 
     public void run(){
+
+        beiYangPrinters = prepareBeiYangPrinterStr();
 
         int timeCounter = 0;
         while(true){
