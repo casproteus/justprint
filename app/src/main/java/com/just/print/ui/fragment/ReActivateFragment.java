@@ -38,11 +38,14 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
         }
 
         String inputedSN = String.valueOf(textView.getText()).trim();
-        if(inputedSN.startsWith("-") && inputedSN.indexOf(":") > 1){
+        if(inputedSN.startsWith("-") && (inputedSN.indexOf(":") > 1 || inputedSN.indexOf("：") > 1)){
             int p = inputedSN.indexOf(":");
+            if(p == -1){
+                p = inputedSN.indexOf("：");
+            }
             String SettingType = inputedSN.substring(1,p);
             inputedSN = inputedSN.substring(p + 1);
-            switch (SettingType) {
+            switch (SettingType.toLowerCase()) {
                 case "ap":   // means theres parameters
                     AppData.putCustomData("adminPassword", inputedSN);
                     showToast("App has set adminPassword to: " + inputedSN);

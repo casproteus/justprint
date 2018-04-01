@@ -100,7 +100,6 @@ public class WifiPrintService implements Runnable{
                     L.d(TAG,"connection stopped with ip:" + WifiPrintService.curPrintIp);
                     contentReadyForPrintFlag = false;
                     printerConnectedFlag = false;
-                    curPrintIp = "";
                     break;
                 case WifiCommunication.WFPRINTER_CONNECTEDERR:
                     L.d(TAG,"Connection Error! With ip:" + WifiPrintService.curPrintIp);
@@ -259,12 +258,79 @@ public class WifiPrintService implements Runnable{
         return SUCCESS;
     }
 
+    public void run(){
+
+        beiYangPrinters = prepareBeiYangPrinterStr();
+
+        int timeCounter = 0;
+        while(true){
+            //check if this round is a good time to reset a curPrintIp and load new contnet to print.
+            if(isReadyToInitNewPrintJob()) {
+                //stop at the first non-empty entry, (non-empty means the values hidden in this printerIp is non-empty.)
+                //and initSocket to the printer key pointing to.
+                for(Map.Entry entry : ipContentMap.entrySet()){
+
+                    List<String> contentList = (List<String>)entry.getValue();
+
+                    if(contentList.size() > 0){
+                        contentReadyForPrintFlag = true; //mark that we have found something to print, don't come into here and do init socket any more.
+                        curPrintIp = (String)entry.getKey();
+                        L.d(TAG,"ip changed to:" + curPrintIp + "the size of content to print is:" + contentList.size());
+                        L.d(TAG,"contentReadyForPrintFlag setted up! now waiting for initSocket to set up the printerConnectedFlag");
+
+                        connectToThePrinter(curPrintIp); //if success, an other flag (printerConnectedFlag) will be set up
+                        break;  //stop for getting content for other printers, stop here, when one printer finished, open connection to an other printer and print again.
+                    }
+                }
+
+            }else if(isReadyToPrint()){//chick if this round is a good time to do actual print work?
+
+                L.d(TAG,"Flags both set, checking the content fllowing current ip:" + curPrintIp);
+
+                if(ipContentMap !=null && ipContentMap.get(curPrintIp) != null) {
+
+                    List<String> contentList = ipContentMap.get(curPrintIp); L.d(TAG,"out printing... content list size is:" + contentList.size());
+                    for (String content : contentList) {    //might print several times, if the printer is setted as "DanDa"
+                        if(content.length()>0) {
+                            printContent(content);
+                        }
+                    }
+
+                    //reset status and get ready for a new print job( a print job = connecting to a printer + print content + reset)
+                    ipContentMap.get(curPrintIp).clear();
+                    //printerConnectedFlag = false;
+                    //contentReadyForPrintFlag = false;
+
+                    isAllPrintedCheck();
+                    L.d(TAG,"Print complete (ipcontent cleaned, flag set to false, connection closed!) for ip:" + curPrintIp);
+                }else{
+                    L.e(TAG,"Unexpected empty Content found when printing to printer: :" + curPrintIp, null);
+                    ToastUtil.showToast("Unexpected empty Content found! when printing to printer: " + curPrintIp);
+                }
+            }else{
+                L.d(TAG,"printerConnectedFlag:" + printerConnectedFlag);
+                timeCounter++;
+                if(timeCounter == 5){
+                    timeCounter = 0;
+                    ToastUtil.showToast("Printer Error! Check " + curPrintIp);
+                }
+            }
+
+            //did any work or didn't do any work, each round should rest for 1 second.
+            AppUtils.sleep(1000);
+        }
+    }
+
     private boolean isReadyToInitNewPrintJob(){
         return contentReadyForPrintFlag == false && printerConnectedFlag == false;
     }
 
     private boolean isBeiYangPrinter(String printerIP){
         return beiYangPrinters.contains(printerIP);
+    }
+
+    private boolean isReadyToPrint(){
+        return contentReadyForPrintFlag == true && printerConnectedFlag == true;
     }
 
     private void connectToThePrinter(String printerIP){
@@ -301,10 +367,6 @@ public class WifiPrintService implements Runnable{
         }else {
             wifiCommunication.initSocket(printerIP, POSPORT);   //this should result in the "printerConnectedFlag" become true .
         }
-    }
-
-    private boolean isReadyToPrint(){
-        return contentReadyForPrintFlag == true && printerConnectedFlag == true;
     }
 
     private void printContent(String content){
@@ -370,70 +432,6 @@ public class WifiPrintService implements Runnable{
         }
     }
 
-    public void run(){
-
-        beiYangPrinters = prepareBeiYangPrinterStr();
-
-        int timeCounter = 0;
-        while(true){
-            //check if this round is a good time to reset a curPrintIp and load new contnet to print.
-            if(isReadyToInitNewPrintJob()) {
-                L.d(TAG,"loading bullet(changing current ip and setup two flags....");
-                //stop at the first non-empty entry, (non-empty means the values hidden in this printerIp is non-empty.)
-                //and initSocket to the printer key pointing to.
-                for(Map.Entry entry : ipContentMap.entrySet()){
-
-                    List<String> contentList = (List<String>)entry.getValue();
-
-                    if(contentList.size() > 0){
-                        contentReadyForPrintFlag = true; //mark that we have found something to print, don't come into here and do init socket any more.
-                        curPrintIp = (String)entry.getKey();
-                        L.d(TAG,"ip changed to:" + curPrintIp + "the size of content to print is:" + contentList.size());
-                        L.d(TAG,"contentReadyForPrintFlag setted up! now waiting for initSocket to set up the printerConnectedFlag");
-
-                        connectToThePrinter(curPrintIp); //if success, an other flag (printerConnectedFlag) will be set up
-                        break;  //stop for getting content for other printers, stop here, when one printer finished, open connection to an other printer and print again.
-                    }
-                }
-
-            }else if(isReadyToPrint()){//chick if this round is a good time to do actual print work?
-
-                L.d(TAG,"Flags both set, checking the content fllowing current ip:" + curPrintIp);
-
-                if(ipContentMap !=null && ipContentMap.get(curPrintIp) != null) {
-
-                    List<String> contentList = ipContentMap.get(curPrintIp); L.d(TAG,"out printing... content list size is:" + contentList.size());
-                    for (String content : contentList) {    //might print several times, if the printer is setted as "DanDa"
-                        if(content.length()>0) {
-                            printContent(content);
-                        }
-                    }
-
-                    //reset status and get ready for a new print job( a print job = connecting to a printer + print content + reset)
-                    ipContentMap.get(curPrintIp).clear();
-                    printerConnectedFlag = false;
-                    contentReadyForPrintFlag = false;
-
-                    isAllPrintedCheck();
-                    L.d(TAG,"Print complete (ipcontent cleaned, flag set to false, connection closed!) for ip:" + curPrintIp);
-                }else{
-                    L.e(TAG,"Unexpected empty Content found when printing to printer: :" + curPrintIp, null);
-                    ToastUtil.showToast("Unexpected empty Content found! when printing to printer: " + curPrintIp);
-                }
-            }else{
-                L.d(TAG,"printerConnectedFlag:" + printerConnectedFlag);
-                timeCounter++;
-                if(timeCounter == 5){
-                    timeCounter = 0;
-                    ToastUtil.showToast("Printer Error! Check " + curPrintIp);
-                }
-            }
-
-            //did any work or didn't do any work, each round should rest for 1 second.
-            AppUtils.sleep(1000);
-        }
-    }
-
     private String prepareBeiYangPrinterStr(){
         String beiYangPrinter = AppData.getCustomData("BeiYangPrinter");
         if(beiYangPrinter != null && beiYangPrinter.length() > 7){
@@ -441,27 +439,29 @@ public class WifiPrintService implements Runnable{
         }
 
         beiYangPrinter = "";
-        for(int i = 0; i < SearchPortMAX; i++){
-            port_info[i] = new SearchPortInfo();
-        }
-        if(interface_wifi == null){
-            interface_wifi  = new POSWIFIAPI();
-            interface_state = new POSWIFIAPI();
-        }
-
-        L.d(TAG, "Searching devices");
-        int sch_prt_num = interface_wifi.WIFISearchPort(port_info, SearchPortMAX);
-        if(sch_prt_num <= 0){
-            L.d(TAG, "No BeiYang WIFI Printer devices found");
-        }else{
-            for(int i = 0; i < sch_prt_num; i++){
-                if (beiYangPrinter.indexOf(port_info[i].GetIPAddress()) == -1)
-                    beiYangPrinter.concat("," + port_info[i].GetIPAddress()); // Get devices name and IP address
+        if( "true".equalsIgnoreCase(AppData.getCustomData("autoSearchBeiYang"))) {
+            for (int i = 0; i < SearchPortMAX; i++) {
+                port_info[i] = new SearchPortInfo();
             }
-        }
+            if (interface_wifi == null) {
+                interface_wifi = new POSWIFIAPI();
+                interface_state = new POSWIFIAPI();
+            }
 
-        AppData.putCustomData("BeiYangPrinter", beiYangPrinter);
-        L.d(TAG, "beiyang printers : " + beiYangPrinter);
+            L.d(TAG, "Searching devices");
+            int sch_prt_num = interface_wifi.WIFISearchPort(port_info, SearchPortMAX);
+            if (sch_prt_num <= 0) {
+                L.d(TAG, "No BeiYang WIFI Printer devices found");
+            } else {
+                for (int i = 0; i < sch_prt_num; i++) {
+                    if (beiYangPrinter.indexOf(port_info[i].GetIPAddress()) == -1)
+                        beiYangPrinter.concat("," + port_info[i].GetIPAddress()); // Get devices name and IP address
+                }
+            }
+
+            AppData.putCustomData("BeiYangPrinter", beiYangPrinter);
+            L.d(TAG, "beiyang printers : " + beiYangPrinter);
+        }
         return beiYangPrinter;
     }
 
