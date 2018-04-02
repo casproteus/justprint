@@ -164,7 +164,6 @@ public class AppData extends Thread{
             HttpURLConnection urlConnection = null;
             try {
                 urlConnection = prepareConnection(AppData.SERVER_URL + "/activeJustPrintAccount");
-                //urlConnection = prepareConnection("http://192.168.1.6/activeJustPrintAccount");
 
                 StringBuilder content = new StringBuilder(AppData.getLicense());
                 content.append(",");
