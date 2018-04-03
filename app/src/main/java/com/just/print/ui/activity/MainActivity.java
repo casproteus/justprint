@@ -25,7 +25,7 @@ public class MainActivity extends BaseActivity {
     private long checkDaysleft() {
         Object limitationMode = AppData.getCustomData("limitation");        L.d("limitationMode:", limitationMode);
 
-        if("none".equals(limitationMode)){
+        if(!"true".equals(limitationMode)){
             return 3024000000l + 1;
         }
         long currentTime = new Date().getTime();                            L.d("currentTime:", currentTime);

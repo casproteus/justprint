@@ -435,6 +435,10 @@ public class WifiPrintService implements Runnable{
     private String prepareBeiYangPrinterStr(){
         String beiYangPrinter = AppData.getCustomData("BeiYangPrinter");
         if(beiYangPrinter != null && beiYangPrinter.length() > 7){
+            if (interface_wifi == null) {
+                interface_wifi = new POSWIFIAPI();
+                interface_state = new POSWIFIAPI();
+            }
             return beiYangPrinter;
         }
 
