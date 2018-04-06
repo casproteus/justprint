@@ -24,7 +24,7 @@ public class MainActivity extends BaseActivity {
     //@in some device, it always return a negative value and cause reactive dlg displayed.
     private long checkDaysleft() {
         //none limitation check
-        if(!"true".equals(AppData.getCustomData("limitation"))){             L.d("limitationMode", "none");
+        if("none".equals(AppData.getCustomData("limitation"))){             L.d("limitationMode", "none");
             return 3024000000l + 1;
         }
 
