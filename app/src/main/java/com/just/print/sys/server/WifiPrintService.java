@@ -446,7 +446,7 @@ public class WifiPrintService implements Runnable{
                             sb.append("_");
                             sb.append(StatusBuffer[i]);
                         }
-                        L.e("Failed to print Text.", curPrintIp, null);
+                        L.e("Printer status:", sb.toString(), null);
                     }
                 }
                 return_code = posSDK.systemCutPaper(66, 10);
