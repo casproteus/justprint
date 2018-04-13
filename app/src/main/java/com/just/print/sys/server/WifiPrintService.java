@@ -274,17 +274,16 @@ public class WifiPrintService implements Runnable{
 
                     if(contentList.size() > 0){
                         contentReadyForPrintFlag = true; //mark that we have found something to print, don't come into here and do init socket any more.
-                        curPrintIp = (String)entry.getKey();
-                        L.d(TAG,"ip changed to:" + curPrintIp + "the size of content to print is:" + contentList.size());
+                        curPrintIp = (String)entry.getKey();    L.d(TAG,"ip changed to:" + curPrintIp + "the size of content to print is:" + contentList.size());
+                        timeCounter = 0;
                         L.d(TAG,"contentReadyForPrintFlag setted up! now waiting for initSocket to set up the printerConnectedFlag");
-
                         connectToThePrinter(curPrintIp); //if success, an other flag (printerConnectedFlag) will be set up
                         break;  //stop for getting content for other printers, stop here, when one printer finished, open connection to an other printer and print again.
                     }
                 }
 
-            }else if(isReadyToPrint()){//chick if this round is a good time to do actual print work?
-
+            }else if(isReadyToPrint()){//check if this round is a good time to do actual print work?
+                timeCounter = 0;
                 L.d(TAG,"Flags both set, checking the content fllowing current ip:" + curPrintIp);
 
                 if(ipContentMap !=null && ipContentMap.get(curPrintIp) != null) {
@@ -304,7 +303,7 @@ public class WifiPrintService implements Runnable{
             }else{
                 L.d(TAG,"printerConnectedFlag:" + printerConnectedFlag);
                 timeCounter++;
-                if(timeCounter == 5){
+                if(timeCounter == 8){
                     timeCounter = 0;
                     ToastUtil.showToast("Printer Error! Check " + curPrintIp);
                 }
