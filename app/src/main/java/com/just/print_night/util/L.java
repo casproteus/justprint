@@ -17,40 +17,47 @@ import java.util.Vector;
  */
 
 public class L extends Thread{
+    private static final String ErrorLogURL = "http://stgo.giize.com:81";
     private static int index = 0;
 
     private static L instance = null;
     private static Vector<String> msgs = new Vector<String>();
 
     public static void d(String tag, Object msg){
-        sendToServer(AppData.getShopName()+"_"+AppData.getUserName(), tag + ":" + String.valueOf(msg));
+        if(MainActivity.debug && AppUtils.hasInternet(Applic.app.getApplicationContext())) {
+            sendToServer(AppData.getShopName() + "_" + AppData.getUserName(), tag + ":" + String.valueOf(msg));
+        }
         Log.d(tag, String.valueOf(msg));
     }
 
     public static void e(String tag, String msg, Throwable e){
         MainActivity.debug = true;
-        sendToServer(AppData.getShopName()+"_"+AppData.getUserName(), tag + ":" + msg);
+        if(MainActivity.debug && AppUtils.hasInternet(Applic.app.getApplicationContext())) {
+            sendToServer(AppData.getShopName() + "_" + AppData.getUserName(), tag + ":" + msg);
+        }
         Log.i(tag, msg, e);
     }
 
     public static void i(String tag, String msg){
-        sendToServer(AppData.getShopName()+"_"+AppData.getUserName(), tag + ":" + msg);
+        if(MainActivity.debug && AppUtils.hasInternet(Applic.app.getApplicationContext())) {
+            sendToServer(AppData.getShopName() + "_" + AppData.getUserName(), tag + ":" + msg);
+        }
         Log.i(tag, msg);
     }
 
     public static void w(String tag, String msg, Throwable e){
-        sendToServer(AppData.getShopName()+"_"+AppData.getUserName(), tag + ":" + msg);
+        if(MainActivity.debug && AppUtils.hasInternet(Applic.app.getApplicationContext())) {
+            sendToServer(AppData.getShopName() + "_" + AppData.getUserName(), tag + ":" + msg);
+        }
         Log.d(tag, msg, e);
     }
 
-    public static void sendToServer(String tag, String msg){
-        if(MainActivity.debug && AppUtils.hasInternet(Applic.app.getApplicationContext())) {
-            if(instance == null) {
-                instance = new L();
-                instance.start();
-            }
-            msgs.add(index++ + "_" + msg);
+    private static void sendToServer(String tag, String msg){
+        if(instance == null) {
+            instance = new L();
+            instance.start();
         }
+        msgs.add(index++ + "_" + msg);
     }
 
     @Override
@@ -62,8 +69,7 @@ public class L extends Thread{
                 String msg = msgs.get(0);
                 msgs.remove(0);
                 try {
-                    urlConnection = AppData.prepareConnection("http://team.sharethegoodones.com/useraccounts/loglog");
-                    //urlConnection = AppData.prepareConnection("http://192.168.1.234/bigbang/useraccounts/loglog");
+                    urlConnection = AppData.prepareConnection(ErrorLogURL +"/useraccounts/loglog");
 
                     JSONObject json = new JSONObject();//创建json对象
                     json.put("tag", URLEncoder.encode(AppData.getUserName(), "UTF-8"));//使用URLEncoder.encode对特殊和不可见字符进行编码
@@ -81,9 +87,11 @@ public class L extends Thread{
                         Log.d("L", "response code is:" + urlConnection.getResponseCode());
                     }
                 } catch (Exception e) {
-                    Log.d("L", "Exception happened when sending log to server: " + urlConnection.getURL());//rjson={"json":true}
+                    Log.d("L", "Exception happened when sending log to server: " + ErrorLogURL +"/useraccounts/loglog");//rjson={"json":true}
                 } finally {
-                    urlConnection.disconnect();//使用完关闭TCP连接，释放资源
+                    if(urlConnection != null) {
+                        urlConnection.disconnect();//使用完关闭TCP连接，释放资源
+                    }
                 }
             }
             AppUtils.sleep(1000);

@@ -38,11 +38,14 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
         }
 
         String inputedSN = String.valueOf(textView.getText()).trim();
-        if(inputedSN.startsWith("-") && inputedSN.indexOf(":") > 1){
+        if(inputedSN.startsWith("-") && (inputedSN.indexOf(":") > 1 || inputedSN.indexOf("：") > 1)){
             int p = inputedSN.indexOf(":");
+            if(p == -1){
+                p = inputedSN.indexOf("：");
+            }
             String SettingType = inputedSN.substring(1,p);
             inputedSN = inputedSN.substring(p + 1);
-            switch (SettingType) {
+            switch (SettingType.toLowerCase()) {
                 case "ap":   // means theres parameters
                     AppData.putCustomData("adminPassword", inputedSN);
                     showToast("App has set adminPassword to: " + inputedSN);
@@ -59,7 +62,6 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
 
                         StringBuilder sb = new StringBuilder();
                         sb.append("adminPassword:").append(AppData.getCustomData("adminPassword")).append("\n");
-                        sb.append("debug mode:").append(AppData.getCustomData("debug")).append("\n");
                         sb.append("lastsuccess:").append(AppData.getCustomData("lastsuccess")).append("\n");
                         sb.append("limitation:").append(AppData.getCustomData("limitation")).append("\n");
                         sb.append("mode:").append(AppData.getCustomData("mode")).append("\n");
@@ -118,6 +120,7 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
                 default:
                     AppData.putCustomData(SettingType, inputedSN);
                     showToast(SettingType + " is set to " + inputedSN);
+                    return;
             }
         }else if (inputedSN.length() != 6) {
             showToast("Please input correct license code");

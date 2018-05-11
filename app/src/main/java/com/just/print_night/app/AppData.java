@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.just.print_night.util.AppUtils;
+import com.just.print_night.util.L;
 import com.just.print_night.util.SharedPreferencesHelper;
 import com.just.print_night.util.ToastUtil;
 
@@ -22,6 +23,8 @@ import java.net.URL;
 import java.util.Date;
 
 public class AppData extends Thread{
+    public static final String SERVER_URL = "http://test.sharethegoodones.com";
+
     public static final String KEY_SHOP_XML = "KEY_SHOP_XML";
     public static final String KEY_SHOP_LIST = "KEY_SHOP_LIST";
     public static final String KEY_SHOP_ID = "KEY_SHOP_ID";
@@ -160,8 +163,7 @@ public class AppData extends Thread{
         if(AppUtils.hasInternet(Applic.app.getApplicationContext())){
             HttpURLConnection urlConnection = null;
             try {
-                urlConnection = prepareConnection("http://test.sharethegoodones.com/activeJustPrintAccount");
-                //urlConnection = prepareConnection("http://192.168.1.2/taostyle/activeJustPrintAccount");
+                urlConnection = prepareConnection(AppData.SERVER_URL + "/activeJustPrintAccount");
 
                 StringBuilder content = new StringBuilder(AppData.getLicense());
                 content.append(",");
@@ -187,16 +189,17 @@ public class AppData extends Thread{
 
                             ToastUtil.showToast("Application is activated successfully!");
                         }else{
-                            ToastUtil.showToast("Please provide valid information!");
+                            ToastUtil.showToast("No time left on server: "+ time);
                         }
                     }catch (Exception e){
-                        ToastUtil.showToast("Please provide valid information!");
+                        ToastUtil.showToast("Please provide valid information! time left on server is:" + responseString);
                     }
                 }else{
                     ToastUtil.showToast("Please provide valid shop name, user name and license number!");
                 }
             } catch (Exception e) {
-//                mHandler.sendEmptyMessage(USERLOGIN_FAILED);
+                L.e("TAG", "USERLOGIN_FAILED", e);
+                ToastUtil.showToast("USERLOGIN_FAILED");
             }finally{
                 if(urlConnection != null)
                     urlConnection.disconnect();//使用完关闭TCP连接，释放资源

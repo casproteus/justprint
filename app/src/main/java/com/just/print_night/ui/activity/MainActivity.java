@@ -15,7 +15,7 @@ import java.util.Date;
 
 public class MainActivity extends BaseActivity {
 
-//    ServiceConnection serviceConnection;
+    //    ServiceConnection serviceConnection;
 //    UDPService udp;
     private static String isDebug = AppData.getCustomData("Debug");
     public static boolean debug = isDebug == null ? false : Boolean.valueOf(isDebug);
@@ -23,40 +23,33 @@ public class MainActivity extends BaseActivity {
     //@note: there's a issue in this method!!!!!
     //@in some device, it always return a negative value and cause reactive dlg displayed.
     private long checkDaysleft() {
-        Object limitationMode = AppData.getCustomData("limitation");        L.d("limitationMode:", limitationMode);
-
-        if("none".equals(limitationMode)){
+        //none limitation check
+        if("none".equals(AppData.getCustomData("limitation"))){             L.d("limitationMode", "none");
             return 3024000000l + 1;
         }
-        long currentTime = new Date().getTime();                            L.d("currentTime:", currentTime);
 
-        //time of last open, if existing number is not valid, then use current time as last open time.
+        //time of last open, @note:if existing last open time is not valid, then use lastSuccess will not be set.
+        long timepassed = 0l;
         String lastsuccessStr = AppData.getCustomData("lastsuccessStr");    L.d("lastSuccessStr:",lastsuccessStr);
-        long lastSuccess = 0l;
         try{
-            lastSuccess= Long.valueOf(lastsuccessStr);
+            Long lastSuccess= Long.valueOf(lastsuccessStr);
+            timepassed = new Date().getTime() - lastSuccess;L.d("timePassed:",timepassed);        //time passed since last open.
         }catch(Exception e){
-            lastSuccess = currentTime;
+            L.e("MainActivity", "the lastsuccessStr is not valid long", e);
         }
 
-        long timepassed = currentTime - lastSuccess;                        L.d("timePassed:",timepassed);
-        //time passed since last open.
-
-        String timeLeftStr = AppData.getCustomData("number");               L.d("timeLeft(before deduct:", timeLeftStr);
-        long timeLeft = 0;
-
         //if timeLeftStr is valid, then it has a chance to turn the timeLeft to be a number bigger than 0.
-        if (timeLeftStr != null && timeLeftStr.length() > 0) {
-            try {
-                //the time left from last calculation, minus time passed. @note: we use abs, so is the time is negative, will still be minused!
-                timeLeft = Long.valueOf(timeLeftStr) - Math.abs(timepassed);    L.d("timeLeft - timePassed:", timeLeft);
+        long timeLeft = 0;
+        String number = AppData.getCustomData("number");               L.d("timeLeft(before deduct:", number);
+        try {
+            //the time left from last calculation, minus time passed. @note: we use abs, so is the time is negative, will still be minused!
+            timeLeft = Long.valueOf(number) - Math.abs(timepassed);    L.d("timeLeft - timePassed:", timeLeft);
 
-                //update the number and lastsuccess into local cache.
-                AppData.putCustomData("lastsuccessStr", String.valueOf(currentTime));   L.d("update new lastSuccess string with:", currentTime);
-                AppData.putCustomData("number", String.valueOf(timeLeft));              L.d("update new number with:", timeLeft);
-            }catch(Exception e){
-                L.e("MainActivity", "the left time number can not be pasered into a long", e);
-            }
+            //update the number and lastsuccess into local cache.
+            AppData.putCustomData("lastsuccessStr", String.valueOf(new Date().getTime()));
+            AppData.putCustomData("number", String.valueOf(timeLeft));              L.d("update new number with:", timeLeft);
+        }catch(Exception e){
+            L.e("MainActivity", "the left time number can not be pasered into a long", e);
         }
 
         return timeLeft;
@@ -75,7 +68,7 @@ public class MainActivity extends BaseActivity {
 
         long timeLeft = checkDaysleft();
         if (timeLeft > 0) {
-            if (timeLeft < 3024000000l) {
+            if (timeLeft < 3024000000l) {   //3024000000L == 35days
                 ToastUtil.showToast("Application is about to expire! Please re-activate it!");
             }
             startActivity(new Intent(this, LoginActivity.class));

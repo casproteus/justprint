@@ -25,8 +25,6 @@ import java.sql.Date;
 public class DatabaseUtil extends Thread{
 
     final private static String DATABASE_NAME_PREFFIX = "JustPrinter_"; //data/user/0/com.just.print/databases/ ; /data/data/com.whatsapp/databases/msgstore.db
-    final private static String SERVER_URL = "http://test.sharethegoodones.com";
-    //final private static String SERVER_URL = "http://192.168.1.234/taostyle";
     private static File file = null;
 
     /**
@@ -57,7 +55,7 @@ public class DatabaseUtil extends Thread{
             HttpURLConnection urlConnection = null;
             URL url = null;
             try {
-                StringBuilder sb = new StringBuilder(SERVER_URL);
+                StringBuilder sb = new StringBuilder(AppData.SERVER_URL);
                 sb.append("/syncJustPrintDb?filepath=");
                 sb.append(AppData.getLicense() + AppData.getShopName());
                 sb.append("&submitDate=");

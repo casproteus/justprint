@@ -135,7 +135,7 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
         AppData.saveShopName(getContext(), shopName);
         AppData.createShopDB(getContext(), shopName);
 
-        //initialize the days left and the stated days.
+        //initialize the days left and the stated days on cloud.
         new AppData().start();
 
         startActivity(new Intent(getContext(), OrderActivity.class));
