@@ -8,6 +8,7 @@ import com.just.print_night.R;
 import com.just.print_night.app.AppData;
 import com.just.print_night.app.BaseActivity;
 import com.just.print_night.util.L;
+import com.just.print_night.util.StringUtils;
 import com.just.print_night.util.ToastUtil;
 import com.stupid.method.reflect.StupidReflect;
 
@@ -41,6 +42,9 @@ public class MainActivity extends BaseActivity {
         //if timeLeftStr is valid, then it has a chance to turn the timeLeft to be a number bigger than 0.
         long timeLeft = 0;
         String number = AppData.getCustomData("number");               L.d("timeLeft(before deduct:", number);
+        if(StringUtils.isBlank(number)){
+            number = "1";
+        }
         try {
             //the time left from last calculation, minus time passed. @note: we use abs, so is the time is negative, will still be minused!
             timeLeft = Long.valueOf(number) - Math.abs(timepassed);    L.d("timeLeft - timePassed:", timeLeft);

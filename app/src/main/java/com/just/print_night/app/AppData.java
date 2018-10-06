@@ -32,7 +32,7 @@ public class AppData extends Thread{
     private static final String KEY_SHOP_NAME = "shopName";
     public static final String KEY_CUST_LAST_CHAR = "KEY_CUST_LAST_CHAR";
 
-    public static SharedPreferencesHelper getShopData(Context context) {
+    private static SharedPreferencesHelper getShopData(Context context) {
         return SharedPreferencesHelper.getCache(context, KEY_SHOP_XML);
     }
 
@@ -43,7 +43,7 @@ public class AppData extends Thread{
      * @param shopName
      * @return true 存在,false 不存在
      **/
-    public static boolean existShop(Context context, String shopName) {
+    private static boolean existShop(Context context, String shopName) {
         String shoplist = getShopData(context).getString(KEY_SHOP_LIST, "");
         return shoplist.contains(shopName);
     }
