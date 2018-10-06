@@ -2,15 +2,11 @@ package com.just.print.sys.server;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import POSSDK.POSSDK;
-import android.annotation.SuppressLint;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.text.Editable;
-import android.util.Log;
-import android.widget.Toast;
 
 public class TestPrintInfo {
 

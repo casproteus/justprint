@@ -20,6 +20,10 @@ import com.stupid.method.reflect.annotation.XClick;
 import com.stupid.method.reflect.annotation.XGetValueByView;
 import com.stupid.method.reflect.annotation.XViewByID;
 
+
+/**
+ * the interface is for inputting shop name and user name.
+ */
 public class LoginFragment extends BaseFragment implements UDPService.UDPCallback {
     @Override
     protected int getLayoutId() {

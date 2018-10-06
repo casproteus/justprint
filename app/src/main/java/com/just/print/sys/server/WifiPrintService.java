@@ -255,6 +255,8 @@ public class WifiPrintService implements Runnable{
         ipContentMap.get(printerIP).add(formatContentForPrintReport(combinedSaleRecords, startTime, endTime));
 
         ToastUtil.showToast("PRINTING REPORT ON " + printerIP);
+        //reset kitchenbillIndex
+        AppData.putCustomData("kitchenBillIdx", "1");
         return SUCCESS;
     }
 
@@ -274,7 +276,8 @@ public class WifiPrintService implements Runnable{
 
                     if(contentList.size() > 0){
                         contentReadyForPrintFlag = true; //mark that we have found something to print, don't come into here and do init socket any more.
-                        curPrintIp = (String)entry.getKey();    L.d(TAG,"ip changed to:" + curPrintIp + "the size of content to print is:" + contentList.size());
+                        curPrintIp = (String)entry.getKey();
+                        L.d(TAG,"ip changed to:" + curPrintIp + "the size of content to print is:" + contentList.size());
                         timeCounter = 0;
                         L.d(TAG,"contentReadyForPrintFlag setted up! now waiting for initSocket to set up the printerConnectedFlag");
                         connectToThePrinter(curPrintIp); //if success, an other flag (printerConnectedFlag) will be set up
@@ -288,7 +291,8 @@ public class WifiPrintService implements Runnable{
 
                 if(ipContentMap !=null && ipContentMap.get(curPrintIp) != null) {
 
-                    List<String> contentList = ipContentMap.get(curPrintIp); L.d(TAG,"out printing... content list size is:" + contentList.size());
+                    List<String> contentList = ipContentMap.get(curPrintIp);
+                    L.d(TAG,"out printing... content list size is:" + contentList.size());
                     printContents(contentList);
 
                     //reset status and get ready for a new print job( a print job = connecting to a printer + print content + reset)
@@ -500,6 +504,7 @@ public class WifiPrintService implements Runnable{
             //default: "27, 33, 48" because it works for both thermal and non-thermal
             String[] pieces = font.split(",");
             if (pieces.length != 3) {
+                L.e("Invalid font format found!", font,null);
                 wifiCommunication.sndByte(Command.GS_ExclamationMark);
             } else {
                 for (int i = 0; i < 3; i++) {
@@ -682,7 +687,14 @@ public class WifiPrintService implements Runnable{
 
             }
         }
-        StringBuilder content = new StringBuilder("\n\n");
+        //add a kitchenBill on top, so when there's issue in printer, user can found a bill was miss printed.
+        String kitchenBillIdx = AppData.getCustomData("kitchenBillIdx");
+        if(StringUtils.isBlank(kitchenBillIdx)){
+            kitchenBillIdx = "1";
+        }
+
+        AppData.putCustomData("kitchenBillIdx", String.valueOf(Integer.valueOf(kitchenBillIdx) + 1));
+        StringBuilder content = new StringBuilder(generateString(width - kitchenBillIdx.length(), " ") + kitchenBillIdx + "\n\n");
         DateFormat df = new SimpleDateFormat("HH:mm");
         String tableName = CustomerSelection.getInstance().getTableNumber();
         String dateStr = df.format(new Date());
