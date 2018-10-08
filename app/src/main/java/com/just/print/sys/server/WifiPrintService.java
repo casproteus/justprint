@@ -200,6 +200,12 @@ public class WifiPrintService implements Runnable{
         }
 
         //3、再次遍历ipSelectionsMap, 封装打印信息
+        //add a kitchenBill on top, so when there's issue in printer, user can found a bill was miss printed.
+        String kitchenBillIdx = AppData.getCustomData("kitchenBillIdx");
+        if(StringUtils.isBlank(kitchenBillIdx)){
+            kitchenBillIdx = "1";
+        }
+
         for(Map.Entry entry: ipSelectionsMap.entrySet()){
             String printerIP = (String)entry.getKey();
             List<SelectionDetail> dishList = (List<SelectionDetail>) entry.getValue();
@@ -209,18 +215,20 @@ public class WifiPrintService implements Runnable{
                     L.d("ERROR!", "the dishList are different from ipSelectionsMap.get(printerIP)!!!!");
                 }
                 if(ipPrinterMap.get(printerIP).getFirstPrint() == 1){  //全单封装
-                    ipContentMap.get(printerIP).add(formatContentForPrint(dishList) + "\n\n\n\n\n");
+                    ipContentMap.get(printerIP).add(formatContentForPrint(dishList, kitchenBillIdx) + "\n\n\n\n\n");
                 }else{                                          //分单封装
                     for(SelectionDetail selectionDetail : dishList){
                         List<SelectionDetail> tlist = new ArrayList<SelectionDetail>();
                         tlist.add(selectionDetail);
-                        ipContentMap.get(printerIP).add(formatContentForPrint(tlist) + "\n\n");
+                        ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx) + "\n\n");
                     }
                 }
             }
             //clear the ipSelectionsMap immediately
             ipSelectionsMap.get(printerIP).clear();
         }
+
+        AppData.putCustomData("kitchenBillIdx", String.valueOf(Integer.valueOf(kitchenBillIdx) + 1));
 
         L.d(TAG, "Order is translated into ipContentMap map and ready for print.");
         ToastUtil.showToast("PRINTING...");
@@ -670,7 +678,7 @@ public class WifiPrintService implements Runnable{
         return content.toString();
     }
 
-    private String formatContentForPrint(List<SelectionDetail> list){
+    private String formatContentForPrint(List<SelectionDetail> list, String kitchenBillIdx){
         L.d(TAG,"formatContentForPrint");
         String font = AppData.getCustomData(curPrintIp + "font");
         if(StringUtils.isBlank(font)) {
@@ -687,14 +695,9 @@ public class WifiPrintService implements Runnable{
 
             }
         }
-        //add a kitchenBill on top, so when there's issue in printer, user can found a bill was miss printed.
-        String kitchenBillIdx = AppData.getCustomData("kitchenBillIdx");
-        if(StringUtils.isBlank(kitchenBillIdx)){
-            kitchenBillIdx = "1";
-        }
 
-        AppData.putCustomData("kitchenBillIdx", String.valueOf(Integer.valueOf(kitchenBillIdx) + 1));
-        StringBuilder content = new StringBuilder(generateString(width - kitchenBillIdx.length(), " ") + kitchenBillIdx + "\n\n");
+        //leave 2 space, incase the printer prints extra characters at the left corner.
+        StringBuilder content = new StringBuilder(generateString(width - 2 - kitchenBillIdx.length(), " ") + kitchenBillIdx + "\n\n");
         DateFormat df = new SimpleDateFormat("HH:mm");
         String tableName = CustomerSelection.getInstance().getTableNumber();
         String dateStr = df.format(new Date());
