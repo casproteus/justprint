@@ -205,6 +205,12 @@ public class WifiPrintService implements Runnable{
         if(StringUtils.isBlank(kitchenBillIdx)){
             kitchenBillIdx = "1";
         }
+        String mobileIdx = AppData.getCustomData("mobileMark");
+        if(!StringUtils.isBlank(mobileIdx)){
+            kitchenBillIdx = mobileIdx + kitchenBillIdx;
+        }
+
+
 
         for(Map.Entry entry: ipSelectionsMap.entrySet()){
             String printerIP = (String)entry.getKey();
