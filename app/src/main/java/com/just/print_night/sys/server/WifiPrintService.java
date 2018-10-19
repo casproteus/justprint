@@ -205,12 +205,13 @@ public class WifiPrintService implements Runnable{
         if(StringUtils.isBlank(kitchenBillIdx)){
             kitchenBillIdx = "1";
         }
+
+        AppData.putCustomData("kitchenBillIdx", String.valueOf(Integer.valueOf(kitchenBillIdx) + 1));
+
         String mobileIdx = AppData.getCustomData("mobileMark");
         if(!StringUtils.isBlank(mobileIdx)){
             kitchenBillIdx = mobileIdx + kitchenBillIdx;
         }
-
-
 
         for(Map.Entry entry: ipSelectionsMap.entrySet()){
             String printerIP = (String)entry.getKey();
@@ -233,8 +234,6 @@ public class WifiPrintService implements Runnable{
             //clear the ipSelectionsMap immediately
             ipSelectionsMap.get(printerIP).clear();
         }
-
-        AppData.putCustomData("kitchenBillIdx", String.valueOf(Integer.valueOf(kitchenBillIdx) + 1));
 
         L.d(TAG, "Order is translated into ipContentMap map and ready for print.");
         ToastUtil.showToast("PRINTING...");
