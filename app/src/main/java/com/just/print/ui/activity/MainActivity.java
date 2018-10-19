@@ -12,6 +12,8 @@ import com.just.print.util.StringUtils;
 import com.just.print.util.ToastUtil;
 import com.stupid.method.reflect.StupidReflect;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MainActivity extends BaseActivity {
@@ -70,6 +72,13 @@ public class MainActivity extends BaseActivity {
             L.i("the value of debug in customerr Data ", "can  not be parsered into a boolean!");
         }
 
+        //working time check
+        if(isOutOfWorkingTime()){
+            ToastUtil.showToast("Invalidate operation detected, please contact info@ShareTheGoodOnes.com for technique support!");
+            return;
+        }
+
+        //software life left time check
         long timeLeft = checkDaysleft();
         if (timeLeft > 0) {
             if (timeLeft < 3024000000l) {   //3024000000L == 35days
@@ -108,5 +117,33 @@ public class MainActivity extends BaseActivity {
 //        }, BIND_AUTO_CREATE);
     }
 
+    private boolean isOutOfWorkingTime(){
+
+        String startTime = AppData.getCustomData("startTime");
+        String endTime = AppData.getCustomData("endTime");
+        String curTime = "";
+
+        DateFormat df = new SimpleDateFormat("HHmm");
+        try {
+            Date d = new Date();
+            curTime = df.format(d);
+        }catch(Exception e){
+            ToastUtil.showToast("Error detected with system time, please contact info@ShareTheGoodOnes.com for technique support.");
+        }
+
+        if(!StringUtils.isBlank(startTime)){
+            if(curTime.compareTo(startTime) < 0) {
+                return true;
+            }
+        }
+
+        if(!StringUtils.isBlank(endTime)){
+            if(curTime.compareTo(endTime) > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 }
