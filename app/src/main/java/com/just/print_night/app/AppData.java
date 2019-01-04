@@ -23,7 +23,7 @@ import java.net.URL;
 import java.util.Date;
 
 public class AppData extends Thread{
-    public static final String SERVER_URL = "http://test.sharethegoodones.com";
+    public static final String SERVER_URL = "http://www.sharethegoodones.com";
 
     public static final String KEY_SHOP_XML = "KEY_SHOP_XML";
     public static final String KEY_SHOP_LIST = "KEY_SHOP_LIST";
