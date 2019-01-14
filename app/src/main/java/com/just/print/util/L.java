@@ -17,7 +17,7 @@ import java.util.Vector;
  */
 
 public class L extends Thread{
-    private static final String ErrorLogURL = "http://test.sharethegoodones.com";
+    private static final String ErrorLogURL = "http://team.sharethegoodones.com";
     private static int index = 0;
 
     private static L instance = null;

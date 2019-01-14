@@ -23,7 +23,7 @@ import java.net.URL;
 import java.util.Date;
 
 public class AppData extends Thread{
-    public static final String SERVER_URL = "http://test.sharethegoodones.com";
+    public static final String SERVER_URL = "http://www.sharethegoodones.com";
 
     public static final String KEY_SHOP_XML = "KEY_SHOP_XML";
     public static final String KEY_SHOP_LIST = "KEY_SHOP_LIST";
@@ -126,11 +126,11 @@ public class AppData extends Thread{
         HttpURLConnection urlConnection;
         URL url = new URL(uri);
         urlConnection = (HttpURLConnection) url.openConnection();//打开http连接
-        urlConnection.setConnectTimeout(3000);//连接的超时时间
+        urlConnection.setConnectTimeout(30000);//连接的超时时间
         urlConnection.setUseCaches(false);//不使用缓存
         //urlConnection.setFollowRedirects(false);是static函数，作用于所有的URLConnection对象。
         urlConnection.setInstanceFollowRedirects(true);//是成员函数，仅作用于当前函数,设置这个连接是否可以被重定向
-        urlConnection.setReadTimeout(3000);//响应的超时时间
+        urlConnection.setReadTimeout(30000);//响应的超时时间
         urlConnection.setDoInput(true);//设置这个连接是否可以写入数据
         urlConnection.setDoOutput(true);//设置这个连接是否可以输出数据
         urlConnection.setRequestMethod("POST");//设置请求的方式
