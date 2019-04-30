@@ -302,7 +302,7 @@ public class WifiPrintService implements Runnable{
                 timeCounter = 0;
                 L.d(TAG,"Flags both set, checking the content fllowing current ip:" + curPrintIp);
 
-                if(ipContentMap !=null && ipContentMap.get(curPrintIp) != null) {
+                if(ipContentMap != null && ipContentMap.get(curPrintIp) != null) {
 
                     List<String> contentList = ipContentMap.get(curPrintIp);
                     L.d(TAG,"out printing... content list size is:" + contentList.size());
@@ -326,8 +326,17 @@ public class WifiPrintService implements Runnable{
                 }
             }
 
-            //did any work or didn't do any work, each round should rest for 1 second.
-            AppUtils.sleep(1000);
+            //did any work or didn't do any work, each round should rest for at least 1 second.
+            String waitTime = AppData.getCustomData("waitTime");
+            if(waitTime == null || waitTime.trim().length() == 0){
+                waitTime = "3000";
+            }else{
+                int time = Integer.valueOf(waitTime);
+                if(time < 100){
+                    time = time * 1000;
+                }
+            }
+            AppUtils.sleep(Integer.valueOf(waitTime));
         }
     }
 
