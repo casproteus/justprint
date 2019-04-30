@@ -329,7 +329,7 @@ public class WifiPrintService implements Runnable{
             //did any work or didn't do any work, each round should rest for at least 1 second.
             String waitTime = AppData.getCustomData("waitTime");
             if(waitTime == null || waitTime.trim().length() == 0){
-                waitTime = "3000";
+                waitTime = "2000";
             }else{
                 int time = Integer.valueOf(waitTime);
                 if(time < 100){
