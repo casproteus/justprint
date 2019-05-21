@@ -218,11 +218,33 @@ public class WifiPrintService implements Runnable{
             List<SelectionDetail> dishList = (List<SelectionDetail>) entry.getValue();
 
             if(dishList.size() > 0){
+
                 if(ipSelectionsMap.get(printerIP) != dishList){
                     L.d("ERROR!", "the dishList are different from ipSelectionsMap.get(printerIP)!!!!");
                 }
-                if(ipPrinterMap.get(printerIP).getFirstPrint() == 1){  //全单封装
-                    ipContentMap.get(printerIP).add(formatContentForPrint(dishList, kitchenBillIdx) + "\n\n\n\n\n");
+                Printer printer = ipPrinterMap.get(printerIP);
+                if(printer.getFirstPrint() == 1){  //全单封装
+                    if(printer.getType() == 0){   //if category is set then cut by category.
+                        List<SelectionDetail> tlist = new ArrayList<SelectionDetail>();
+                        String currentCategory = null;
+                        for(SelectionDetail selectionDetail : dishList){
+                            Category c1 = Applic.app.getDaoMaster().newSession().getCategoryDao().load(selectionDetail.getDish().getCid());
+                            if(currentCategory == null){    //if not set yet, then set the first value.
+                                currentCategory = c1.getCname();
+                                tlist.add(selectionDetail);
+                            } else if(currentCategory.equals(c1.getCname())){    //if same with previous, then add into the list.
+                                tlist.add(selectionDetail);
+                            } else {                    //if not same, then add current list into ipContent map, and start a new list.
+                                ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx) + "\n\n");
+                                tlist = new ArrayList<SelectionDetail>();
+                                tlist.add(selectionDetail);
+                            }
+                        }
+                        //put the last list into ipContent map.
+                        ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx) + "\n\n");
+                    }else{
+                        ipContentMap.get(printerIP).add(formatContentForPrint(dishList, kitchenBillIdx) + "\n\n\n\n\n");
+                    }
                 }else{                                          //分单封装
                     for(SelectionDetail selectionDetail : dishList){
                         List<SelectionDetail> tlist = new ArrayList<SelectionDetail>();
