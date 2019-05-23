@@ -1,5 +1,7 @@
 package com.just.print_night.ui.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -34,6 +36,9 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
     FlowListView gridView;
     XAdapter2<Mark> markXAdapter;
 
+    private SaleRecordDao saleRecordDao;
+    private long now;
+
     @Override
     protected int getLayoutId() {
         return R.layout.config_printreport_fragment;
@@ -56,7 +61,7 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
             return;
         }
 
-        SaleRecordDao saleRecordDao = Applic.app.getDaoMaster().newSession().getSaleRecordDao();
+        saleRecordDao = Applic.app.getDaoMaster().newSession().getSaleRecordDao();
         List<SaleRecord> orders = saleRecordDao.loadAll();
 
         if(orders == null || orders.size() == 0){
@@ -69,19 +74,31 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
             reportStartDate = AppData.getCustomData("lastsuccess");
         }
 
-        long now = new Date().getTime();
+        now = new Date().getTime();
 
         //print code:
         String result = WifiPrintService.getInstance().exePrintReportCommand(orders, reportStartDate, String.valueOf(now));
         if("0".equals(result)) {
-            //when printed succcesfully, clean all records, and update now as the next reportStartDate
-            saleRecordDao.deleteAll();
-            AppData.putCustomData("reportStartDate", String.valueOf(now));
-            showToast("Report printted!");
-
-            startActivity(new Intent(getContext(), OrderActivity.class));
-            getActivity().finish();
+            findViewById(R.id.confirmPassword).setVisibility(View.INVISIBLE);
+            findViewById(R.id.alertDlg).setVisibility(View.VISIBLE);
         }
+    }
+
+    @XClick({R.id.buttonOK})
+    private void resetReport(){
+        //when printed succcesfully, clean all records, and update now as the next reportStartDate
+        saleRecordDao.deleteAll();
+        AppData.putCustomData("reportStartDate", String.valueOf(now));
+
+        startActivity(new Intent(getContext(), OrderActivity.class));
+        getActivity().finish();
+    }
+
+    @XClick({R.id.buttonCancel})
+    private void notResetReport(){
+
+        startActivity(new Intent(getContext(), OrderActivity.class));
+        getActivity().finish();
     }
 
     @Override
