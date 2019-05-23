@@ -328,7 +328,16 @@ public class WifiPrintService implements Runnable{
 
                     List<String> contentList = ipContentMap.get(curPrintIp);
                     L.d(TAG,"out printing... content list size is:" + contentList.size());
-                    printContents(contentList);
+                    String note = ipPrinterMap.get(curPrintIp).getNote();
+                    try{
+                        int loopTime = Integer.valueOf(note);
+                        for(int i = 0; i < loopTime; i++) {
+                            printContents(contentList);
+                        }
+                    }catch(Exception e){
+                        //note is not a number then do not loop.
+                        printContents(contentList);
+                    }
 
                     //reset status and get ready for a new print job( a print job = connecting to a printer + print content + reset)
                     ipContentMap.get(curPrintIp).clear();

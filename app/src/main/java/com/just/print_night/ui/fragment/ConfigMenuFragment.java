@@ -42,18 +42,24 @@ import static android.content.DialogInterface.OnClickListener;
 public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLongClickListener {
 
     private static Menu modifyingMenu = null;
+
     private Category modifyingCategory = null;
 
     XAdapter2<Category> categoryXAdapter;
+
     @XViewByID(R.id.lvCategory)
     ListView lvCategory;
+
     private Category mCategory;
+
     @XViewByID(R.id.tvMenuTitle)
     private TextView tvMenuTitle;
+
     @XViewByID(R.id.lvMenu)
     private ListView lvMenu;
 
     MenuDao menuDao;
+
     private XAdapter2<Menu> menuXAdapter;
     IXOnItemClickListener categoryAdapterClick = new IXOnItemClickListener() {
         @Override
