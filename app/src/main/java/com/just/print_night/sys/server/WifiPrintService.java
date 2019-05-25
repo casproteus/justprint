@@ -337,6 +337,13 @@ public class WifiPrintService implements Runnable{
                     }catch(Exception e){
                         //note is not a number then do not loop.
                         printContents(contentList);
+                    }finally{
+                        //when all content of a printer has printed, it's the right time to close conenction.
+                        if (isBeiYangPrinter(curPrintIp)) {
+                            closeConenctionToBeiYangPrinter();
+                        }else{
+                            wifiCommunication.close();
+                        }
                     }
 
                     //reset status and get ready for a new print job( a print job = connecting to a printer + print content + reset)
@@ -411,13 +418,6 @@ public class WifiPrintService implements Runnable{
             } else {
                 doZiJiangPrint(font, content);
             }
-        }
-
-        //when all content of a printer has printed, it's the right time to close conenction.
-        if (isBeiYangPrinter(curPrintIp)) {
-            closeConenctionToBeiYangPrinter();
-        }else{
-            wifiCommunication.close();
         }
     }
 
