@@ -27,16 +27,25 @@ public class DatabaseUtil extends Thread{
     final private static String DATABASE_NAME_PREFFIX = "JustPrinter_"; //data/user/0/com.just.print/databases/ ; /data/data/com.whatsapp/databases/msgstore.db
     private static File file = null;
 
+    String license = AppData.getLicense();
+    String storName = AppData.getShopName();
     /**
      * Call this method from any activity in your app (
      * for example ->    DatabaseUtil.copyDatabaseToExtStg(MainActivity.this);
      * this method will copy the database of your application onto SERVER
      */
-    public static void syncDbOntoServer() {
+    public static void syncDbOntoServer(String license, String storeName) {
         //https://developer.android.com/reference/android/content/Context.html#getDatabasePath(java.lang.String)
         file = Applic.app.getApplicationContext().getDatabasePath(DATABASE_NAME_PREFFIX + AppData.getShopName(Applic.app.getApplicationContext()));
         if (file.exists()){
-            new DatabaseUtil().start();
+            DatabaseUtil util = new DatabaseUtil();
+            if(license != null && license.length() > 0){
+                util.license = license;
+            }
+            if(storeName != null && storeName.length() > 0){
+                util.storName = storeName;
+            }
+            util.start();
         }else{
             L.e("DatabaseUtil", "can not find database!", null);
             ToastUtil.showToast(Applic.app.getApplicationContext(), "Can not find the menu file.");
@@ -46,6 +55,7 @@ public class DatabaseUtil extends Thread{
     public static void main(String args[]){
         new DatabaseUtil().run();
     }
+
     @Override
     public void run() {
         super.run();
@@ -57,7 +67,7 @@ public class DatabaseUtil extends Thread{
             try {
                 StringBuilder sb = new StringBuilder(AppData.SERVER_URL);
                 sb.append("/syncJustPrintDb?filepath=");
-                sb.append(AppData.getLicense() + AppData.getShopName());
+                sb.append(license + storName);
                 sb.append("&submitDate=");
                 sb.append(AppData.getLastSyncDate());
                 url = new URL(sb.toString());

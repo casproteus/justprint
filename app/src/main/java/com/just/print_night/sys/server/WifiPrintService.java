@@ -659,7 +659,10 @@ public class WifiPrintService implements Runnable{
         }
         String spaceStr = generateString((width - startTime.length())/2, " ");
 
-        StringBuilder content = new StringBuilder("\n");
+        String mobileMark = AppData.getCustomData("mobileMark");
+        StringBuilder content = new StringBuilder(mobileMark == null ? "" : mobileMark);
+        String idx = AppData.getCustomData("reportIdx");
+        content.append(idx == null || idx.length() == 0 ? "1" : idx).append("\n");
         content.append(generateString((width - 6)/2, " "));
         content.append("REPORT");
         content.append("\n\n\n");

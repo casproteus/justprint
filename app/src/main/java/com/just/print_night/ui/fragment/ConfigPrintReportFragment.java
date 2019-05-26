@@ -14,6 +14,7 @@ import com.just.print_night.db.bean.Mark;
 import com.just.print_night.db.bean.SaleRecord;
 import com.just.print_night.db.dao.SaleRecordDao;
 import com.just.print_night.sys.server.WifiPrintService;
+import com.just.print_night.ui.activity.ConfigActivity;
 import com.just.print_night.ui.activity.OrderActivity;
 import com.just.print_night.ui.holder.ConfigPrintReportViewHolder;
 import com.stupid.method.adapter.OnClickItemListener;
@@ -84,20 +85,27 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
         }
     }
 
+    @XClick({R.id.buttonCancel})
+    private void notResetReport(){
+
+        startActivity(new Intent(getContext(), ConfigActivity.class));
+        getActivity().finish();
+    }
+
     @XClick({R.id.buttonOK})
     private void resetReport(){
         //when printed succcesfully, clean all records, and update now as the next reportStartDate
         saleRecordDao.deleteAll();
         AppData.putCustomData("reportStartDate", String.valueOf(now));
+        int reportIdx = 1;
+        try{
+            reportIdx = Integer.valueOf(AppData.getCustomData("reportIdx"));
+        }catch(Exception e){
+            //report error.
+        }
+        AppData.putCustomData("reportIdx", String.valueOf(reportIdx + 1));
 
-        startActivity(new Intent(getContext(), OrderActivity.class));
-        getActivity().finish();
-    }
-
-    @XClick({R.id.buttonCancel})
-    private void notResetReport(){
-
-        startActivity(new Intent(getContext(), OrderActivity.class));
+        startActivity(new Intent(getContext(), ConfigActivity.class));
         getActivity().finish();
     }
 

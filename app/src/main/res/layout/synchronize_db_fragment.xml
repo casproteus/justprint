@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/menuDetail"
+    android:id="@+id/synchronizedb"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_alignParentTop="true"
@@ -9,58 +9,48 @@
     android:orientation="vertical"
     android:padding="10dp">
 
-    <TextView
-        android:id="@+id/tvMenuTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Category"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/etMenuID"
+        <TextView
+            android:id="@+id/notice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ems="4"
-            android:hint="Code"
-            android:maxLines="1" />
-
-        <EditText
-            android:id="@+id/etMenu"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Name"
-            android:maxLines="1" />
-
-        <EditText
-            android:id="@+id/price"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Price"
-            android:maxLines="1" />
+            android:text="You can modify the host name to synchronize from an other store. Please be noticed that if the modification date of local database is later than the data on server, the database on server will be replaced by local database." />
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/selectPrint"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="right"
-        android:drawableStart="@android:drawable/ic_input_add"
-        android:text="Add Printer"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:orientation="horizontal">
 
-    <ListView
-        android:id="@+id/addPrintListView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        <EditText
+            android:id="@+id/store_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Store Name"
+            android:maxLines="1" />
+
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="License Code"
+            android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/lastModified"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Local DB Modified Time" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -69,7 +59,7 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/cancelAddMenu"
+            android:id="@+id/buttonCancel"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -77,11 +67,12 @@
             android:text="Cancel" />
 
         <Button
-            android:id="@+id/addMenu"
+            android:id="@+id/buttonOK"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:text="    OK    " />
+            android:text="  OK  " />
     </LinearLayout>
+
 </LinearLayout>

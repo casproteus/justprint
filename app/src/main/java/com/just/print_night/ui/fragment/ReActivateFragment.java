@@ -9,6 +9,7 @@ import com.just.print_night.R;
 import com.just.print_night.app.AppData;
 import com.just.print_night.app.Applic;
 import com.just.print_night.app.BaseFragment;
+import com.just.print_night.ui.activity.ConfigActivity;
 import com.just.print_night.ui.activity.MainActivity;
 import com.just.print_night.ui.activity.OrderActivity;
 import com.just.print_night.util.AppUtils;
@@ -130,7 +131,7 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
         AppData.setLicense(inputedSN);
         new AppData().start();
 
-        startActivity(new Intent(getContext(), OrderActivity.class));
+        startActivity(new Intent(getContext(), ConfigActivity.class));
         getActivity().finish();
     }
 

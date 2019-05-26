@@ -63,16 +63,20 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/buttonOK"
+                    android:id="@+id/buttonCancel"
+                    style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" YES " />
+                    android:layout_gravity="right"
+                    android:text="    NO    " />
 
                 <Button
-                    android:id="@+id/buttonCancel"
+                    android:id="@+id/buttonOK"
+                    style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="  NO  " />
+                    android:layout_gravity="right"
+                    android:text="    YES    " />
 
             </LinearLayout>
 
