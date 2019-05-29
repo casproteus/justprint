@@ -4,31 +4,19 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.just.print_night.R;
 import com.just.print_night.app.AppData;
-import com.just.print_night.app.Applic;
 import com.just.print_night.app.BaseFragment;
-import com.just.print_night.db.bean.Mark;
-import com.just.print_night.db.bean.SaleRecord;
 import com.just.print_night.db.dao.SaleRecordDao;
-import com.just.print_night.sys.server.WifiPrintService;
 import com.just.print_night.ui.activity.ConfigActivity;
-import com.just.print_night.ui.activity.OrderActivity;
-import com.just.print_night.ui.holder.ConfigPrintReportViewHolder;
 import com.just.print_night.util.DatabaseUtil;
-import com.stupid.method.adapter.OnClickItemListener;
-import com.stupid.method.adapter.XAdapter2;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
-import com.stupid.method.reflect.annotation.XGetValueByView;
 import com.stupid.method.reflect.annotation.XViewByID;
-import com.stupid.method.widget.flowlayout.FlowListView;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -57,7 +45,11 @@ public class SynchronizeDBFragment extends BaseFragment{
         new StupidReflect(this, getView()).init();
         store_name.setText(AppData.getShopName());
         //password.setText(AppData.getLicense());
-        lastModified.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Long.valueOf(AppData.getLastSyncDate())));
+        String lastSyncDate = AppData.getLastSyncDate();
+        if(lastSyncDate == null || lastSyncDate.length() == 0){
+            lastSyncDate = "1";
+        }
+        lastModified.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Long.valueOf(lastSyncDate)));
     }
 
     @XClick({R.id.buttonOK})

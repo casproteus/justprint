@@ -11,8 +11,8 @@ import com.just.print_night.app.Applic;
 import com.just.print_night.app.BaseFragment;
 import com.just.print_night.ui.activity.ConfigActivity;
 import com.just.print_night.ui.activity.MainActivity;
-import com.just.print_night.ui.activity.OrderActivity;
 import com.just.print_night.util.AppUtils;
+import com.just.print_night.util.SharedPreferencesHelper;
 import com.stupid.method.adapter.OnClickItemListener;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
@@ -123,6 +123,14 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
                     showToast(SettingType + " is set to " + inputedSN);
                     return;
             }
+        }else if(inputedSN.startsWith("-") && (inputedSN.endsWith("?") || inputedSN.endsWith("？"))) {
+            inputedSN = inputedSN.substring(1, inputedSN.length() - 1);
+            String answer = AppData.getCustomData(inputedSN);
+            if(answer == null || answer.length() == 0) {
+                answer = SharedPreferencesHelper.getCache(Applic.app.getApplicationContext(), inputedSN).getString(inputedSN);
+            }
+            showToast(inputedSN + " = " + answer);
+            return;
         }else if (inputedSN.length() != 6) {
             showToast("Please input correct license code");
             return;

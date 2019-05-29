@@ -1,13 +1,11 @@
 package com.just.print_night;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
 import com.just.print_night.app.AppData;
 import com.just.print_night.app.Applic;
 import com.just.print_night.app.BaseActivity;
-import com.just.print_night.ui.activity.LoginActivity;
 import com.just.print_night.util.AppUtils;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
@@ -45,7 +43,8 @@ public class Activate extends BaseActivity {
         }
 
         AppData.setLicense(inputedSN);
-        startActivity(new Intent(this, LoginActivity.class));
+        new AppData().start();
+        //startActivity(new Intent(this, LoginActivity.class));
         finish();
     }
 

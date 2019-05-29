@@ -9,7 +9,6 @@ import com.just.print_night.R;
 import com.just.print_night.app.AppData;
 import com.just.print_night.app.BaseFragment;
 import com.just.print_night.ui.activity.ConfigActivity;
-import com.just.print_night.util.DatabaseUtil;
 import com.just.print_night.util.StringUtils;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;

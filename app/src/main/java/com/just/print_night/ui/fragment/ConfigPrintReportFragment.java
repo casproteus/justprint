@@ -1,7 +1,5 @@
 package com.just.print_night.ui.fragment;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -15,7 +13,6 @@ import com.just.print_night.db.bean.SaleRecord;
 import com.just.print_night.db.dao.SaleRecordDao;
 import com.just.print_night.sys.server.WifiPrintService;
 import com.just.print_night.ui.activity.ConfigActivity;
-import com.just.print_night.ui.activity.OrderActivity;
 import com.just.print_night.ui.holder.ConfigPrintReportViewHolder;
 import com.stupid.method.adapter.OnClickItemListener;
 import com.stupid.method.adapter.XAdapter2;
