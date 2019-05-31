@@ -112,7 +112,7 @@ public class ConfigPrinterFragment extends BaseFragment implements
         printer.setState(State.def);
         Applic.app.getDaoMaster().newSession().getPrinterDao().insert(printer);
         printer.updateAndUpgrade();
-        AppData.updataeLastSyncDate(null);
+        AppData.updataeLastModifyTime(null);
         loadPrinter();
     }
 

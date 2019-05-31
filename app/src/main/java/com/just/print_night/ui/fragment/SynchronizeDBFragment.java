@@ -45,7 +45,7 @@ public class SynchronizeDBFragment extends BaseFragment{
         new StupidReflect(this, getView()).init();
         store_name.setText(AppData.getShopName());
         //password.setText(AppData.getLicense());
-        String lastSyncDate = AppData.getLastSyncDate();
+        String lastSyncDate = AppData.getLastModifyTime();
         if(lastSyncDate == null || lastSyncDate.length() == 0){
             lastSyncDate = "1";
         }

@@ -69,7 +69,7 @@ public class DatabaseUtil extends Thread{
                 sb.append("/syncJustPrintDb?filepath=");
                 sb.append(license + storName);
                 sb.append("&submitDate=");
-                sb.append(AppData.getLastSyncDate());
+                sb.append(AppData.getLastModifyTime());
                 url = new URL(sb.toString());
 
                 urlConnection = (HttpURLConnection) url.openConnection();

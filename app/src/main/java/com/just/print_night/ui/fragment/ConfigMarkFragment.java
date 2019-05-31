@@ -60,7 +60,7 @@ public class ConfigMarkFragment extends BaseFragment implements OnClickItemListe
         mark1.setName(mark);
         Applic.app.getDaoMaster().newSession().getMarkDao().insertOrReplace(mark1);
         mark1.updateAndUpgrade();
-        AppData.updataeLastSyncDate(null);
+        AppData.updataeLastModifyTime(null);
         loadMark();
     }
 

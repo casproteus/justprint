@@ -300,7 +300,7 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
             m2m.setPrint(p);
             m2mDao.insertOrReplace(m2m);
         }
-        AppData.updataeLastSyncDate(null);
+        AppData.updataeLastModifyTime(null);
         modifyingMenu = null;
         findViewById(R.id.menuLayout).setVisibility(View.GONE);
         loadMenu();
@@ -337,7 +337,7 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
         cat.setState(State.def);
         Applic.app.getDaoMaster().newSession().getCategoryDao().insertOrReplace(cat);
         cat.updateAndUpgrade();
-        AppData.updataeLastSyncDate(null);
+        AppData.updataeLastModifyTime(null);
         loadCategory();
         cname.setText("");
         modifyingCategory = null;

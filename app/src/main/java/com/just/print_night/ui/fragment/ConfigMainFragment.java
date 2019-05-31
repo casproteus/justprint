@@ -9,6 +9,7 @@ import com.just.print_night.R;
 import com.just.print_night.app.AppData;
 import com.just.print_night.app.BaseFragment;
 import com.just.print_night.ui.activity.ConfigActivity;
+import com.just.print_night.util.DatabaseUtil;
 import com.just.print_night.util.StringUtils;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
@@ -71,7 +72,8 @@ public class ConfigMainFragment extends BaseFragment {
                 getEventBus().post(ConfigActivity.CHANGE_PAGE, ConfigPrintReportFragment.class);
                 break;
             case R.id.synchronizedb:
-                getEventBus().post(ConfigActivity.CHANGE_PAGE, SynchronizeDBFragment.class);
+                //getEventBus().post(ConfigActivity.CHANGE_PAGE, SynchronizeDBFragment.class);
+                DatabaseUtil.syncDbOntoServer(AppData.getLicense(), AppData.getShopName());
                 break;
             case R.id.reactivate:
                 getEventBus().post(ConfigActivity.CHANGE_PAGE, ReActivateFragment.class);

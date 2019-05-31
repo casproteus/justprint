@@ -109,11 +109,11 @@ public class AppData extends Thread{
         getShopData(Applic.app.getApplicationContext()).putString("custom_" + key, value);
     }
 
-    public static String getLastSyncDate(){
+    public static String getLastModifyTime(){
         return getShopData(Applic.app.getApplicationContext()).getString("LastSyncDate","");
     }
 
-    public static void updataeLastSyncDate(String lastUpdateTime) {
+    public static void updataeLastModifyTime(String lastUpdateTime) {
         getShopData(Applic.app.getApplicationContext()).putString("LastSyncDate",
                 lastUpdateTime != null && lastUpdateTime.length() > 1 ? lastUpdateTime : String.valueOf(new Date().getTime()));
     }
