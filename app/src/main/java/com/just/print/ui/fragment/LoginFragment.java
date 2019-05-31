@@ -42,7 +42,7 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
             userName.setText(UserName);
             userName.setEnabled(false);
             findViewById(R.id.confirmUserName).setVisibility(View.GONE);
-            findViewById(R.id.shopShow).setVisibility(View.VISIBLE);
+            findViewById(R.id.printersShow).setVisibility(View.VISIBLE);
         }
         if (!StringUtils.isEmpty(shopName)) {
             //showToast(shopName);
@@ -107,7 +107,7 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
         if (StringUtils.isEmpty(userName) || userName.length() < 2) {
             showToast("Please input your name");
         } else {
-            findViewById(R.id.shopShow).setVisibility(View.VISIBLE);
+            findViewById(R.id.printersShow).setVisibility(View.VISIBLE);
             view.setVisibility(View.GONE);
 
             int p = userName.indexOf("-p:");

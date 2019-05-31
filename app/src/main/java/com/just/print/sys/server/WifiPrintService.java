@@ -218,11 +218,33 @@ public class WifiPrintService implements Runnable{
             List<SelectionDetail> dishList = (List<SelectionDetail>) entry.getValue();
 
             if(dishList.size() > 0){
+
                 if(ipSelectionsMap.get(printerIP) != dishList){
                     L.d("ERROR!", "the dishList are different from ipSelectionsMap.get(printerIP)!!!!");
                 }
-                if(ipPrinterMap.get(printerIP).getFirstPrint() == 1){  //全单封装
-                    ipContentMap.get(printerIP).add(formatContentForPrint(dishList, kitchenBillIdx) + "\n\n\n\n\n");
+                Printer printer = ipPrinterMap.get(printerIP);
+                if(printer.getFirstPrint() == 1){  //全单封装
+                    if(printer.getType() == 0){   //if category is set then cut by category.
+                        List<SelectionDetail> tlist = new ArrayList<SelectionDetail>();
+                        String currentCategory = null;
+                        for(SelectionDetail selectionDetail : dishList){
+                            Category c1 = Applic.app.getDaoMaster().newSession().getCategoryDao().load(selectionDetail.getDish().getCid());
+                            if(currentCategory == null){    //if not set yet, then set the first value.
+                                currentCategory = c1.getCname();
+                                tlist.add(selectionDetail);
+                            } else if(currentCategory.equals(c1.getCname())){    //if same with previous, then add into the list.
+                                tlist.add(selectionDetail);
+                            } else {                    //if not same, then add current list into ipContent map, and start a new list.
+                                ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx) + "\n\n");
+                                tlist = new ArrayList<SelectionDetail>();
+                                tlist.add(selectionDetail);
+                            }
+                        }
+                        //put the last list into ipContent map.
+                        ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx) + "\n\n");
+                    }else{
+                        ipContentMap.get(printerIP).add(formatContentForPrint(dishList, kitchenBillIdx) + "\n\n\n\n\n");
+                    }
                 }else{                                          //分单封装
                     for(SelectionDetail selectionDetail : dishList){
                         List<SelectionDetail> tlist = new ArrayList<SelectionDetail>();
@@ -302,11 +324,27 @@ public class WifiPrintService implements Runnable{
                 timeCounter = 0;
                 L.d(TAG,"Flags both set, checking the content fllowing current ip:" + curPrintIp);
 
-                if(ipContentMap !=null && ipContentMap.get(curPrintIp) != null) {
+                if(ipContentMap != null && ipContentMap.get(curPrintIp) != null) {
 
                     List<String> contentList = ipContentMap.get(curPrintIp);
                     L.d(TAG,"out printing... content list size is:" + contentList.size());
-                    printContents(contentList);
+                    String note = ipPrinterMap.get(curPrintIp).getNote();
+                    try{
+                        int loopTime = Integer.valueOf(note);
+                        for(int i = 0; i < loopTime; i++) {
+                            printContents(contentList);
+                        }
+                    }catch(Exception e){
+                        //note is not a number then do not loop.
+                        printContents(contentList);
+                    }finally{
+                        //when all content of a printer has printed, it's the right time to close conenction.
+                        if (isBeiYangPrinter(curPrintIp)) {
+                            closeConenctionToBeiYangPrinter();
+                        }else{
+                            wifiCommunication.close();
+                        }
+                    }
 
                     //reset status and get ready for a new print job( a print job = connecting to a printer + print content + reset)
                     ipContentMap.get(curPrintIp).clear();
@@ -326,8 +364,17 @@ public class WifiPrintService implements Runnable{
                 }
             }
 
-            //did any work or didn't do any work, each round should rest for 1 second.
-            AppUtils.sleep(1000);
+            //did any work or didn't do any work, each round should rest for at least 1 second.
+            String waitTime = AppData.getCustomData("waitTime");
+            if(waitTime == null || waitTime.trim().length() == 0){
+                waitTime = "2000";
+            }else{
+                int time = Integer.valueOf(waitTime);
+                if(time < 100){
+                    time = time * 1000;
+                }
+            }
+            AppUtils.sleep(Integer.valueOf(waitTime));
         }
     }
 
@@ -371,13 +418,6 @@ public class WifiPrintService implements Runnable{
             } else {
                 doZiJiangPrint(font, content);
             }
-        }
-
-        //when all content of a printer has printed, it's the right time to close conenction.
-        if (isBeiYangPrinter(curPrintIp)) {
-            closeConenctionToBeiYangPrinter();
-        }else{
-            wifiCommunication.close();
         }
     }
 
@@ -619,7 +659,10 @@ public class WifiPrintService implements Runnable{
         }
         String spaceStr = generateString((width - startTime.length())/2, " ");
 
-        StringBuilder content = new StringBuilder("\n");
+        String mobileMark = AppData.getCustomData("mobileMark");
+        StringBuilder content = new StringBuilder(mobileMark == null ? "" : mobileMark);
+        String idx = AppData.getCustomData("reportIdx");
+        content.append(idx == null || idx.length() == 0 ? "1" : idx).append("\n");
         content.append(generateString((width - 6)/2, " "));
         content.append("REPORT");
         content.append("\n\n\n");

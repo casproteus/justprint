@@ -12,8 +12,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigActivity extends BaseActivity implements EventBus.EventHandler {
+
     public static final String CHANGE_PAGE = "CHANGE_PAGE";
+
     Map<Class<? extends Fragment>, Fragment> mFragment = new HashMap<Class<? extends Fragment>, Fragment>();
+
 
     {
         mFragment.put(ConfigMainFragment.class, new ConfigMainFragment());

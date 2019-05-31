@@ -30,6 +30,7 @@ public class ConfigMainFragment extends BaseFragment {
     public void onCreated(Bundle savedInstanceState) {
         new StupidReflect(this, getView()).init();
     }
+
     @XClick({R.id.verifyPassword})
     private void onConfirmUserName(View view) {
         String inputContent = this.password.getText().toString().trim();
@@ -71,7 +72,8 @@ public class ConfigMainFragment extends BaseFragment {
                 getEventBus().post(ConfigActivity.CHANGE_PAGE, ConfigPrintReportFragment.class);
                 break;
             case R.id.synchronizedb:
-                DatabaseUtil.syncDbOntoServer();
+                //getEventBus().post(ConfigActivity.CHANGE_PAGE, SynchronizeDBFragment.class);
+                DatabaseUtil.syncDbOntoServer(AppData.getLicense(), AppData.getShopName());
                 break;
             case R.id.reactivate:
                 getEventBus().post(ConfigActivity.CHANGE_PAGE, ReActivateFragment.class);

@@ -48,26 +48,31 @@ abstract public class BaseFragment extends Fragment {
 
         String[] markNames = new String[allMarks.size()];
         boolean[] selectionStatus = new boolean[allMarks.size()];
-        //we want to remenmber the position of the remarks now.....
-        // final Map<String, Integer> sa = new HashMap<String, Integer>();
-        final List<Mark> sa = choiceItem;
+        final Map<String, Integer> sa = new HashMap<String, Integer>();
         for (int i = 0, s = allMarks.size(); i < s; i++) {
             markNames[i] = allMarks.get(i).getName();
             selectionStatus[i] = choiceItem.contains(allMarks.get(i));
+            if(selectionStatus[i]) {
+                sa.put(Integer.toString(i), i);
+            }
         }
 
         new AlertDialog.Builder(this.getActivity()).setMultiChoiceItems(markNames, selectionStatus, new DialogInterface.OnMultiChoiceClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                 if (isChecked)
-                    sa.add(allMarks.get(which));
+                    sa.put(Integer.toString(which), which);
                 else
-                    sa.remove(allMarks.get(which));
+                    sa.remove(Integer.toString(which));
             }
         }).setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                choiceMarks.onChoiceMarks(sa);
+                List<Mark> result = new ArrayList<Mark>();
+                for (Integer i : sa.values()) {
+                    result.add(allMarks.get(i));
+                }
+                choiceMarks.onChoiceMarks(result);
 
             }
         }).setNegativeButton("Cancel", null).show();

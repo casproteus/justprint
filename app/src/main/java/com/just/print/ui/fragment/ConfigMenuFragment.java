@@ -42,18 +42,24 @@ import static android.content.DialogInterface.OnClickListener;
 public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLongClickListener {
 
     private static Menu modifyingMenu = null;
+
     private Category modifyingCategory = null;
 
     XAdapter2<Category> categoryXAdapter;
+
     @XViewByID(R.id.lvCategory)
     ListView lvCategory;
+
     private Category mCategory;
+
     @XViewByID(R.id.tvMenuTitle)
     private TextView tvMenuTitle;
+
     @XViewByID(R.id.lvMenu)
     private ListView lvMenu;
 
     MenuDao menuDao;
+
     private XAdapter2<Menu> menuXAdapter;
     IXOnItemClickListener categoryAdapterClick = new IXOnItemClickListener() {
         @Override
@@ -294,7 +300,7 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
             m2m.setPrint(p);
             m2mDao.insertOrReplace(m2m);
         }
-        AppData.updataeLastSyncDate(null);
+        AppData.updataeLastModifyTime(null);
         modifyingMenu = null;
         findViewById(R.id.menuLayout).setVisibility(View.GONE);
         loadMenu();
@@ -331,7 +337,7 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
         cat.setState(State.def);
         Applic.app.getDaoMaster().newSession().getCategoryDao().insertOrReplace(cat);
         cat.updateAndUpgrade();
-        AppData.updataeLastSyncDate(null);
+        AppData.updataeLastModifyTime(null);
         loadCategory();
         cname.setText("");
         modifyingCategory = null;

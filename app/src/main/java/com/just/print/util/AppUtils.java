@@ -36,7 +36,7 @@ public class AppUtils {
 
     public static void sleep(int time){
         try{
-            Thread.sleep(1000);
+            Thread.sleep(time);
         }catch(InterruptedException e) {
             Thread.currentThread().interrupt();
         }

@@ -1,13 +1,11 @@
 package com.just.print;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
 import com.just.print.app.AppData;
 import com.just.print.app.Applic;
 import com.just.print.app.BaseActivity;
-import com.just.print.ui.activity.LoginActivity;
 import com.just.print.util.AppUtils;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
@@ -45,7 +43,8 @@ public class Activate extends BaseActivity {
         }
 
         AppData.setLicense(inputedSN);
-        startActivity(new Intent(this, LoginActivity.class));
+        new AppData().start();
+        //startActivity(new Intent(this, LoginActivity.class));
         finish();
     }
 

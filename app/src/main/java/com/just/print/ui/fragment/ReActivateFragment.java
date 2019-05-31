@@ -9,9 +9,10 @@ import com.just.print.R;
 import com.just.print.app.AppData;
 import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
+import com.just.print.ui.activity.ConfigActivity;
 import com.just.print.ui.activity.MainActivity;
-import com.just.print.ui.activity.OrderActivity;
 import com.just.print.util.AppUtils;
+import com.just.print.util.SharedPreferencesHelper;
 import com.stupid.method.adapter.OnClickItemListener;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
@@ -122,6 +123,14 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
                     showToast(SettingType + " is set to " + inputedSN);
                     return;
             }
+        }else if(inputedSN.startsWith("-") && (inputedSN.endsWith("?") || inputedSN.endsWith("？"))) {
+            inputedSN = inputedSN.substring(1, inputedSN.length() - 1);
+            String answer = AppData.getCustomData(inputedSN);
+            if(answer == null || answer.length() == 0) {
+                answer = SharedPreferencesHelper.getCache(Applic.app.getApplicationContext(), inputedSN).getString(inputedSN);
+            }
+            showToast(inputedSN + " = " + answer);
+            return;
         }else if (inputedSN.length() != 6) {
             showToast("Please input correct license code");
             return;
@@ -130,7 +139,7 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
         AppData.setLicense(inputedSN);
         new AppData().start();
 
-        startActivity(new Intent(getContext(), OrderActivity.class));
+        startActivity(new Intent(getContext(), ConfigActivity.class));
         getActivity().finish();
     }
 

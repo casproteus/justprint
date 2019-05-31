@@ -12,7 +12,7 @@ import com.just.print.db.bean.Mark;
 import com.just.print.db.bean.SaleRecord;
 import com.just.print.db.dao.SaleRecordDao;
 import com.just.print.sys.server.WifiPrintService;
-import com.just.print.ui.activity.OrderActivity;
+import com.just.print.ui.activity.ConfigActivity;
 import com.just.print.ui.holder.ConfigPrintReportViewHolder;
 import com.stupid.method.adapter.OnClickItemListener;
 import com.stupid.method.adapter.XAdapter2;
@@ -33,6 +33,9 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
     @XViewByID(R.id.gridView)
     FlowListView gridView;
     XAdapter2<Mark> markXAdapter;
+
+    private SaleRecordDao saleRecordDao;
+    private long now;
 
     @Override
     protected int getLayoutId() {
@@ -56,7 +59,7 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
             return;
         }
 
-        SaleRecordDao saleRecordDao = Applic.app.getDaoMaster().newSession().getSaleRecordDao();
+        saleRecordDao = Applic.app.getDaoMaster().newSession().getSaleRecordDao();
         List<SaleRecord> orders = saleRecordDao.loadAll();
 
         if(orders == null || orders.size() == 0){
@@ -69,19 +72,38 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
             reportStartDate = AppData.getCustomData("lastsuccess");
         }
 
-        long now = new Date().getTime();
+        now = new Date().getTime();
 
         //print code:
         String result = WifiPrintService.getInstance().exePrintReportCommand(orders, reportStartDate, String.valueOf(now));
         if("0".equals(result)) {
-            //when printed succcesfully, clean all records, and update now as the next reportStartDate
-            saleRecordDao.deleteAll();
-            AppData.putCustomData("reportStartDate", String.valueOf(now));
-            showToast("Report printted!");
-
-            startActivity(new Intent(getContext(), OrderActivity.class));
-            getActivity().finish();
+            findViewById(R.id.confirmPassword).setVisibility(View.INVISIBLE);
+            findViewById(R.id.alertDlg).setVisibility(View.VISIBLE);
         }
+    }
+
+    @XClick({R.id.buttonCancel})
+    private void notResetReport(){
+
+        startActivity(new Intent(getContext(), ConfigActivity.class));
+        getActivity().finish();
+    }
+
+    @XClick({R.id.buttonOK})
+    private void resetReport(){
+        //when printed succcesfully, clean all records, and update now as the next reportStartDate
+        saleRecordDao.deleteAll();
+        AppData.putCustomData("reportStartDate", String.valueOf(now));
+        int reportIdx = 1;
+        try{
+            reportIdx = Integer.valueOf(AppData.getCustomData("reportIdx"));
+        }catch(Exception e){
+            //report error.
+        }
+        AppData.putCustomData("reportIdx", String.valueOf(reportIdx + 1));
+
+        startActivity(new Intent(getContext(), ConfigActivity.class));
+        getActivity().finish();
     }
 
     @Override
