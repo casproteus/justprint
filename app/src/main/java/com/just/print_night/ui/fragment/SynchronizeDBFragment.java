@@ -1,7 +1,6 @@
 package com.just.print_night.ui.fragment;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.widget.EditText;
@@ -11,7 +10,6 @@ import com.just.print_night.R;
 import com.just.print_night.app.AppData;
 import com.just.print_night.app.BaseFragment;
 import com.just.print_night.db.dao.SaleRecordDao;
-import com.just.print_night.ui.activity.ConfigActivity;
 import com.just.print_night.util.DatabaseUtil;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
@@ -55,13 +53,11 @@ public class SynchronizeDBFragment extends BaseFragment{
     @XClick({R.id.buttonOK})
     private void onButtonOK(){
         DatabaseUtil.syncDbOntoServer(store_name.getText().toString(), password.getText().toString());
-        startActivity(new Intent(getContext(), ConfigActivity.class));
         getActivity().finish();
     }
 
     @XClick({R.id.buttonCancel})
     private void onButtonCancel(){
-        startActivity(new Intent(getContext(), ConfigActivity.class));
         getActivity().finish();
     }
 

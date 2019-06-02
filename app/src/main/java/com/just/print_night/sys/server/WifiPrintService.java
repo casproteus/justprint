@@ -155,7 +155,7 @@ public class WifiPrintService implements Runnable{
         }
     }
 
-    public String exePrintCommand(){
+    public String exePrintCommand(boolean isCancel){
         L.d(TAG,"start to translate selection into ipContent for printing.");
         if(!isIpContentMapEmpty()){
             L.d(TAG,"ipContent not empty, means last print job not finished yet! returning not success flag.");
@@ -235,21 +235,21 @@ public class WifiPrintService implements Runnable{
                             } else if(currentCategory.equals(c1.getCname())){    //if same with previous, then add into the list.
                                 tlist.add(selectionDetail);
                             } else {                    //if not same, then add current list into ipContent map, and start a new list.
-                                ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx) + "\n\n");
+                                ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx, isCancel) + "\n\n");
                                 tlist = new ArrayList<SelectionDetail>();
                                 tlist.add(selectionDetail);
                             }
                         }
                         //put the last list into ipContent map.
-                        ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx) + "\n\n");
+                        ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx, isCancel) + "\n\n");
                     }else{
-                        ipContentMap.get(printerIP).add(formatContentForPrint(dishList, kitchenBillIdx) + "\n\n\n\n\n");
+                        ipContentMap.get(printerIP).add(formatContentForPrint(dishList, kitchenBillIdx, isCancel) + "\n\n\n\n\n");
                     }
                 }else{                                          //分单封装
                     for(SelectionDetail selectionDetail : dishList){
                         List<SelectionDetail> tlist = new ArrayList<SelectionDetail>();
                         tlist.add(selectionDetail);
-                        ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx) + "\n\n");
+                        ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx, isCancel) + "\n\n");
                     }
                 }
             }
@@ -274,9 +274,15 @@ public class WifiPrintService implements Runnable{
         HashMap<String, SaleRecord> map = new HashMap<String, SaleRecord>();
         //combine the records
         for(SaleRecord saleRecord : saleRecords){
-            SaleRecord exist = map.get(saleRecord.getMname());
+
+            String name = saleRecord.getMname();
+            if(saleRecord.getPrice() < 0){
+                name = "<<<<" + name;
+            }
+
+            SaleRecord exist = map.get(name);
             if(exist == null){
-                map.put(saleRecord.getMname(), saleRecord);
+                map.put(name, saleRecord);
             }else{
                 exist.setNumber(exist.getNumber() + saleRecord.getNumber());
                 exist.setPrice(exist.getPrice() + saleRecord.getPrice());
@@ -642,21 +648,7 @@ public class WifiPrintService implements Runnable{
         }
 
         //determin the width of paper.
-        String font = AppData.getCustomData(curPrintIp + "font");
-        if(StringUtils.isBlank(font)) {
-            font = AppData.getCustomData("font");
-        }
-        if(!StringUtils.isBlank(font)){
-            String w = AppData.getCustomData(curPrintIp + "width");
-            if(StringUtils.isBlank(w)) {
-                w = AppData.getCustomData("width");
-            }
-            try {
-                width = Integer.valueOf(w);
-            }catch(Exception e){
-
-            }
-        }
+        determinTheWidth();
         String spaceStr = generateString((width - startTime.length())/2, " ");
 
         String mobileMark = AppData.getCustomData("mobileMark");
@@ -726,8 +718,7 @@ public class WifiPrintService implements Runnable{
         return content.toString();
     }
 
-    private String formatContentForPrint(List<SelectionDetail> list, String kitchenBillIdx){
-        L.d(TAG,"formatContentForPrint");
+    private void determinTheWidth() {
         String font = AppData.getCustomData(curPrintIp + "font");
         if(StringUtils.isBlank(font)) {
             font = AppData.getCustomData("font");
@@ -743,13 +734,24 @@ public class WifiPrintService implements Runnable{
 
             }
         }
+    }
+
+    private String formatContentForPrint(List<SelectionDetail> list, String kitchenBillIdx, boolean isCancel){
+        L.d(TAG,"formatContentForPrint");
+
+        determinTheWidth();
 
         //leave 2 space, incase the printer prints extra characters at the left corner.
-        StringBuilder content = new StringBuilder(generateString(width - 2 - kitchenBillIdx.length(), " ") + kitchenBillIdx + "\n\n");
+        String SEPRATOR = isCancel ? "<" : " ";
+        StringBuilder content = new StringBuilder();
+        if(isCancel){
+            content.append("       *** (取消CANCEL) ***\n");
+        }
+        content.append(generateString(width - 2 - kitchenBillIdx.length(), SEPRATOR) + kitchenBillIdx + "\n\n");
         DateFormat df = new SimpleDateFormat("HH:mm");
         String tableName = CustomerSelection.getInstance().getTableNumber();
         String dateStr = df.format(new Date());
-        String spaceStr = generateString(width - (2 + CustomerSelection.getInstance().getTableNumber().length() + dateStr.length()), " ");
+        String spaceStr = generateString(width - (2 + CustomerSelection.getInstance().getTableNumber().length() + dateStr.length()), SEPRATOR);
 
         if(width < 20){
             content.append("\n\n");
@@ -771,19 +773,19 @@ public class WifiPrintService implements Runnable{
         for(SelectionDetail dd:list){
             StringBuilder sb = new StringBuilder();
             sb.append(dd.getDish().getID());
-            sb.append(generateString(5 - dd.getDish().getID().length(), " "));
+            sb.append(generateString(5 - dd.getDish().getID().length(), SEPRATOR));
             sb.append(dd.getDish().getMname());
             if(dd.getDishNum() > 1){
-                String space = " ";
+                String space = SEPRATOR;
                 int occupiedLength = getLengthOfString(sb.toString());
-                sb.append(generateString(width - occupiedLength - (dd.getDishNum() < 10 ? 2 : 3), " "));
+                sb.append(generateString(width - occupiedLength - (dd.getDishNum() < 10 ? 2 : 3), SEPRATOR));
                 sb.append("X").append(Integer.toString(dd.getDishNum()));
             }
             content.append(sb);
             content.append("\n");
             if(dd.getMarkList() != null) {
                 for (Mark str : dd.getMarkList()) {
-                    content.append(generateString(5, " ")).append("* ").append(str.getName()).append(" *\n");
+                    content.append(generateString(5, SEPRATOR)).append("* ").append(str.getName()).append(" *\n");
                 }
             }
             content.append(generateString(width, sep_str2)).append("\n");
