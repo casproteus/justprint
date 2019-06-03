@@ -13,6 +13,7 @@ import com.just.print.db.bean.Mark;
 import com.just.print.db.expand.DaoExpand;
 import com.just.print.db.expand.State;
 import com.just.print.ui.holder.ConfigMarkViewHolder;
+import com.just.print.util.L;
 import com.stupid.method.adapter.OnClickItemListener;
 import com.stupid.method.adapter.XAdapter2;
 import com.stupid.method.reflect.StupidReflect;
@@ -21,6 +22,8 @@ import com.stupid.method.reflect.annotation.XGetValueByView;
 import com.stupid.method.reflect.annotation.XViewByID;
 import com.stupid.method.widget.flowlayout.FlowListView;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -48,16 +51,37 @@ public class ConfigMarkFragment extends BaseFragment implements OnClickItemListe
 
     private void loadMark() {
         List<Mark> list = DaoExpand.queryNotDeletedAll(Applic.app.getDaoMaster().newSession().getMarkDao());
+        Collections.sort(list, new Comparator<Mark>() {
+            @Override
+            public int compare(Mark mark, Mark t1) {
+                return mark.getState() - t1.getState();
+            }
+        });
         markXAdapter.setData(list);
         markXAdapter.notifyDataSetChanged();
     }
 
     @XClick({R.id.addMark})
-    private void addMark(@XGetValueByView(fromId = R.id.etMark) String mark) {
+    private void addMark(@XGetValueByView(fromId = R.id.etMark) String mark,
+                         @XGetValueByView(fromId = R.id.dspIdxMark) String dspIdx,
+                         @XGetValueByView(fromId = R.id.priceMark) String price) {
 
         Mark mark1 = new Mark();
-        mark1.setState(State.def);
+
         mark1.setName(mark);
+
+        try{
+            mark1.setState((int)(Float.valueOf(dspIdx) * 100));
+        }catch(NumberFormatException e){
+            //do nothing.
+        }
+
+        try{
+            mark1.setVersion((long) (Float.valueOf(price) * 100));
+        }catch(NumberFormatException e){
+            //do nothing.
+        }
+
         Applic.app.getDaoMaster().newSession().getMarkDao().insertOrReplace(mark1);
         mark1.updateAndUpgrade();
         AppData.updataeLastModifyTime(null);
@@ -74,9 +98,9 @@ public class ConfigMarkFragment extends BaseFragment implements OnClickItemListe
         builder.setTitle("Notice").setNegativeButton("Delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                mark.logicDelete();
-                loadMark();
+//                dialog.dismiss();
+//                mark.logicDelete();
+//                loadMark();
             }
         });
         builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {

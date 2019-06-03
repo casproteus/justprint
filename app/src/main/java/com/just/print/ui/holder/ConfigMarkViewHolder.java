@@ -30,7 +30,7 @@ public class ConfigMarkViewHolder extends XViewHolder<Mark> {
         tvMark.setTextOff(null);
         tvMark.setChecked(true);
         tvMark.setCompoundDrawablePadding(10);
-        tvMark.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.forum_tag_close, 0);
+        tvMark.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.change, 0);
     }
 
     @Override
