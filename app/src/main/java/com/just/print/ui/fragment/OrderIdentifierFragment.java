@@ -48,6 +48,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     private static final String TAG = "OrderIdentifierFragment";
 
     private static OrderIdentifierFragment instance = null;
+    private static boolean isCancel;
+
     public static OrderIdentifierFragment getInstance(){
         if(instance == null){
             instance = new OrderIdentifierFragment();
@@ -85,7 +87,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     public static List<SelectionDetail> bkOfLastSelection;
     private static CharSequence bkOfLastTable;
     static int times = 0;
-    String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "F", "H", "+","togo"};
+    String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "H", "+", "togo", "canc"};
 
     @XClick({R.id.odIdConfigBtn, R.id.odIdSndBtn, R.id.odIdDelBtn, R.id.odIdOkBtn})
     private void exeControlCommand(View v) {
@@ -94,32 +96,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 startActivity(new Intent(getContext(), ConfigActivity.class));
                 break;
             case R.id.odIdSndBtn:
-                List<SelectionDetail> selectionDetails = CustomerSelection.getInstance().getSelectedDishes();
-                if(selectionDetails == null || selectionDetails.size() == 0){
-                    showToast("Nothing selected!");
-                    return;
-                }
-
-                String result = WifiPrintService.getInstance().exePrintCommand();
-                if(WifiPrintService.ERROR.equals(result)){
-                    if(times < 1) {
-                        showToast("Last print not done yet. Please wait.");
-                        times++;
-                    }else if(times < 2){
-                        showToast("Last print not done yet. Press Send Again To Resend it!");
-                        times++;
-                    }else{
-                        WifiPrintService.getInstance().reInitPrintRelatedMaps();
-                        if(WifiPrintService.SUCCESS.equals(WifiPrintService.getInstance().exePrintCommand())){
-                            times = 0;
-                            clearOrderMenu();
-                        }
-                        showToast("Order was re-send!");
-                    }
-                }else {
-                    times = 0;
-                    clearOrderMenu();
-                }
+                printCurrentSelection(false);
                 break;
             case R.id.odIdDelBtn:
                 DelOneText();
@@ -150,6 +127,37 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
     }
 
+    private boolean printCurrentSelection(boolean isCancel) {
+        List<SelectionDetail> selectionDetails = CustomerSelection.getInstance().getSelectedDishes();
+        if(selectionDetails == null || selectionDetails.size() == 0){
+            showToast("Nothing selected!");
+            return false;
+        }else {
+            String result = WifiPrintService.getInstance().exePrintCommand(isCancel);
+            if (WifiPrintService.ERROR.equals(result)) {
+                if (times < 1) {
+                    showToast("Last print not done yet. Please wait.");
+                    times++;
+                } else if (times < 2) {
+                    showToast("Last print not done yet. Press Send Again To Resend it!");
+                    times++;
+                } else {
+                    WifiPrintService.getInstance().reInitPrintRelatedMaps();
+                    if (WifiPrintService.SUCCESS.equals(WifiPrintService.getInstance().exePrintCommand(isCancel))) {
+                        times = 0;
+                        clearOrderMenu();
+                    }
+                    showToast("Order was re-send!");
+                }
+                return false;
+            } else {
+                times = 0;
+                clearOrderMenu();
+                return true;
+            }
+        }
+    }
+
     //currently it's used by number buttons and the note tag buttons. both types are buttons in holder.
     IXOnItemClickListener itemXAdapterClick = new IXOnItemClickListener() {
         @Override
@@ -160,15 +168,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             switch (view.getId()) {
                 case R.id.buttonholder: //number buttons.
                     switch (i) {
-                        case 14:
-                            if(items.length == 18) {
-                                InputText("F");
-                            }else{
-                                InputText(Character.toString((char) (i % 10 + 'A')));
-                            }
-                            break;
-                        case 15:
-                            if(items.length == 18) {
+                        case 16:
+                            if(items.length == 20) {
                                 InputText("H");
                             }else{
                                 InputText(Character.toString((char) (i % 10 + 'A')));
@@ -177,11 +178,17 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         default:
                             if (i < 10) {
                                 InputText(Integer.toString((i + 1) % 10));
-                            } else if( i == items.length - 2){
+                            } else if( i == items.length - 3){
                                 InputText("+");
-                            } else if (i == items.length - 1) {
+                            } else if (i == items.length - 2) {
                                 odIdTableTbtn.setText("TOGO");
                                 CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
+                            } else if (i == items.length - 1) {
+                                odIdTableTbtn.setText("");
+                                //added the selected dish with negative price.
+                                if(printCurrentSelection(true)){    //arranged to print---didn't met the case that previous print not finished yet.
+                                    isCancel = true;
+                                }
                             }else {
                                 InputText(Character.toString((char) (i % 10 + 'A')));
                             }
@@ -242,9 +249,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         storedMenu = null;
         if(!StringUtils.isBlank(AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR))) {
             if(AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR).equalsIgnoreCase("P")){
-                items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F","G","H","I","J","K","L","M","N","O","P", "+", "togo"};
+                items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F","G","H","I","J","K","L","M","N","O","P", "+", "togo", "canc"};
             }else if(AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR).equalsIgnoreCase("N")){
-                items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F","G","H","I","J","K","L","M","N", "+", "togo"};
+                items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F","G","H","I","J","K","L","M","N", "+", "togo", "canc"};
             }
         }
         itemXAdapter = new XAdapter2<String>(getActivity(), Arrays.asList(items), OrderIdentifierItemViewHolder.class);
@@ -439,7 +446,10 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             Menu menu = selectionDetail.getDish();
             String name = menu.getMname();
             Double price = menu.getPrice() * number;
-
+            if(isCancel){
+                isCancel = false;
+                price *= -1;
+            }
             SaleRecord saleRecord = new SaleRecord();
             saleRecord.setMname(name);
             saleRecord.setNumber(Double.valueOf(number));

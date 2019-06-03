@@ -1,6 +1,5 @@
 package com.just.print.ui.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -12,7 +11,6 @@ import com.just.print.db.bean.Mark;
 import com.just.print.db.bean.SaleRecord;
 import com.just.print.db.dao.SaleRecordDao;
 import com.just.print.sys.server.WifiPrintService;
-import com.just.print.ui.activity.ConfigActivity;
 import com.just.print.ui.holder.ConfigPrintReportViewHolder;
 import com.stupid.method.adapter.OnClickItemListener;
 import com.stupid.method.adapter.XAdapter2;
@@ -84,8 +82,6 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
 
     @XClick({R.id.buttonCancel})
     private void notResetReport(){
-
-        startActivity(new Intent(getContext(), ConfigActivity.class));
         getActivity().finish();
     }
 
@@ -102,7 +98,6 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
         }
         AppData.putCustomData("reportIdx", String.valueOf(reportIdx + 1));
 
-        startActivity(new Intent(getContext(), ConfigActivity.class));
         getActivity().finish();
     }
 

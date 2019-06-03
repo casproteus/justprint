@@ -1,6 +1,5 @@
 package com.just.print.ui.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -9,7 +8,6 @@ import com.just.print.R;
 import com.just.print.app.AppData;
 import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
-import com.just.print.ui.activity.ConfigActivity;
 import com.just.print.ui.activity.MainActivity;
 import com.just.print.util.AppUtils;
 import com.just.print.util.SharedPreferencesHelper;
@@ -139,7 +137,6 @@ public class ReActivateFragment extends BaseFragment implements OnClickItemListe
         AppData.setLicense(inputedSN);
         new AppData().start();
 
-        startActivity(new Intent(getContext(), ConfigActivity.class));
         getActivity().finish();
     }
 
