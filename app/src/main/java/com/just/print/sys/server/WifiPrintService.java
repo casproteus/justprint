@@ -747,7 +747,7 @@ public class WifiPrintService implements Runnable{
         StringBuilder content = new StringBuilder();
         String title = AppData.getCustomData("kitchentitle");
         if(title.length() > 0){
-            if(title.endsWith("spaces")) {
+            if(title.endsWith("lines")) {
                 title = title.substring(0, title.length() - 6).trim();
                 try {
                     int qt = Integer.valueOf(title);
