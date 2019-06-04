@@ -247,13 +247,27 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         //设置餐桌号用
         //CustomerSelection.getInstance().setTableNumber(odIdTableNumEt.getText().toString());
         storedMenu = null;
-        if(!StringUtils.isBlank(AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR))) {
-            if(AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR).equalsIgnoreCase("P")){
-                items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F","G","H","I","J","K","L","M","N","O","P", "+", "togo", "canc"};
-            }else if(AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR).equalsIgnoreCase("N")){
-                items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F","G","H","I","J","K","L","M","N", "+", "togo", "canc"};
+        String definedLast = AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR);
+        items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E"};
+        List<String> ary = new ArrayList<String>();
+        for(int i = 0; i < items.length; i++){
+            ary.add(items[i]);
+        }
+
+        if(!StringUtils.isBlank(definedLast)) {
+            char maxChar = definedLast.charAt(0);
+            char lastChar = items[items.length - 1].charAt(0);
+            while(lastChar < maxChar){
+                lastChar++;
+                ary.add(String.valueOf(lastChar));
             }
         }
+
+        ary.add("+");
+        ary.add("togo");
+        ary.add("canc");
+        items = ary.toArray(items);
+
         itemXAdapter = new XAdapter2<String>(getActivity(), Arrays.asList(items), OrderIdentifierItemViewHolder.class);
         itemXAdapter.setClickItemListener(this.itemXAdapterClick);
         odIdLoutItemsGv.setAdapter(itemXAdapter);
@@ -446,6 +460,11 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             Menu menu = selectionDetail.getDish();
             String name = menu.getMname();
             Double price = menu.getPrice() * number;
+            List<Mark> marks = selectionDetail.getMarkList();
+            for (Mark mark : marks) {
+                price += ((float)mark.getVersion())/100.0;
+            }
+
             if(isCancel){
                 isCancel = false;
                 price *= -1;
