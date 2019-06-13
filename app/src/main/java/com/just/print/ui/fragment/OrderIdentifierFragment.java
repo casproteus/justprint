@@ -461,10 +461,11 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             String name = menu.getMname();
             Double price = menu.getPrice() * number;
             List<Mark> marks = selectionDetail.getMarkList();
-            for (Mark mark : marks) {
-                price += ((float)mark.getVersion())/100.0;
+            if(marks != null) {
+                for (Mark mark : marks) {
+                    price += ((float) mark.getVersion()) / 100.0;
+                }
             }
-
             if(isCancel){
                 isCancel = false;
                 price *= -1;

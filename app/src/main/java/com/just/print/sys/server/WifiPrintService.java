@@ -88,7 +88,7 @@ public class WifiPrintService implements Runnable{
     @SuppressLint("HandlerLeak")
     private final Handler handler = new Handler() {
         @Override
-        public void handleMessage(Message msg){//this method will handle the message queue of this thread base on the message type(.waht)
+        public void handleMessage(Message msg){//this method will handle the message queue of this thread base on the message type(.what)
             switch (msg.what){
                 case WifiCommunication.WFPRINTER_CONNECTED:
                     L.d(TAG,"connection generated with ip:" + WifiPrintService.curPrintIp);
@@ -341,7 +341,7 @@ public class WifiPrintService implements Runnable{
                             printContents(contentList);
                         }
                     }catch(Exception e){
-                        //note is not a number then do not loop.
+                        //note is not a number then do not loop. just print the content。
                         printContents(contentList);
                     }finally{
                         //when all content of a printer has printed, it's the right time to close conenction.
