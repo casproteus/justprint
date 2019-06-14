@@ -71,11 +71,11 @@
                     android:text="    NO    " />
 
                 <Button
-                    android:id="@+id/buttonOK"
+                    android:id="@+id/btnConfirmResetReportOK"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right"
+                    android:layout_alignParentRight="true"
                     android:text="    YES    " />
 
             </LinearLayout>

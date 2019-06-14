@@ -5,10 +5,13 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.just.print.R;
+import com.just.print.db.bean.Mark;
 import com.just.print.sys.model.SelectionDetail;
 import com.stupid.method.adapter.XViewHolder;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XViewByID;
+
+import java.util.List;
 
 /**
  * Created by qiqi on 2016/11/9.
@@ -69,12 +72,15 @@ public class OrderMenuViewHolder extends XViewHolder<SelectionDetail> {
 //        L.d(TAG, Integer.toString(menu.getDishNum()));
         odMNNum.setText(Integer.toString(menu.getDishNum()));
         odMnLoutMarkTv.setText("");
-        if (menu.getMarkList() != null) {
-            for (int j = 0; j < menu.getMarkList().size(); j++) {
+        List<Mark> marks = menu.getMarkList();
+        if (marks != null) {
+            for (int j = 0; j < marks.size(); j++) {
+                Mark mark = marks.get(j);
+
                 if (j == 0) {
-                    odMnLoutMarkTv.setText(menu.getMarkList().get(j).getName());
+                    odMnLoutMarkTv.setText(mark.toString());
                 } else {
-                    odMnLoutMarkTv.append(" " + menu.getMarkList().get(j));
+                    odMnLoutMarkTv.append(" " + mark.toString());
                 }
             }
         }

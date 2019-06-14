@@ -38,46 +38,6 @@ abstract public class BaseFragment extends Fragment {
         void onChoiceMarks(List<Mark> list);
     }
 
-    public void showMarksDialog(List<Mark> choiceItem, final onChoiceMarks choiceMarks) {
-
-        if (choiceItem == null) {
-            choiceItem = new ArrayList<Mark>();
-        }
-
-        final List<Mark> allMarks = DaoExpand.queryNotDeletedAll(Applic.app.getDaoMaster().newSession().getMarkDao());
-
-        String[] markNames = new String[allMarks.size()];
-        boolean[] selectionStatus = new boolean[allMarks.size()];
-        final Map<String, Integer> sa = new HashMap<String, Integer>();
-        for (int i = 0, s = allMarks.size(); i < s; i++) {
-            markNames[i] = allMarks.get(i).getName();
-            selectionStatus[i] = choiceItem.contains(allMarks.get(i));
-            if(selectionStatus[i]) {
-                sa.put(Integer.toString(i), i);
-            }
-        }
-
-        new AlertDialog.Builder(this.getActivity()).setMultiChoiceItems(markNames, selectionStatus, new DialogInterface.OnMultiChoiceClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                if (isChecked)
-                    sa.put(Integer.toString(which), which);
-                else
-                    sa.remove(Integer.toString(which));
-            }
-        }).setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                List<Mark> result = new ArrayList<Mark>();
-                for (Integer i : sa.values()) {
-                    result.add(allMarks.get(i));
-                }
-                choiceMarks.onChoiceMarks(result);
-
-            }
-        }).setNegativeButton("Cancel", null).show();
-    }
-
     public EventBus getEventBus() {
         if (mEventBus == null)
             if (getActivity() instanceof EventBus) {

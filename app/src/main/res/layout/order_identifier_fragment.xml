@@ -95,7 +95,6 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:src="@drawable/erase"/>
-
         <ImageButton
             android:id="@+id/odIdOkBtn"
             android:layout_width="match_parent"
@@ -106,56 +105,126 @@
     <!--android:background="#FFF0F5"-->
     <!--android:background="#8A2BE2"-->
 
-    <LinearLayout
+    <ViewSwitcher
+        android:id="@+id/viewSwitcher"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:inAnimation="@android:anim/slide_in_left"
+        android:outAnimation="@android:anim/slide_out_right">
+
         <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:orientation="vertical"
-            android:layout_weight="1">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#DCDCDC"
-                android:orientation="vertical">
-                <!--
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical"
+                android:layout_weight="1">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <ToggleButton
-                        android:id="@+id/odIdDefaultTbtn"
+                    android:background="#DCDCDC"
+                    android:orientation="vertical">
+                    <!--
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/tag_bg"
-                        android:layout_marginTop="10px"
-                        android:layout_marginLeft="10px"
-                        android:layout_marginRight="20px"
-                        android:button="@null"
-                        android:minHeight="10dp"
-                        android:minWidth="25dp"
-                        android:paddingBottom="5dp"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:paddingTop="5dp"
-                        android:textOff=""
-                        android:textOn=""
-                        android:layout_weight="1"/>
+                        android:orientation="horizontal">
+
+                        <ToggleButton
+                            android:id="@+id/odIdDefaultTbtn"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/tag_bg"
+                            android:layout_marginTop="10px"
+                            android:layout_marginLeft="10px"
+                            android:layout_marginRight="20px"
+                            android:button="@null"
+                            android:minHeight="10dp"
+                            android:minWidth="25dp"
+                            android:paddingBottom="5dp"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:paddingTop="5dp"
+                            android:textOff=""
+                            android:textOn=""
+                            android:layout_weight="1"/>
+                    </LinearLayout>
+                    -->
+                    <GridView
+                        android:id="@+id/odIdMarksGrid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:numColumns="2">
+                    </GridView>
                 </LinearLayout>
-                -->
-                <GridView
-                    android:id="@+id/odIdMarksGrid"
-                    android:layout_width="match_parent"
+
+                <ListView
+                    android:id="@+id/odIdFrLoutMenuList"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:numColumns="2">
-                </GridView>
+                    android:divider="#000000"
+                    android:dividerHeight="1px"
+                    android:stackFromBottom="true"
+                    android:transcriptMode="alwaysScroll">
+
+                </ListView>
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical"
+                android:layout_weight="1">
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/odIdInput"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="ID"
+                        />
+                    <TextView
+                        android:id="@+id/odIdfrName"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+                </LinearLayout>
+                <GridView
+                    android:id="@+id/odIdLoutItemsGv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:numColumns="2"
+                    android:textSize="24sp"
+                    android:textStyle="bold">
+                </GridView>
+
+                <Button
+                    android:id="@+id/odIdSndBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="200px"
+                    android:layout_weight="1"
+                    android:background="@android:color/background_dark"
+                    android:text="SEND"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
             <ListView
-                android:id="@+id/odIdFrLoutMenuList"
+                android:id="@+id/allMarkList"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:divider="#000000"
@@ -164,51 +233,23 @@
                 android:transcriptMode="alwaysScroll">
 
             </ListView>
-        </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:orientation="vertical"
-            android:layout_weight="1">
-            <LinearLayout
-                android:layout_width="fill_parent"
+            <!--LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-                <TextView
-                    android:id="@+id/odIdInput"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="ID"
-                    />
-                <TextView
-                    android:id="@+id/odIdfrName"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
-            </LinearLayout>
-            <GridView
-                android:id="@+id/odIdLoutItemsGv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:numColumns="2"
-                android:textSize="24sp"
-                android:textStyle="bold">
-            </GridView>
 
-            <Button
-                android:id="@+id/odIdSndBtn"
-                android:layout_width="match_parent"
-                android:layout_height="200px"
-                android:layout_weight="1"
-                android:background="@android:color/background_dark"
-                android:text="SEND"
-                android:textColor="@android:color/holo_red_dark"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+                <Button android:id="@+id/odMarkSelectionCancel"
+                    android:layout_width="100dp"
+                    android:layout_height="40dp"
+                    android:text="Cancel"/>
+
+                <Button android:id="@+id/odMarkSelectionOK"
+                    android:layout_width="100dp"
+                    android:layout_height="40dp"
+                    android:text="OK"/>
+
+            </LinearLayout-->
         </LinearLayout>
-
-    </LinearLayout>
-
+    </ViewSwitcher>
 </LinearLayout>

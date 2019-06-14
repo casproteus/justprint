@@ -96,13 +96,13 @@ public class ConfigMarkFragment extends BaseFragment implements OnClickItemListe
         try{
             mark1.setState((int)(Float.valueOf(dspIdx) * 100));
         }catch(NumberFormatException e){
-            //do nothing.
+            mark1.setState(0);
         }
 
         try{
             mark1.setVersion((long) (Float.valueOf(price) * 100));
         }catch(NumberFormatException e){
-            //do nothing.
+            mark1.setVersion(0l);
         }
 
         Applic.app.getDaoMaster().newSession().getMarkDao().insertOrReplace(mark1);
@@ -152,6 +152,7 @@ public class ConfigMarkFragment extends BaseFragment implements OnClickItemListe
             onEditMark.update();
             onEditMark = null;
             markXAdapter.notifyDataSetChanged();
+            AppData.updataeLastModifyTime(null);
         }
         modifyViewSwitch.setDisplayedChild(0);
     }

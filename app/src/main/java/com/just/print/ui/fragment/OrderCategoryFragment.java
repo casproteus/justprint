@@ -104,7 +104,7 @@ public class OrderCategoryFragment extends BaseFragment {
     FlowListView showMarks;
     @XViewByID(R.id.addMenuCtrl)
     View addMenuCtrl;
-    @XViewByID(R.id.buttonOK)
+    @XViewByID(R.id.btnConfirmResetReportOK)
     Button buttonOk;
     @XViewByID(R.id.buttonCancel)
     Button buttonCancel;
@@ -166,7 +166,7 @@ public class OrderCategoryFragment extends BaseFragment {
                         mCount--;
                     showCount.setText(Integer.toString(mCount));
                     break;
-                case R.id.buttonOK:
+                case R.id.btnConfirmResetReportOK:
                     addMenu(mMenu, mCount, marks);
                 case R.id.buttonCancel:
                     cancel();

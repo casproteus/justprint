@@ -7,6 +7,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 import android.content.Intent;
+import android.widget.ViewSwitcher;
 
 import com.just.print.R;
 import com.just.print.app.AppData;
@@ -22,6 +23,7 @@ import com.just.print.sys.model.SelectionDetail;
 import com.just.print.sys.server.CustomerSelection;
 import com.just.print.sys.server.WifiPrintService;
 import com.just.print.ui.activity.ConfigActivity;
+import com.just.print.ui.holder.OrderMarksSelectionViewHolder;
 import com.just.print.ui.holder.OrderIdentifierItemViewHolder;
 import com.just.print.ui.holder.OrderIdentifierMarkViewHolder;
 import com.just.print.ui.holder.OrderMenuViewHolder;
@@ -49,6 +51,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
     private static OrderIdentifierFragment instance = null;
     private static boolean isCancel;
+    private List<Mark> allMarkList;
+    private List<Mark> marksOfCurDish;
+    private int curmarkitem;
 
     public static OrderIdentifierFragment getInstance(){
         if(instance == null){
@@ -56,6 +61,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         }
         return instance;
     }
+
+    @XViewByID(R.id.viewSwitcher)
+    private ViewSwitcher viewSwitcher;
 
     @XViewByID(R.id.odIdFrLoutMenuList)
     private ListView odIdFrLoutMenuList;
@@ -75,15 +83,18 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     @XViewByID(R.id.odIdTableTbtn)
     ToggleButton odIdTableTbtn;
 
+    @XViewByID(R.id.allMarkList)
+    ListView markAllList;
+
     private Menu storedMenu;
 
-    XAdapter2<Mark> markXAdapter;
+    XAdapter2<Mark> markShorCutXAdapter;
     XAdapter2<Menu> menuXAdapter;
     XAdapter2<SelectionDetail> dishesXAdapter;
     XAdapter2<String> itemXAdapter;
+    XAdapter2<Mark> markAllXAdapter;
 
-    int curmarkitem;
-    List<Mark> markselect;
+    List<Mark> markShotCutSelection;
     public static List<SelectionDetail> bkOfLastSelection;
     private static CharSequence bkOfLastTable;
     static int times = 0;
@@ -99,32 +110,70 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 printCurrentSelection(false);
                 break;
             case R.id.odIdDelBtn:
-                DelOneText();
-                break;
-            case R.id.odIdOkBtn:
-                if (odIdTableTbtn.isChecked()) {    //waiting for input table num status. always allowed!
-                    odIdTableTbtn.setChecked(false);
-                    CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
-                } else {                            //inputting dishes status. need to check print status.
-
-                    if(bkOfLastSelection != null){      //content not all send to printer yet.
-                        //if last order has only one dish and it happened to be same
-                        //as the one selected this time, waiter will think the roll back is not happenning.
-                        //we decided to not display last order--- rollbackLastOrder();
-                        ToastUtil.showToast("Printing...Please wait.");
-                        return;
-                    }else if (storedMenu != null) {     //last order send to printer well.
-                        addDish();
-                        odIdInput.setText("");
-                        odIdfrName.setText("");
-                        if (dishesXAdapter != null) {
-                            loadOrderMenu();
-                        }
-                    }
+                if( viewSwitcher.getDisplayedChild() == 0) {
+                    DelOneText();
+                }else{
+                    viewSwitcher.setDisplayedChild(0);
                 }
                 break;
+            case R.id.odIdOkBtn:
+                if( viewSwitcher.getDisplayedChild() == 0) {
+                    if (odIdTableTbtn.isChecked()) {    //waiting for input table num status. always allowed!
+                        odIdTableTbtn.setChecked(false);
+                        CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
+                    } else {                            //inputting dishes status. need to check print status.
+
+                        if (bkOfLastSelection != null) {      //content not all send to printer yet.
+                            //if last order has only one dish and it happened to be same
+                            //as the one selected this time, waiter will think the roll back is not happenning.
+                            //we decided to not display last order--- rollbackLastOrder();
+                            ToastUtil.showToast("Printing...Please wait.");
+                            return;
+                        } else if (storedMenu != null) {     //last order send to printer well.
+                            addDish();
+                            odIdInput.setText("");
+                            odIdfrName.setText("");
+                            if (dishesXAdapter != null) {
+                                loadOrderMenu();
+                            }
+                        }
+                    }
+                }else{
+                    updateSelectionOfCurrentDish();
+                }
+                break;
+
+//            case R.id.odMarkSelectionCancel:
+//                viewSwitcher.setDisplayedChild(0);
+//                break;
+//
+//            case R.id.odMarkSelectionOK:
+//                updateSelectionOfCurrentDish();
+//                break;
         }
 
+    }
+
+    private void updateSelectionOfCurrentDish() {
+        for(int i = 0; i < allMarkList.size(); i++){
+            Mark mark = allMarkList.get(i);
+            boolean matched = false;
+            for(int j = 0; j < marksOfCurDish.size(); j++){
+                if(marksOfCurDish.get(j).getName().equals(mark.getName())){
+                    marksOfCurDish.get(j).setQt(mark.getQt());
+                    matched = true;
+                    break;
+                }
+            }
+            if(!matched && mark.getQt() > 0){
+                marksOfCurDish.add(mark.clone());
+            }
+        }
+        viewSwitcher.setDisplayedChild(0);
+        //menuXAdapter.notifyDataSetChanged();
+        dishesXAdapter.get(curmarkitem).setMarkList(marksOfCurDish);
+
+        loadOrderMenu();
     }
 
     private boolean printCurrentSelection(boolean isCancel) {
@@ -206,19 +255,19 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 case R.id.tagid:            //not tag buttons.
                     L.d(TAG, "case tag");
                     //Mark Press
-                    Mark m = markXAdapter.getItem(i);
-                    L.d(TAG, String.valueOf(m.select));
-                    if (m.select) {
-                        m.select = false;
-                        markselect.remove(m);
+                    Mark selectedMark = markShorCutXAdapter.getItem(i);
+                    L.d(TAG, String.valueOf(selectedMark.select));
+                    if (selectedMark.select) {
+                        selectedMark.select = false;
+                        markShotCutSelection.remove(selectedMark);
                     } else {
-                        m.select = true;
-                        markselect.add(m);
+                        selectedMark.select = true;
+                        markShotCutSelection.add(selectedMark);
                     }
-                    L.d(TAG, String.valueOf(m.select));
+                    L.d(TAG, String.valueOf(selectedMark.select));
                     if (CustomerSelection.getInstance().getSelectedDishes() != null && CustomerSelection.getInstance().getSelectedDishes().size() > 0) {
                         int size = CustomerSelection.getInstance().getSelectedDishes().size();
-                        CustomerSelection.getInstance().getSelectedDishes().get(size - 1).setMarkList(markselect);
+                        CustomerSelection.getInstance().getSelectedDishes().get(size - 1).setMarkList(markShotCutSelection);
                         loadOrderMenu();
                     }
             }
@@ -285,14 +334,13 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         odIdFrLoutMenuList.setAdapter(dishesXAdapter);
 
         //添加Mark列表
-        markselect = new ArrayList<Mark>(3);
-        List<Mark> markList = DaoExpand.queryNotDeletedAll(Applic.getMarkDao());
-        List<Mark> marks = new ArrayList<Mark>();
-        marks.add(markList.size() > 0 ? markList.get(0) : new Mark("M1"));
-        marks.add(markList.size() > 1 ? markList.get(1) : new Mark("M2"));
-        markXAdapter = new XAdapter2<Mark>(getActivity(), marks, OrderIdentifierMarkViewHolder.class);
-        markXAdapter.setClickItemListener(this.itemXAdapterClick);
-        odIdMarksGrid.setAdapter(markXAdapter);
+        initShortCutMarkArea();
+
+        //init MarkSelection panel
+        markAllXAdapter = new XAdapter2<Mark>(getContext(), OrderMarksSelectionViewHolder.class);
+        markAllXAdapter.setClickItemListener(this);
+        markAllXAdapter.setData(allMarkList);
+        markAllList.setAdapter(markAllXAdapter);
     }
 
     @Override
@@ -357,35 +405,81 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 CustomerSelection.getInstance().deleteSelectedDish(a);
                 loadOrderMenu();
                 break;
+
             case R.id.odMnLoutMarkBtn:
                 curmarkitem = i;
-                showMarksDialog(dishesXAdapter.get(i).getMarkList(), new onChoiceMarks() {
-                    @Override
-                    public void onChoiceMarks(List<Mark> result) {
-                        L.d(TAG, result.toString());
-                        dishesXAdapter.get(curmarkitem).setMarkList(result);
-                        loadOrderMenu();
-                    }
-                });
+                marksOfCurDish = dishesXAdapter.get(i).getMarkList();
+                showMarksPanel();
 
                 break;
         }
     }
 
+    private void showMarksPanel(){   //final onChoiceMarks choiceMarks) {
+
+        if (marksOfCurDish == null) {
+            marksOfCurDish = new ArrayList<Mark>();
+        }
+
+        for(int j = 0; j < allMarkList.size(); j++) {
+            Mark mark = allMarkList.get(j);
+            boolean matched = false;
+            for(int i = 0; i < marksOfCurDish.size(); i++){
+                String markName = marksOfCurDish.get(i).getName();
+                if(mark.getName().equals(markName)){
+                    matched = true;
+                    mark.setQt(marksOfCurDish.get(i).getQt());
+                    break;
+                }
+            }
+
+            if(!matched) {
+                mark.setQt(0);
+            }
+        }
+
+
+        markAllXAdapter.setData(allMarkList);
+        markAllList.setAdapter(markAllXAdapter);
+
+        if (viewSwitcher.getDisplayedChild() == 0){
+            viewSwitcher.setDisplayedChild(1);
+        }
+//        new AlertDialog.Builder(this.getActivity()).setMultiChoiceItems(markNames, selectedQT, new DialogInterface.OnMultiChoiceClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+//                if (isChecked)
+//                    sa.put(Integer.toString(which), which);
+//                else
+//                    sa.remove(Integer.toString(which));
+//            }
+//        }).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                List<Mark> result = new ArrayList<Mark>();
+//                for (Integer i : sa.values()) {
+//                    result.add(allMarks.get(i));
+//                }
+//                choiceMarks.onChoiceMarks(result);
+//
+//            }
+//        }).setNegativeButton("Cancel", null).show();
+    }
+
     private void addDish() {
-        SelectionDetail ddm = new SelectionDetail();
-        ddm.setDish(storedMenu);
-        ddm.setMarkList(new ArrayList<Mark>());
-        L.d(TAG, markselect.toString());
-        ddm.setDishNum(1);
-        CustomerSelection.getInstance().addSelectedDish(ddm);
+        SelectionDetail selectedDish = new SelectionDetail();
+        selectedDish.setDish(storedMenu);
+        selectedDish.setMarkList(new ArrayList<Mark>());
+        L.d(TAG, markShotCutSelection.toString());
+        selectedDish.setDishNum(1);
+        CustomerSelection.getInstance().addSelectedDish(selectedDish);
         storedMenu = null;
-        //markselect.clear();
-        markselect = new ArrayList<Mark>();
-        markselect.clear();
-        markXAdapter.notifyDataSetChanged();
+        //markShotCutSelection.clear();
+        markShotCutSelection = new ArrayList<Mark>();
+        markShotCutSelection.clear();
+        markShorCutXAdapter.notifyDataSetChanged();
         /*  clear Convenience Mark Area */
-        resetConvenienceMarkArea();
+        initShortCutMarkArea();
     }
 
     private void loadOrderMenu() {
@@ -393,14 +487,48 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         dishesXAdapter.notifyDataSetChanged();
     }
 
-    private void resetConvenienceMarkArea() {
-        List<Mark> markList = DaoExpand.queryNotDeletedAll(Applic.app.getDaoMaster().newSession().getMarkDao());
+    private void initShortCutMarkArea() {
+        markShotCutSelection = new ArrayList<Mark>(3);
+        allMarkList = DaoExpand.queryNotDeletedAll(Applic.getMarkDao());
         List<Mark> marks = new ArrayList<Mark>();
-        //添加Mark列表
-        marks.add(markList.size() > 0 ? markList.get(0) : new Mark("M1"));
-        marks.add(markList.size() > 1 ? markList.get(1) : new Mark("M2"));
-        markXAdapter.setData(marks);
-        markXAdapter.notifyDataSetChanged();
+        if(allMarkList.size() == 0){
+            marks.add(new Mark("M1"));
+            marks.add(new Mark("M2"));
+        }else{
+            for(int i = 0; i < allMarkList.size(); i++){
+                Mark mark = allMarkList.get(i);
+                boolean inserted = false;
+                for(int j = 0; j < marks.size(); j++){
+                    if(marks.get(j).getState() > mark.getState()){
+                        marks.add(j, mark);
+                        inserted = true;
+                        break;
+                    }
+                }
+                if(!inserted) {
+                    marks.add(mark);
+                }
+            }
+            if(marks.size() > 2){
+                for(int i = 2; i < marks.size(); i++){
+                    marks.remove(i);
+                }
+            }
+        }
+        markShorCutXAdapter = new XAdapter2<Mark>(getActivity(), marks, OrderIdentifierMarkViewHolder.class);
+        markShorCutXAdapter.setClickItemListener(this.itemXAdapterClick);
+        odIdMarksGrid.setAdapter(markShorCutXAdapter);
+
+
+
+//
+//        List<Mark> markList = DaoExpand.queryNotDeletedAll(Applic.app.getDaoMaster().newSession().getMarkDao());
+//        List<Mark> marks = new ArrayList<Mark>();
+//        //添加Mark列表
+//        marks.add(markList.size() > 0 ? markList.get(0) : new Mark("M1"));
+//        marks.add(markList.size() > 1 ? markList.get(1) : new Mark("M2"));
+//        markShorCutXAdapter.setData(marks);
+//        markShorCutXAdapter.notifyDataSetChanged();
     }
 
     private void clearOrderMenu() {
@@ -461,11 +589,12 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             String name = menu.getMname();
             Double price = menu.getPrice() * number;
             List<Mark> marks = selectionDetail.getMarkList();
-            if(marks != null) {
+            if(marks != null){
                 for (Mark mark : marks) {
-                    price += ((float) mark.getVersion()) / 100.0;
+                    price += ((float)mark.getVersion())/100.0;
                 }
             }
+
             if(isCancel){
                 isCancel = false;
                 price *= -1;
