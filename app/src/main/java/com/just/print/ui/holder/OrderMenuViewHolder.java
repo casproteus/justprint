@@ -76,10 +76,7 @@ public class OrderMenuViewHolder extends XViewHolder<SelectionDetail> {
         if (marks != null) {
             for (int j = 0; j < marks.size(); j++) {
                 Mark mark = marks.get(j);
-
-                if (j == 0) {
-                    odMnLoutMarkTv.setText(mark.toString());
-                } else {
+                if(mark.getQt() > 0){
                     odMnLoutMarkTv.append(" " + mark.toString());
                 }
             }

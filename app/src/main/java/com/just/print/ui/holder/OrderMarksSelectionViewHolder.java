@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.just.print.R;
+import com.just.print.app.AppData;
 import com.just.print.db.bean.Mark;
 import com.stupid.method.adapter.XViewHolder;
 import com.stupid.method.reflect.StupidReflect;
@@ -69,7 +70,11 @@ public class OrderMarksSelectionViewHolder extends XViewHolder<Mark> {
     public void onResetView(Mark mark, int i) {
         this.mark = mark;
         markName.setText(mark.getName());
-        markPrice.setText(String.valueOf(mark.getVersion()/100.0));
+        if("true".equals(AppData.getCustomData("ShowMarkPirce"))) {
+            markPrice.setText(String.valueOf(mark.getVersion() / 100.0));
+        }else{
+            markPrice.setText("");  //in case it's already displaying a "0", user changed setting, then we need to make "0" become "".
+        }
         markSelectedNum.setText(Integer.toString(mark.getQt()));
     }
 }

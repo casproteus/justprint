@@ -51,7 +51,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
     private static OrderIdentifierFragment instance = null;
     private static boolean isCancel;
-    private List<Mark> allMarkList;
+    private List<Mark> allMarks;
     private List<Mark> marksOfCurDish;
     private int curmarkitem;
 
@@ -94,7 +94,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     XAdapter2<String> itemXAdapter;
     XAdapter2<Mark> markAllXAdapter;
 
-    List<Mark> markShotCutSelection;
+    private List<Mark> shortCutMarks;
+
     public static List<SelectionDetail> bkOfLastSelection;
     private static CharSequence bkOfLastTable;
     static int times = 0;
@@ -155,8 +156,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     }
 
     private void updateSelectionOfCurrentDish() {
-        for(int i = 0; i < allMarkList.size(); i++){
-            Mark mark = allMarkList.get(i);
+        for(int i = 0; i < allMarks.size(); i++){
+            Mark mark = allMarks.get(i);
             boolean matched = false;
             for(int j = 0; j < marksOfCurDish.size(); j++){
                 if(marksOfCurDish.get(j).getName().equals(mark.getName())){
@@ -254,20 +255,26 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                     break;
                 case R.id.tagid:            //not tag buttons.
                     L.d(TAG, "case tag");
+                    List<SelectionDetail> selectionDetails = CustomerSelection.getInstance().getSelectedDishes();
                     //Mark Press
-                    Mark selectedMark = markShorCutXAdapter.getItem(i);
-                    L.d(TAG, String.valueOf(selectedMark.select));
-                    if (selectedMark.select) {
-                        selectedMark.select = false;
-                        markShotCutSelection.remove(selectedMark);
-                    } else {
-                        selectedMark.select = true;
-                        markShotCutSelection.add(selectedMark);
-                    }
-                    L.d(TAG, String.valueOf(selectedMark.select));
-                    if (CustomerSelection.getInstance().getSelectedDishes() != null && CustomerSelection.getInstance().getSelectedDishes().size() > 0) {
-                        int size = CustomerSelection.getInstance().getSelectedDishes().size();
-                        CustomerSelection.getInstance().getSelectedDishes().get(size - 1).setMarkList(markShotCutSelection);
+                    if (selectionDetails != null && selectionDetails.size() > 0) {
+                        Mark selectedMark = markShorCutXAdapter.getItem(i);
+                        L.d(TAG, String.valueOf(selectedMark.select));
+                        List<Mark> marks = selectionDetails.get(selectionDetails.size() - 1).getMarkList();
+                        boolean matched = false;
+                        for(int m = 0; m < marks.size(); m++){
+                            Mark mark = marks.get(m);
+                            if(mark.getName().equals(selectedMark.getName())){
+                                mark.setQt(mark.getQt() + 1);
+                                matched = true;
+                                break;
+                            }
+                        }
+                        if(!matched){
+                            Mark m = selectedMark.clone();
+                            m.setQt(1);
+                            marks.add(m);
+                        }
                         loadOrderMenu();
                     }
             }
@@ -333,13 +340,15 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         dishesXAdapter.setData(CustomerSelection.getInstance().getSelectedDishes());
         odIdFrLoutMenuList.setAdapter(dishesXAdapter);
 
-        //添加Mark列表
-        initShortCutMarkArea();
+        //add Marks
+        allMarks = sortMarks(DaoExpand.queryNotDeletedAll(Applic.getMarkDao()));
+        //add shortcut Marks.
+        initShortCutMarks();
 
         //init MarkSelection panel
         markAllXAdapter = new XAdapter2<Mark>(getContext(), OrderMarksSelectionViewHolder.class);
         markAllXAdapter.setClickItemListener(this);
-        markAllXAdapter.setData(allMarkList);
+        markAllXAdapter.setData(allMarks);
         markAllList.setAdapter(markAllXAdapter);
     }
 
@@ -421,8 +430,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             marksOfCurDish = new ArrayList<Mark>();
         }
 
-        for(int j = 0; j < allMarkList.size(); j++) {
-            Mark mark = allMarkList.get(j);
+        for(int j = 0; j < allMarks.size(); j++) {
+            Mark mark = allMarks.get(j);
             boolean matched = false;
             for(int i = 0; i < marksOfCurDish.size(); i++){
                 String markName = marksOfCurDish.get(i).getName();
@@ -439,7 +448,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         }
 
 
-        markAllXAdapter.setData(allMarkList);
+        markAllXAdapter.setData(allMarks);
         markAllList.setAdapter(markAllXAdapter);
 
         if (viewSwitcher.getDisplayedChild() == 0){
@@ -470,16 +479,10 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         SelectionDetail selectedDish = new SelectionDetail();
         selectedDish.setDish(storedMenu);
         selectedDish.setMarkList(new ArrayList<Mark>());
-        L.d(TAG, markShotCutSelection.toString());
+        L.d(TAG, shortCutMarks.toString());
         selectedDish.setDishNum(1);
         CustomerSelection.getInstance().addSelectedDish(selectedDish);
         storedMenu = null;
-        //markShotCutSelection.clear();
-        markShotCutSelection = new ArrayList<Mark>();
-        markShotCutSelection.clear();
-        markShorCutXAdapter.notifyDataSetChanged();
-        /*  clear Convenience Mark Area */
-        initShortCutMarkArea();
     }
 
     private void loadOrderMenu() {
@@ -487,48 +490,33 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         dishesXAdapter.notifyDataSetChanged();
     }
 
-    private void initShortCutMarkArea() {
-        markShotCutSelection = new ArrayList<Mark>(3);
-        allMarkList = DaoExpand.queryNotDeletedAll(Applic.getMarkDao());
-        List<Mark> marks = new ArrayList<Mark>();
-        if(allMarkList.size() == 0){
-            marks.add(new Mark("M1"));
-            marks.add(new Mark("M2"));
-        }else{
-            for(int i = 0; i < allMarkList.size(); i++){
-                Mark mark = allMarkList.get(i);
-                boolean inserted = false;
-                for(int j = 0; j < marks.size(); j++){
-                    if(marks.get(j).getState() > mark.getState()){
-                        marks.add(j, mark);
-                        inserted = true;
-                        break;
-                    }
-                }
-                if(!inserted) {
-                    marks.add(mark);
+    private List<Mark> sortMarks(List<Mark> unsortedMarks) {
+        List<Mark> sortedMarks = new ArrayList<Mark>();
+        for (int i = 0; i < unsortedMarks.size(); i++) {
+            Mark mark = unsortedMarks.get(i);
+            boolean inserted = false;
+            for (int j = 0; j < sortedMarks.size(); j++) {
+                if (sortedMarks.get(j).getState() > mark.getState()) {
+                    sortedMarks.add(j, mark);
+                    inserted = true;
+                    break;
                 }
             }
-            if(marks.size() > 2){
-                for(int i = 2; i < marks.size(); i++){
-                    marks.remove(i);
-                }
+            if (!inserted) {
+                sortedMarks.add(mark);
             }
         }
+        return sortedMarks;
+    }
+
+    private void initShortCutMarks() {
+        shortCutMarks = new ArrayList<Mark>(3);
+        List<Mark> marks = new ArrayList<Mark>();
+        marks.add(allMarks.size() < 1 ? new Mark("M1") : allMarks.get(0));
+        marks.add(allMarks.size() < 2 ? new Mark("M2") : allMarks.get(1));
         markShorCutXAdapter = new XAdapter2<Mark>(getActivity(), marks, OrderIdentifierMarkViewHolder.class);
         markShorCutXAdapter.setClickItemListener(this.itemXAdapterClick);
         odIdMarksGrid.setAdapter(markShorCutXAdapter);
-
-
-
-//
-//        List<Mark> markList = DaoExpand.queryNotDeletedAll(Applic.app.getDaoMaster().newSession().getMarkDao());
-//        List<Mark> marks = new ArrayList<Mark>();
-//        //添加Mark列表
-//        marks.add(markList.size() > 0 ? markList.get(0) : new Mark("M1"));
-//        marks.add(markList.size() > 1 ? markList.get(1) : new Mark("M2"));
-//        markShorCutXAdapter.setData(marks);
-//        markShorCutXAdapter.notifyDataSetChanged();
     }
 
     private void clearOrderMenu() {
@@ -548,32 +536,32 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     }
 
     /**no one is calling this mehtod now, because we not response feels like app goes wrong. and user might input again.
-    //waiting 15 seconds or untile comfirmPrintOK() is called.
-    private void waitForPrintSuccess(){
-        int i = 0;
-        while (true){
-            i++;
-            AppUtils.sleep(1000);
-            if( bkOfLastSelection == null && "TB".equals(bkOfLastTable)){
-                return;
-            }
-        }
-    }
+     //waiting 15 seconds or untile comfirmPrintOK() is called.
+     private void waitForPrintSuccess(){
+     int i = 0;
+     while (true){
+     i++;
+     AppUtils.sleep(1000);
+     if( bkOfLastSelection == null && "TB".equals(bkOfLastTable)){
+     return;
+     }
+     }
+     }
 
-    //no one is calling this mehtod now, because we relized the order will not lost, it stay in ipConentMap
-    //when connection come back, it will be printed out.
-    private void rollbackLastOrder() {
-        //save the menu into database.
-        for(SelectionDetail selectionDetail : bkOfLastSelection){
-            CustomerSelection.getInstance().addSelectedDish(selectionDetail);
-        }
+     //no one is calling this mehtod now, because we relized the order will not lost, it stay in ipConentMap
+     //when connection come back, it will be printed out.
+     private void rollbackLastOrder() {
+     //save the menu into database.
+     for(SelectionDetail selectionDetail : bkOfLastSelection){
+     CustomerSelection.getInstance().addSelectedDish(selectionDetail);
+     }
 
-        //clear selected menu
-        odIdTableTbtn.setText(bkOfLastTable);
-        odIdTableTbtn.setChecked(false);
-        loadOrderMenu();
+     //clear selected menu
+     odIdTableTbtn.setText(bkOfLastTable);
+     odIdTableTbtn.setChecked(false);
+     loadOrderMenu();
 
-    }*/
+     }*/
 
     public static void comfirmPrintOK(){
 
@@ -591,12 +579,11 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             List<Mark> marks = selectionDetail.getMarkList();
             if(marks != null){
                 for (Mark mark : marks) {
-                    price += ((float)mark.getVersion())/100.0;
+                    price += ((float)mark.getVersion())/100.0 * mark.getQt();
                 }
             }
 
             if(isCancel){
-                isCancel = false;
                 price *= -1;
             }
             SaleRecord saleRecord = new SaleRecord();
@@ -607,5 +594,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         }
         bkOfLastSelection = null;
         bkOfLastTable = "TB";
+
+        isCancel = false;
     }
 }
