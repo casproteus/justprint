@@ -138,10 +138,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         //print code:
                         String result = WifiPrintService.getInstance().exePrintReportCommand(orders, reportStartDate, String.valueOf(new Date().getTime()));
                         if ("0".equals(result)) {
-                            //if set to auto clean, then clean the records.
-                            if("true".equals(AppData.getCustomData("resetReport"))) {
-                                resetReport();
-                            }
+                            findViewById(R.id.alertDlg).setVisibility(View.VISIBLE);
                         }
                     }
                     odIdTableTbtn.setText("");
@@ -181,6 +178,27 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 //                break;
         }
 
+    }
+
+    @XClick({R.id.buttonCancel})
+    private void notResetReport(){
+        findViewById(R.id.alertDlg).setVisibility(View.INVISIBLE);
+    }
+
+    @XClick({R.id.btnConfirmResetReportOK})
+    private void resetReport(){
+        //when printed succcesfully, clean all records, and update now as the next reportStartDate
+        Applic.app.getDaoMaster().newSession().getSaleRecordDao().deleteAll();
+        AppData.putCustomData("reportStartDate", String.valueOf(new Date().getTime()));
+        int reportIdx = 1;
+        try{
+            reportIdx = Integer.valueOf(AppData.getCustomData("reportIdx"));
+        }catch(Exception e){
+            //report error.
+        }
+        AppData.putCustomData("reportIdx", String.valueOf(reportIdx + 1));
+
+        findViewById(R.id.alertDlg).setVisibility(View.INVISIBLE);
     }
 
     private void updateSelectionOfCurrentDish() {
@@ -564,18 +582,6 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
     }
 
-    private void resetReport(){
-        //when printed succcesfully, clean all records, and update now as the next reportStartDate
-        Applic.app.getDaoMaster().newSession().getSaleRecordDao().deleteAll();
-        AppData.putCustomData("reportStartDate", String.valueOf(new Date().getTime()));
-        int reportIdx = 1;
-        try{
-            reportIdx = Integer.valueOf(AppData.getCustomData("reportIdx"));
-        }catch(Exception e){
-            //report error.
-        }
-        AppData.putCustomData("reportIdx", String.valueOf(reportIdx + 1));
-    }
     /**no one is calling this mehtod now, because we not response feels like app goes wrong. and user might input again.
      //waiting 15 seconds or untile comfirmPrintOK() is called.
      private void waitForPrintSuccess(){

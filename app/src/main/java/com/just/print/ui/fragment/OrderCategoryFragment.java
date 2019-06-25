@@ -86,6 +86,7 @@ public class OrderCategoryFragment extends BaseFragment {
                                         } else {
                                             numInseid1 = Integer.valueOf(s1.substring(0, j));
                                             matched1 = true;
+                                            break;
                                         }
                                     }
                                     if (!matched1) {
@@ -99,10 +100,9 @@ public class OrderCategoryFragment extends BaseFragment {
                                         if (ch1 >= '0' && ch1 <= '9') {
                                             continue;
                                         } else {
-                                            Log.i("OrderC", "#######################################################");
-                                            Log.i("OrderC", "s1 = " + s1 + "; j = " + j);
-                                            numInseid2 = Integer.valueOf(s1.substring(0, j-1));
+                                            numInseid2 = Integer.valueOf(s2.substring(0, j));
                                             matched2 = true;
+                                            break;
                                         }
                                     }
                                     if (!matched2) {
