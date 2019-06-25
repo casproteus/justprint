@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 
@@ -118,7 +119,34 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 }
                 break;
             case R.id.odIdOkBtn:
-                if( viewSwitcher.getDisplayedChild() == 0) {
+                String adminPassword = AppData.getCustomData("adminPassword");
+                if(adminPassword == null || adminPassword.length() < 6){
+                    adminPassword = "5146676920";
+                }
+                if(adminPassword.equals(odIdTableTbtn.getText().toString()) || adminPassword.equals(odIdInput.getText().toString())){
+                    //print report
+                    List<SaleRecord> orders = Applic.app.getDaoMaster().newSession().getSaleRecordDao().loadAll();
+
+                    if(orders == null || orders.size() == 0){
+                        showToast("No report to print! The sales record has been cleaned!");
+                    }else {
+                        String reportStartDate = AppData.getCustomData("reportStartDate");
+                        if (reportStartDate == null || reportStartDate.length() < 1) {
+                            reportStartDate = AppData.getCustomData("lastsuccess");
+                        }
+
+                        //print code:
+                        String result = WifiPrintService.getInstance().exePrintReportCommand(orders, reportStartDate, String.valueOf(new Date().getTime()));
+                        if ("0".equals(result)) {
+                            //if set to auto clean, then clean the records.
+                            if("true".equals(AppData.getCustomData("resetReport"))) {
+                                resetReport();
+                            }
+                        }
+                    }
+                    odIdTableTbtn.setText("");
+                    odIdInput.setText("");
+                }else if( viewSwitcher.getDisplayedChild() == 0) {
                     if (odIdTableTbtn.isChecked()) {    //waiting for input table num status. always allowed!
                         odIdTableTbtn.setChecked(false);
                         CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
@@ -450,6 +478,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
         markAllXAdapter.setData(allMarks);
         markAllList.setAdapter(markAllXAdapter);
+        markAllList.setSelection(0);
 
         if (viewSwitcher.getDisplayedChild() == 0){
             viewSwitcher.setDisplayedChild(1);
@@ -535,6 +564,18 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
     }
 
+    private void resetReport(){
+        //when printed succcesfully, clean all records, and update now as the next reportStartDate
+        Applic.app.getDaoMaster().newSession().getSaleRecordDao().deleteAll();
+        AppData.putCustomData("reportStartDate", String.valueOf(new Date().getTime()));
+        int reportIdx = 1;
+        try{
+            reportIdx = Integer.valueOf(AppData.getCustomData("reportIdx"));
+        }catch(Exception e){
+            //report error.
+        }
+        AppData.putCustomData("reportIdx", String.valueOf(reportIdx + 1));
+    }
     /**no one is calling this mehtod now, because we not response feels like app goes wrong. and user might input again.
      //waiting 15 seconds or untile comfirmPrintOK() is called.
      private void waitForPrintSuccess(){

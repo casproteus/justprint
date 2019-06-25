@@ -28,6 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@+id/markQt"
+            android:textSize="24sp"
             android:text="  -  " />
 
         <TextView
@@ -44,6 +45,7 @@
             android:id="@+id/markQtAdd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textSize="24sp"
             android:text="  +  "/>
 
 </LinearLayout>

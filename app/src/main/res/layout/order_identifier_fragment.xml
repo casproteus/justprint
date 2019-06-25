@@ -68,6 +68,7 @@
     </LinearLayout>
 -->
     <LinearLayout
+        android:id="@+id/topButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <ToggleButton
@@ -228,7 +229,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:divider="#000000"
-                android:dividerHeight="1px"
+                android:dividerHeight="2px"
                 android:stackFromBottom="true"
                 android:transcriptMode="alwaysScroll">
 
@@ -252,4 +253,5 @@
             </LinearLayout-->
         </LinearLayout>
     </ViewSwitcher>
+
 </LinearLayout>

@@ -1,6 +1,7 @@
 package com.just.print.ui.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
@@ -29,6 +30,8 @@ import com.stupid.method.reflect.annotation.XViewByID;
 import com.stupid.method.widget.flowlayout.FlowListView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +60,67 @@ public class OrderCategoryFragment extends BaseFragment {
         List<Category> list = DaoExpand.queryAllNotDeleted(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.DisplayIdx).list();
         MenuDao dao = Applic.app.getDaoMaster().newSession().getMenuDao();
         for (Category ca : list) {
-            mdata.put(ca, DaoExpand.queryMenuByCategory(ca, dao));
+            List<Menu> menus = DaoExpand.queryMenuByCategory(ca, dao);
+            Collections.sort(menus, new Comparator<Menu>() {
+                @Override
+                public int compare(Menu m1, Menu m2) {
+                    String id1 = m1.getID();
+                    String id2 = m2.getID();
+                    int minLen = id1.length() > id2.length() ? id2.length() : id1.length();
+                    for(int i = 0; i < minLen; i++){
+                        char c1 = id1.charAt(i);
+                        char c2 = id2.charAt(i);
+                        if(c1 >= '0' && c1 <= '9' && c2 >= '0' && c2 <= '9') { //if it's number, then treat specially.
+                            String s1 = id1.substring(i);
+                            String s2 = id2.substring(i);
+                            try{
+                                return Integer.valueOf(s1) - Integer.valueOf(s2);
+                            }catch (Exception e){
+                                try {
+                                    int numInseid1 = 0;
+                                    boolean matched1 = false;
+                                    for (int j = 0; j < s1.length(); j++) {
+                                        char ch1 = s1.charAt(j);
+                                        if (ch1 >= '0' && ch1 <= '9') {
+                                            continue;
+                                        } else {
+                                            numInseid1 = Integer.valueOf(s1.substring(0, j));
+                                            matched1 = true;
+                                        }
+                                    }
+                                    if (!matched1) {
+                                        numInseid1 = Integer.valueOf(s1);
+                                    }
+
+                                    int numInseid2 = 0;
+                                    boolean matched2 = false;
+                                    for (int j = 0; j < s2.length(); j++) {
+                                        char ch1 = s2.charAt(j);
+                                        if (ch1 >= '0' && ch1 <= '9') {
+                                            continue;
+                                        } else {
+                                            Log.i("OrderC", "#######################################################");
+                                            Log.i("OrderC", "s1 = " + s1 + "; j = " + j);
+                                            numInseid2 = Integer.valueOf(s1.substring(0, j-1));
+                                            matched2 = true;
+                                        }
+                                    }
+                                    if (!matched2) {
+                                        numInseid2 = Integer.valueOf(s2);
+                                    }
+                                    return numInseid1 == numInseid2 ? s1.compareTo(s2) : numInseid1 - numInseid2;
+                                }catch(Exception exp){
+                                    exp.printStackTrace();
+                                }
+                            }
+                        }else if(c1 != c2){
+                            return c1 - c2;
+                        }
+                    }
+                    return id1.length() - id2.length();
+                }
+            });
+            mdata.put(ca, menus);
         }
         categoryExXAdapter.addAll(mdata);
         categoryExXAdapter.setClickItemListener(new OnXItemClickListener() {
