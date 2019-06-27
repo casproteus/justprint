@@ -39,7 +39,7 @@ public class ConfigMainFragment extends BaseFragment {
         } else {
             String userPassword = AppData.getCustomData("userPassword");
             if(userPassword == null || userPassword.length() == 0){
-                userPassword = AppData.getLicense();
+                userPassword = "88882288";
             }
 
             if(!userPassword.equals(inputContent)){

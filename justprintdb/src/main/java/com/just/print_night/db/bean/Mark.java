@@ -19,7 +19,7 @@ public class Mark {
     private String name;
     private Integer state;
     private Long version;
-
+    private int qt; //this property is transit not in db.
     /**
      * Used to resolve relations
      */
@@ -28,7 +28,7 @@ public class Mark {
     /**
      * Used for active entity operations.
      */
-    private transient MarkDao myDao;
+    private transient MarkDao markDao;
 
 
     // KEEP FIELDS - put your custom fields here
@@ -53,7 +53,7 @@ public class Mark {
      */
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
-        myDao = daoSession != null ? daoSession.getMarkDao() : null;
+        markDao = daoSession != null ? daoSession.getMarkDao() : null;
     }
 
     public String getName() {
@@ -80,34 +80,38 @@ public class Mark {
         this.version = version;
     }
 
+    public Integer getQt() { return qt; }
+
+    public void setQt(int qt){ this.qt = qt; }
+
     /**
      * Convenient call for {@link AbstractDao#delete(Object)}. Entity must attached to an entity context.
      */
     public void delete() {
-        if (myDao == null) {
+        if (markDao == null) {
             throw new DaoException("Entity is detached from DAO context");
         }
-        myDao.delete(this);
+        markDao.delete(this);
     }
 
     /**
      * Convenient call for {@link AbstractDao#update(Object)}. Entity must attached to an entity context.
      */
     public void update() {
-        if (myDao == null) {
+        if (markDao == null) {
             throw new DaoException("Entity is detached from DAO context");
         }
-        myDao.update(this);
+        markDao.update(this);
     }
 
     /**
      * Convenient call for {@link AbstractDao#refresh(Object)}. Entity must attached to an entity context.
      */
     public void refresh() {
-        if (myDao == null) {
+        if (markDao == null) {
             throw new DaoException("Entity is detached from DAO context");
         }
-        myDao.refresh(this);
+        markDao.refresh(this);
     }
 
     // KEEP METHODS - put your custom methods here
@@ -119,7 +123,8 @@ public class Mark {
     }
 
     public void updateAndUpgrade() {
-        version = com.just.print_night.db.expand.DaoExpand.queryMaxVersion(myDao);
+        //we use version as price so should not update version any more.
+        //version = com.just.print.db.expand.DaoExpand.queryMaxVersion(markDao);
         update();
     }
 
@@ -135,9 +140,20 @@ public class Mark {
 
     @Override
     public String toString() {
-
-        return String.valueOf(name);
+        if(qt <= 1) {
+            return name;
+        }else{
+            return name + " x" + qt;
+        }
     }
-    // KEEP METHODS END
+
+    public Mark clone(){
+        Mark mark = new Mark();
+        mark.setQt(getQt());
+        mark.setName(getName());
+        mark.setState(getState());
+        mark.setVersion(getVersion());
+        return mark;
+    }
 
 }

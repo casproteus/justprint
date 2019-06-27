@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -67,148 +67,245 @@
             android:hint="Mark" />
     </LinearLayout>
 -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <ToggleButton
-            android:id="@+id/odIdTableTbtn"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/tag_bg"
-            android:layout_marginBottom="2dp"
-            android:button="@null"
-            android:paddingBottom="5dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:textOff=""
-            android:textOn=""
-            android:layout_weight="1" />
-        <ImageButton
-            android:id="@+id/odIdConfigBtn"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:src="@drawable/setting"/>
-        <ImageButton
-            android:id="@+id/odIdDelBtn"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:src="@drawable/erase"/>
-
-        <ImageButton
-            android:id="@+id/odIdOkBtn"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:src="@drawable/ok" />
-    </LinearLayout>
-    <!--android:background="#FFF0F5"-->
-    <!--android:background="#8A2BE2"-->
 
     <LinearLayout
+        android:id="@+id/alertDlg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:visibility="gone">
         <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:orientation="vertical"
-            android:layout_weight="1">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#DCDCDC"
-                android:orientation="vertical">
-                <!--
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/alertDeleteReport"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Do you want to reset report?" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/buttonCancel"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:text="    NO    " />
+
+                <Button
+                    android:id="@+id/btnConfirmResetReportOK"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="    YES    " />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/topButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ToggleButton
+                android:id="@+id/odIdTableTbtn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/tag_bg"
+                android:layout_marginBottom="2dp"
+                android:button="@null"
+                android:paddingBottom="5dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:textOff=""
+                android:textOn=""
+                android:layout_weight="1" />
+            <ImageButton
+                android:id="@+id/odIdConfigBtn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/setting"/>
+            <ImageButton
+                android:id="@+id/odIdDelBtn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/erase"/>
+            <ImageButton
+                android:id="@+id/odIdOkBtn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/ok" />
+        </LinearLayout>
+        <!--android:background="#FFF0F5"-->
+        <!--android:background="#8A2BE2"-->
+
+        <ViewSwitcher
+            android:id="@+id/viewSwitcher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inAnimation="@android:anim/slide_in_left"
+            android:outAnimation="@android:anim/slide_out_right">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
                 <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical"
+                    android:layout_weight="1">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#DCDCDC"
+                        android:orientation="vertical">
+                        <!--
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <ToggleButton
+                                android:id="@+id/odIdDefaultTbtn"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/tag_bg"
+                                android:layout_marginTop="10px"
+                                android:layout_marginLeft="10px"
+                                android:layout_marginRight="20px"
+                                android:button="@null"
+                                android:minHeight="10dp"
+                                android:minWidth="25dp"
+                                android:paddingBottom="5dp"
+                                android:paddingLeft="10dp"
+                                android:paddingRight="10dp"
+                                android:paddingTop="5dp"
+                                android:textOff=""
+                                android:textOn=""
+                                android:layout_weight="1"/>
+                        </LinearLayout>
+                        -->
+                        <GridView
+                            android:id="@+id/odIdMarksGrid"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:numColumns="2">
+                        </GridView>
+                    </LinearLayout>
+
+                    <ListView
+                        android:id="@+id/odIdFrLoutMenuList"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:divider="#000000"
+                        android:dividerHeight="1px"
+                        android:stackFromBottom="true"
+                        android:transcriptMode="alwaysScroll">
+
+                    </ListView>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical"
+                    android:layout_weight="1">
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/odIdInput"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="ID"
+                            />
+                        <TextView
+                            android:id="@+id/odIdfrName"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"/>
+                    </LinearLayout>
+                    <GridView
+                        android:id="@+id/odIdLoutItemsGv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:numColumns="2"
+                        android:textSize="24sp"
+                        android:textStyle="bold">
+                    </GridView>
+
+                    <Button
+                        android:id="@+id/odIdSndBtn"
+                        android:layout_width="match_parent"
+                        android:layout_height="200px"
+                        android:layout_weight="1"
+                        android:background="@android:color/background_dark"
+                        android:text="SEND"
+                        android:textColor="@android:color/holo_red_dark"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <ListView
+                    android:id="@+id/allMarkList"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:divider="#000000"
+                    android:dividerHeight="2px"
+                    android:stackFromBottom="true"
+                    android:transcriptMode="alwaysScroll">
+
+                </ListView>
+
+                <!--LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <ToggleButton
-                        android:id="@+id/odIdDefaultTbtn"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/tag_bg"
-                        android:layout_marginTop="10px"
-                        android:layout_marginLeft="10px"
-                        android:layout_marginRight="20px"
-                        android:button="@null"
-                        android:minHeight="10dp"
-                        android:minWidth="25dp"
-                        android:paddingBottom="5dp"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:paddingTop="5dp"
-                        android:textOff=""
-                        android:textOn=""
-                        android:layout_weight="1"/>
-                </LinearLayout>
-                -->
-                <GridView
-                    android:id="@+id/odIdMarksGrid"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:numColumns="2">
-                </GridView>
+                    <Button android:id="@+id/odMarkSelectionCancel"
+                        android:layout_width="100dp"
+                        android:layout_height="40dp"
+                        android:text="Cancel"/>
+
+                    <Button android:id="@+id/odMarkSelectionOK"
+                        android:layout_width="100dp"
+                        android:layout_height="40dp"
+                        android:text="OK"/>
+
+                </LinearLayout-->
             </LinearLayout>
-
-            <ListView
-                android:id="@+id/odIdFrLoutMenuList"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:divider="#000000"
-                android:dividerHeight="1px"
-                android:stackFromBottom="true"
-                android:transcriptMode="alwaysScroll">
-
-            </ListView>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:orientation="vertical"
-            android:layout_weight="1">
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <TextView
-                    android:id="@+id/odIdInput"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="ID"
-                    />
-                <TextView
-                    android:id="@+id/odIdfrName"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"/>
-            </LinearLayout>
-            <GridView
-                android:id="@+id/odIdLoutItemsGv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:numColumns="2"
-                android:textSize="24sp"
-                android:textStyle="bold">
-            </GridView>
-
-            <Button
-                android:id="@+id/odIdSndBtn"
-                android:layout_width="match_parent"
-                android:layout_height="200px"
-                android:layout_weight="1"
-                android:background="@android:color/background_dark"
-                android:text="SEND"
-                android:textColor="@android:color/holo_red_dark"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
+        </ViewSwitcher>
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

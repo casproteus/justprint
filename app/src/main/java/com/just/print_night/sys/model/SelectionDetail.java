@@ -3,6 +3,7 @@ package com.just.print_night.sys.model;
 import com.just.print_night.db.bean.Mark;
 import com.just.print_night.db.bean.Menu;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SelectionDetail {
@@ -10,9 +11,12 @@ public class SelectionDetail {
 	private Menu dish;
 	private int dishNum;
 	private String pIP;
-	private List<Mark> markList;
+	private List<Mark> markList;//don't know why, but if I initialize it here, it will still be null when getting it....
 
 	public List<Mark> getMarkList() {
+		if(markList == null){
+			markList = new ArrayList<Mark>();
+		}
 		return markList;
 	}
 

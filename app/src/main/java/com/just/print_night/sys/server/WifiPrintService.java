@@ -236,6 +236,7 @@ public class WifiPrintService implements Runnable{
                                 tlist.add(selectionDetail);
                             } else {                    //if not same, then add current list into ipContent map, and start a new list.
                                 ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx, isCancel) + "\n\n");
+                                currentCategory = c1.getCname();
                                 tlist = new ArrayList<SelectionDetail>();
                                 tlist.add(selectionDetail);
                             }
@@ -370,17 +371,22 @@ public class WifiPrintService implements Runnable{
                 }
             }
 
-            //did any work or didn't do any work, each round should rest for at least 1 second.
+            //did any work or didn't do any work, each round should rest for at least 50.
+            int time = 50;
             String waitTime = AppData.getCustomData("waitTime");
-            if(waitTime == null || waitTime.trim().length() == 0){
-                waitTime = "2000";
-            }else{
-                int time = Integer.valueOf(waitTime);
-                if(time < 100){
-                    time = time * 1000;
+            if(waitTime != null && waitTime.trim().length() > 0){
+                try {
+                    time = Integer.valueOf(waitTime);
+                    if(time == 0){
+                        time = 50;
+                    }
+                }catch(Exception e){
+                    L.e("WifiPrintService", " unexpected wait time set: " + waitTime, e);
                 }
             }
-            AppUtils.sleep(Integer.valueOf(waitTime));
+            if(time > 0) {
+                AppUtils.sleep(time);
+            }
         }
     }
 
@@ -631,7 +637,7 @@ public class WifiPrintService implements Runnable{
         L.d(TAG,"formatContentForPrintReport");
 
         //translate the time format
-        DateFormat df = new SimpleDateFormat("MM-dd HH:mm");
+        DateFormat df = new SimpleDateFormat("MM/dd HH:mm");
         try {
             Date d = new Date(Long.valueOf(startTime));
             startTime = df.format(d);
@@ -658,9 +664,7 @@ public class WifiPrintService implements Runnable{
         content.append(generateString((width - 6)/2, " "));
         content.append("REPORT");
         content.append("\n\n\n");
-        content.append(startTime).append(" to");
-        content.append("\n");
-        content.append(endTime);
+        content.append(startTime).append("--").append(endTime);
         content.append("\n");
 
         String sep_str1 = AppData.getCustomData("sep_str1");
@@ -743,7 +747,25 @@ public class WifiPrintService implements Runnable{
 
         //leave 2 space, incase the printer prints extra characters at the left corner.
         String SEPRATOR = isCancel ? "<" : " ";
+
         StringBuilder content = new StringBuilder();
+        String title = AppData.getCustomData("kitchentitle");
+        if(title.length() > 0){
+            if(title.endsWith("lines")) {
+                title = title.substring(0, title.length() - 6).trim();
+                try {
+                    int qt = Integer.valueOf(title);
+                    for (int i = 0; i < qt; i++) {
+                        content.append("\n");
+                    }
+                }catch(Exception e){
+                    L.e("WifiPrint", "when seeting title", e);
+                }
+            }else{
+                content.append(title);
+            }
+        }
+        //StringBuilder content = new StringBuilder(AppData.getCustomData("kitchentitle"));
         if(isCancel){
             content.append("       *** (取消CANCEL) ***\n");
         }
@@ -784,8 +806,8 @@ public class WifiPrintService implements Runnable{
             content.append(sb);
             content.append("\n");
             if(dd.getMarkList() != null) {
-                for (Mark str : dd.getMarkList()) {
-                    content.append(generateString(5, SEPRATOR)).append("* ").append(str.getName()).append(" *\n");
+                for (Mark mark : dd.getMarkList()) {
+                    content.append(generateString(5, SEPRATOR)).append("* ").append(mark).append(" *\n");
                 }
             }
             content.append(generateString(width, sep_str2)).append("\n");

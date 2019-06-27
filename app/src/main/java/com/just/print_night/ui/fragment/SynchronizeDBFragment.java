@@ -50,7 +50,7 @@ public class SynchronizeDBFragment extends BaseFragment{
         lastModified.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Long.valueOf(lastSyncDate)));
     }
 
-    @XClick({R.id.buttonOK})
+    @XClick({R.id.btnConfirmResetReportOK})
     private void onButtonOK(){
         DatabaseUtil.syncDbOntoServer(store_name.getText().toString(), password.getText().toString());
         getActivity().finish();

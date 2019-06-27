@@ -85,7 +85,7 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
         getActivity().finish();
     }
 
-    @XClick({R.id.buttonOK})
+    @XClick({R.id.btnConfirmResetReportOK})
     private void resetReport(){
         //when printed succcesfully, clean all records, and update now as the next reportStartDate
         saleRecordDao.deleteAll();

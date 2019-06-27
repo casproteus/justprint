@@ -20,7 +20,6 @@ public class ConfigMenuViewHolder extends XViewHolder<Menu> {
 
     @Override
     public int getLayoutId() {
-
         return R.layout.config_menu_view_holder;
     }
 
