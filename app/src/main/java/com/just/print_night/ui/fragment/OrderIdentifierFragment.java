@@ -219,7 +219,11 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             boolean matched = false;
             for(int j = 0; j < marksOfCurDish.size(); j++){
                 if(marksOfCurDish.get(j).getName().equals(mark.getName())){
-                    marksOfCurDish.get(j).setQt(mark.getQt());
+                    if(mark.getQt() == 0){
+                        marksOfCurDish.remove(j);
+                    }else {
+                        marksOfCurDish.get(j).setQt(mark.getQt());
+                    }
                     matched = true;
                     break;
                 }

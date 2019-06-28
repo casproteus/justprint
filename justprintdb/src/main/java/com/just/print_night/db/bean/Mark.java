@@ -140,7 +140,9 @@ public class Mark {
 
     @Override
     public String toString() {
-        if(qt <= 1) {
+        if(qt == 0) {
+            return "";
+        }else if(qt == 1) {
             return name;
         }else{
             return name + " x" + qt;
