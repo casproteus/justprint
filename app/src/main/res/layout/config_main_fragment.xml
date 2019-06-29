@@ -10,7 +10,7 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/notice"
+            android:id="@+id/notice2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
@@ -75,11 +75,18 @@
             android:text="Justprint" />
 
         <TextView
-            android:id="@+id/synchronizedb"
+            android:id="@+id/uploadDB"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:text="Synchronize Menus" />
+            android:text="Upload Menus" />
+
+        <TextView
+            android:id="@+id/downloadDB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Download Menus" />
 
         <TextView
             android:id="@+id/reactivate"

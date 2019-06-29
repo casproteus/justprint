@@ -29,12 +29,13 @@ public class DatabaseUtil extends Thread{
 
     String license = AppData.getLicense();
     String storName = AppData.getShopName();
+    boolean isUpload = false;
     /**
      * Call this method from any activity in your app (
      * for example ->    DatabaseUtil.copyDatabaseToExtStg(MainActivity.this);
      * this method will copy the database of your application onto SERVER
      */
-    public static void syncDbOntoServer(String license, String storeName) {
+    public static void syncDbOntoServer(String license, String storeName, boolean isUpload) {
         //https://developer.android.com/reference/android/content/Context.html#getDatabasePath(java.lang.String)
         file = Applic.app.getApplicationContext().getDatabasePath(DATABASE_NAME_PREFFIX + AppData.getShopName(Applic.app.getApplicationContext()));
         if (file.exists()){
@@ -45,6 +46,7 @@ public class DatabaseUtil extends Thread{
             if(storeName != null && storeName.length() > 0){
                 util.storName = storeName;
             }
+            util.isUpload = isUpload;
             util.start();
         }else{
             L.e("DatabaseUtil", "can not find database!", null);
@@ -69,7 +71,7 @@ public class DatabaseUtil extends Thread{
                 sb.append("/syncJustPrintDb?filepath=");
                 sb.append(license + storName);
                 sb.append("&submitDate=");
-                sb.append(AppData.getLastModifyTime());
+                sb.append(isUpload ? AppData.getLastModifyTime() : "");
                 url = new URL(sb.toString());
 
                 urlConnection = (HttpURLConnection) url.openConnection();

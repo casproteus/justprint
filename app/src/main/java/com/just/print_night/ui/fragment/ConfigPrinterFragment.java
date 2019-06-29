@@ -81,7 +81,7 @@ public class ConfigPrinterFragment extends BaseFragment implements
         }
 
         findViewById(R.id.confirmPassword).setVisibility(View.INVISIBLE);
-        findViewById(R.id.printersShow).setVisibility(View.VISIBLE);
+        findViewById(R.id.storeName).setVisibility(View.VISIBLE);
     }
 
     @XClick({R.id.addPrint})
@@ -97,21 +97,14 @@ public class ConfigPrinterFragment extends BaseFragment implements
             return;
         }
 
-        Printer printer = new Printer();
-        printer.setFirstPrint(checkBox.isChecked() ? 1 : 0);//是否全单打印,1 全单打印,0单独打印
-        printer.setPname(name.getText().toString());
-        printer.setIp(ip.toString());
-        printer.setType(checkid == R.id.orderPrint ? 1 : 0);// 1: 顺序打印,0 :类别打印
-        printer.setNote(note.getText().toString());
-        //        if (checkBox.isChecked()) {
-        //            //DaoExpand.updateAllPrintTo0(getDaoMaster().newSession().getPrinterDao());
-        //            printer.setFirstPrint(1);
-        //        }
+        AppData.createPrinter(ip.toString(),
+                name.getText().toString(),
+                checkBox.isChecked() ? 1 : 0,
+                checkid == R.id.orderPrint ? 1 : 0,
+                note.getText().toString());
+
         name.setText("");
         checkBox.setChecked(false);
-        printer.setState(State.def);
-        Applic.app.getDaoMaster().newSession().getPrinterDao().insert(printer);
-        printer.updateAndUpgrade();
         AppData.updataeLastModifyTime(null);
         loadPrinter();
     }

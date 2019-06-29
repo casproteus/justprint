@@ -53,7 +53,7 @@ public class ConfigMainFragment extends BaseFragment {
     }
 
     @XClick({R.id.configMenuManager, R.id.configPrintManager, R.id.configTagManager,
-            R.id.configUserManager, R.id.configPrintReport, R.id.synchronizedb, R.id.reactivate})
+            R.id.configUserManager, R.id.configPrintReport, R.id.uploadDB, R.id.downloadDB, R.id.reactivate})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.configMenuManager:
@@ -71,9 +71,11 @@ public class ConfigMainFragment extends BaseFragment {
             case R.id.configPrintReport:
                 getEventBus().post(ConfigActivity.CHANGE_PAGE, ConfigPrintReportFragment.class);
                 break;
-            case R.id.synchronizedb:
-                //getEventBus().post(ConfigActivity.CHANGE_PAGE, SynchronizeDBFragment.class);
-                DatabaseUtil.syncDbOntoServer(AppData.getLicense(), AppData.getShopName());
+            case R.id.uploadDB:
+                getEventBus().post(ConfigActivity.CHANGE_PAGE, UploadingConfirmFragment.class);
+                break;
+            case R.id.downloadDB:
+                getEventBus().post(ConfigActivity.CHANGE_PAGE, DownloadingConfirmFragment.class);
                 break;
             case R.id.reactivate:
                 getEventBus().post(ConfigActivity.CHANGE_PAGE, ReActivateFragment.class);

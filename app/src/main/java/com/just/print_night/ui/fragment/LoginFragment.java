@@ -42,7 +42,7 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
             userName.setText(UserName);
             userName.setEnabled(false);
             findViewById(R.id.confirmUserName).setVisibility(View.GONE);
-            findViewById(R.id.printersShow).setVisibility(View.VISIBLE);
+            findViewById(R.id.storeName).setVisibility(View.VISIBLE);
         }
         if (!StringUtils.isEmpty(shopName)) {
             //showToast(shopName);
@@ -107,7 +107,7 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
         if (StringUtils.isEmpty(userName) || userName.length() < 2) {
             showToast("Please input your name");
         } else {
-            findViewById(R.id.printersShow).setVisibility(View.VISIBLE);
+            findViewById(R.id.storeName).setVisibility(View.VISIBLE);
             view.setVisibility(View.GONE);
 
             int p = userName.indexOf("-p:");
@@ -138,6 +138,9 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
 
         AppData.saveShopName(getContext(), shopName);
         AppData.createShopDB(getContext(), shopName);
+
+        AppData.createPrinter("192.168.8.100","p1",1,1, "");
+        AppData.createPrinter("192.168.8.102","p2",1,1, "");
 
         //initialize the days left and the stated days on cloud.
         new AppData().start();

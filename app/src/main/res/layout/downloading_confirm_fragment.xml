@@ -11,12 +11,25 @@
 
 
     <LinearLayout
+        android:id="@+id/notice1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/notice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="You are about to download configurations from server, local database will be replaced after downloading, are you sure to proceed?" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/notice2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="You can modify the host name to synchronize from an other store. Please be noticed that if the modification date of local database is later than the data on server, the database on server will be replaced by local database." />
@@ -24,6 +37,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/inputArea"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="right"
