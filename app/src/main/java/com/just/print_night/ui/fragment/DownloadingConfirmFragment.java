@@ -1,7 +1,6 @@
 package com.just.print_night.ui.fragment;
 
 import android.annotation.SuppressLint;
-import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -18,6 +17,8 @@ import com.stupid.method.reflect.annotation.XViewByID;
 
 import java.util.HashMap;
 import java.util.List;
+
+import java.text.SimpleDateFormat;
 
 public class DownloadingConfirmFragment extends BaseFragment{
 

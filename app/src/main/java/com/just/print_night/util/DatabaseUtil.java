@@ -68,7 +68,11 @@ public class DatabaseUtil extends Thread{
             URL url = null;
             try {
                 StringBuilder sb = new StringBuilder(AppData.SERVER_URL);
-                sb.append("/syncJustPrintDb?filepath=");
+                if(isUpload) {
+                    sb.append("/uploadDb?filepath=");
+                }else{
+                    sb.append("/downloadDb?filepath=");
+                }
                 sb.append(license + storName);
                 sb.append("&submitDate=");
                 sb.append(isUpload ? AppData.getLastModifyTime() : "");
@@ -87,10 +91,12 @@ public class DatabaseUtil extends Thread{
                 urlConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
                 urlConnection.connect();// 连接，从上述至此的配置必须要在connect之前完成，实际上它只是建立了一个与服务器的TCP连接
 
-
-                FileInputStream is = new FileInputStream(file);
-                byte[] content = toByteArray(file);
-                String encodedStr = Base64.encodeToString(content,Base64.DEFAULT);//new String(content);//, "ISO-8859-1");
+                String encodedStr = "downloading";
+                if(isUpload) {
+                    FileInputStream is = new FileInputStream(file);
+                    byte[] content = toByteArray(file);
+                    encodedStr = Base64.encodeToString(content, Base64.DEFAULT);//new String(content);//, "ISO-8859-1");
+                }
                 if(false){
                     byte[] content2 = encodedStr.getBytes();//"ISO-8859-1");
                     writeDBByte(content2);

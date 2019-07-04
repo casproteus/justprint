@@ -1,7 +1,6 @@
 package com.just.print_night.ui.fragment;
 
 import android.annotation.SuppressLint;
-import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
