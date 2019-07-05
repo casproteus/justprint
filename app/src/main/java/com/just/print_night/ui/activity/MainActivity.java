@@ -7,8 +7,6 @@ import com.just.print_night.Activate;
 import com.just.print_night.R;
 import com.just.print_night.app.AppData;
 import com.just.print_night.app.BaseActivity;
-import com.just.print_night.ui.fragment.ConfigPrinterFragment;
-import com.just.print_night.ui.holder.OrderMarksSelectionViewHolder;
 import com.just.print_night.util.L;
 import com.just.print_night.util.StringUtils;
 import com.just.print_night.util.ToastUtil;

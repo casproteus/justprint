@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.just.print_night.db.bean.Printer;
-import com.just.print_night.db.expand.State;
 import com.just.print_night.util.AppUtils;
 import com.just.print_night.util.L;
 import com.just.print_night.util.SharedPreferencesHelper;

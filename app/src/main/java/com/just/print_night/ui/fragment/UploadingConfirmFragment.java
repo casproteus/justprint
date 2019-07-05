@@ -2,9 +2,6 @@ package com.just.print_night.ui.fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.just.print_night.R;
 import com.just.print_night.app.AppData;
@@ -13,7 +10,6 @@ import com.just.print_night.db.dao.SaleRecordDao;
 import com.just.print_night.util.DatabaseUtil;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
-import com.stupid.method.reflect.annotation.XViewByID;
 
 import java.util.HashMap;
 import java.util.List;

@@ -16,7 +16,6 @@ import com.just.print_night.app.Applic;
 import com.just.print_night.app.BaseFragment;
 import com.just.print_night.db.bean.Printer;
 import com.just.print_night.db.expand.DaoExpand;
-import com.just.print_night.db.expand.State;
 import com.just.print_night.sys.server.WifiPrintService;
 import com.just.print_night.ui.holder.ConfigPrinterViewHolder;
 import com.stupid.method.adapter.OnClickItemListener;
