@@ -639,10 +639,14 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             Menu menu = selectionDetail.getDish();
             String name = menu.getMname();
             Double price = menu.getPrice() * number;
-            List<Mark> marks = selectionDetail.getMarkList();
-            if(marks != null){
-                for (Mark mark : marks) {
-                    price += ((float)mark.getVersion())/100.0 * mark.getQt();
+
+            //if set as conbine mark price into dish price.
+            if("true".equals(AppData.getCustomData("conbineMarkPrice"))) {
+                List<Mark> marks = selectionDetail.getMarkList();
+                if (marks != null) {
+                    for (Mark mark : marks) {
+                        price += ((float) mark.getVersion()) / 100.0 * mark.getQt();
+                    }
                 }
             }
 
@@ -654,6 +658,25 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             saleRecord.setNumber(Double.valueOf(number));
             saleRecord.setPrice(price);
             saleRecordDao.insertOrReplace(saleRecord);
+
+            if (!"true".equals(AppData.getCustomData("combineMarkPrice"))) {  //by defalut mark price is not added into salesrecord, so, generate saleRecord for the marks.
+                List<Mark> marks = selectionDetail.getMarkList();
+                if (marks != null) {
+                    for (Mark mark : marks) {
+                        Double markPrice = ((float) mark.getVersion()) / 100.0 * mark.getQt();
+                        if(markPrice >= 0.01) {
+                            SaleRecord saleRecordForMark = new SaleRecord();
+                            saleRecordForMark.setMname(mark.getName());
+                            saleRecordForMark.setNumber(Double.valueOf(mark.getQt()));
+                            if(isCancel){
+                                markPrice *= -1;
+                            }
+                            saleRecordForMark.setPrice(markPrice);
+                            saleRecordDao.insertOrReplace(saleRecordForMark);
+                        }
+                    }
+                }
+            }
         }
         bkOfLastSelection = null;
         bkOfLastTable = "TB";
