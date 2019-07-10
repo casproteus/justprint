@@ -28,7 +28,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true"
-                    android:text="V2.90705-N"
+                    android:text="V2.90710-N"
                     android:textAlignment="viewStart"
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"
