@@ -59,10 +59,10 @@ public class ConfigPrinterFragment extends BaseFragment implements
     private CheckBox modifyCheckBox = null;
 
     @XViewByID(R.id.modifyOrderPrint)
-    private RadioButton modifyOrderPrint = null;
+    private CheckBox modifyOrderPrint = null;
 
     @XViewByID(R.id.modifyClassPrint)
-    private RadioButton modifyClassPrint = null;
+    private CheckBox modifyClassPrint = null;
     @XViewByID(R.id.modifyNote)
     private TextView modifyNote = null;
 
@@ -88,18 +88,29 @@ public class ConfigPrinterFragment extends BaseFragment implements
             @XGetValueByView(fromId = R.id.pip, fromMethodName = "getText#toString#trim") String ip,
             @XGetValueByView(fromId = R.id.pname) TextView name,
             @XGetValueByView(fromId = R.id.checkBox) CheckBox checkBox,
-            @XGetValueByView(fromId = R.id.printType, fromMethodName = "getCheckedRadioButtonId") int checkid,
+            //@XGetValueByView(fromId = R.id.printType, fromMethodName = "getCheckedRadioButtonId") int checkid,
+            @XGetValueByView(fromId = R.id.orderPrint) CheckBox orderPrint,
+            @XGetValueByView(fromId = R.id.classPrint) CheckBox classPrint,
             @XGetValueByView(fromId = R.id.note) TextView note) {
 
         if (!isIP(ip)) {
             showToast("Please input correct IP address.");
             return;
         }
-
+        int type = 0;
+        if(orderPrint.isChecked() && !classPrint.isChecked()){
+            type = 1;
+        }else if(!orderPrint.isChecked() && classPrint.isChecked()){
+            type = 0;
+        }else if(!orderPrint.isChecked() && !classPrint.isChecked()){
+            type = 2;
+        }else if(orderPrint.isChecked() && classPrint.isChecked()){
+            type = 3;
+        }
         AppData.createPrinter(ip.toString(),
                 name.getText().toString(),
                 checkBox.isChecked() ? 1 : 0,
-                checkid == R.id.orderPrint ? 1 : 0,
+                type,//checkid == R.id.orderPrint ? 1 : 0,
                 note.getText().toString());
 
         name.setText("");
@@ -117,7 +128,8 @@ public class ConfigPrinterFragment extends BaseFragment implements
     @XClick({R.id.modifyPrint})
     private void modifyPrint(
             @XGetValueByView(fromId = R.id.modifyCheckBox) CheckBox modifyCheckBox,
-            @XGetValueByView(fromId = R.id.modifyPrintType2, fromMethodName = "getCheckedRadioButtonId") int checkid) {
+            @XGetValueByView(fromId = R.id.modifyOrderPrint) CheckBox modifyOrderPrint,
+            @XGetValueByView(fromId = R.id.modifyClassPrint) CheckBox modifyClassPrint) {
         if (mModifyCache != null) {
             if (!isIP(modifIP.getText().toString())) {
                 showToast("Please input correct ip");
@@ -127,7 +139,15 @@ public class ConfigPrinterFragment extends BaseFragment implements
             mModifyCache.setPname(modifName.getText().toString());
             mModifyCache.setIp(modifIP.getText().toString().trim());
             mModifyCache.setVersion(mModifyCache.getVersion() + 1);
-            mModifyCache.setType(checkid == R.id.modifyOrderPrint ? 1 : 0);// 1: 顺序打印,0 :类别打印
+            if(modifyOrderPrint.isChecked() && !modifyClassPrint.isChecked()){
+                mModifyCache.setType(1);// 1: 顺序打印,
+            }else if(!modifyOrderPrint.isChecked() && modifyClassPrint.isChecked()){
+                mModifyCache.setType(0);//0 :类别打印
+            }else if(!modifyOrderPrint.isChecked() && !modifyClassPrint.isChecked()){
+                mModifyCache.setType(2);// tbd
+            }else if(modifyOrderPrint.isChecked() && modifyClassPrint.isChecked()){
+                mModifyCache.setType(3);//按类别排序的全打
+            }
             //DaoExpand.updateAllPrintTo0(getDaoMaster().newSession().getPrinterDao());
             mModifyCache.setFirstPrint(modifyCheckBox.isChecked() ? 1 : 0);
             mModifyCache.setNote(modifyNote.getText().toString());
@@ -156,9 +176,15 @@ public class ConfigPrinterFragment extends BaseFragment implements
                 if(mModifyCache.getType() == 0){    //by category
                     modifyOrderPrint.setChecked(false);
                     modifyClassPrint.setChecked(true);
-                }else{                                  //by order time
+                }else if(mModifyCache.getType() == 1){                                  //by order time
                     modifyOrderPrint.setChecked(true);
                     modifyClassPrint.setChecked(false);
+                }else if(mModifyCache.getType() == 2){
+                    modifyOrderPrint.setChecked(false);
+                    modifyClassPrint.setChecked(false);
+                }else if(mModifyCache.getType() == 3){
+                    modifyOrderPrint.setChecked(true);
+                    modifyClassPrint.setChecked(true);
                 }
                 modifyNote.setText(mModifyCache.getNote());
 

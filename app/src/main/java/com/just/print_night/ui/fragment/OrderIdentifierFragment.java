@@ -100,7 +100,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     public static List<SelectionDetail> bkOfLastSelection;
     private static CharSequence bkOfLastTable;
     static int times = 0;
-    String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "H", "+", "togo", "canc"};
+    String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "H", "S", "U", "+", "togo", "canc"};
 
     @XClick({R.id.odIdConfigBtn, R.id.odIdSndBtn, R.id.odIdDelBtn, R.id.odIdOkBtn})
     private void exeControlCommand(View v) {
@@ -279,34 +279,30 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             L.d(TAG, String.valueOf(view.getId()) + String.valueOf(i));
             switch (view.getId()) {
                 case R.id.buttonholder: //number buttons.
-                    switch (i) {
-                        case 16:
-                            if(items.length == 20) {
-                                InputText("H");
-                            }else{
-                                InputText(Character.toString((char) (i % 10 + 'A')));
-                            }
-                            break;
-                        default:
-                            if (i < 10) {
-                                InputText(Integer.toString((i + 1) % 10));
-                            } else if( i == items.length - 3){
-                                InputText("+");
-                            } else if (i == items.length - 2) {
-                                odIdTableTbtn.setText("TOGO");
-                                CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
-                            } else if (i == items.length - 1) {
-                                odIdTableTbtn.setText("");
-                                //added the selected dish with negative price.
-                                if(printCurrentSelection(true)){    //arranged to print---didn't met the case that previous print not finished yet.
-                                    isCancel = true;
-                                }
-                            }else {
-                                InputText(Character.toString((char) (i % 10 + 'A')));
-                            }
-                            break;
+                    if (i < 10) {
+                        InputText(Integer.toString((i + 1) % 10));
+                    } else if (i == items.length - 5) {
+                        InputText("S");
+                    } else if (i == items.length - 4) {
+                        InputText("U");
+                    } else if (i == items.length - 3) {
+                        InputText("+");
+                    } else if (i == items.length - 2) {
+                        odIdTableTbtn.setText("TOGO");
+                        CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
+                    } else if (i == items.length - 1) {
+                        odIdTableTbtn.setText("");
+                        //added the selected dish with negative price.
+                        if (printCurrentSelection(true)) {    //arranged to print---didn't met the case that previous print not finished yet.
+                            isCancel = true;
+                        }
+                    } else if (items.length == 20 && i == 16) {
+                        InputText("H");
+                    } else {
+                        InputText(Character.toString((char) (i % 10 + 'A')));
                     }
-                    if(!odIdTableTbtn.isChecked()){
+
+                    if (!odIdTableTbtn.isChecked()) {
                         tmpMenu = SearchMenuFromDB(odIdInput.getText().toString());
                         if (null != tmpMenu) {
                             odIdfrName.setText(tmpMenu.getMname());
@@ -381,6 +377,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             }
         }
 
+        ary.add("S");
+        ary.add("U");
         ary.add("+");
         ary.add("togo");
         ary.add("canc");

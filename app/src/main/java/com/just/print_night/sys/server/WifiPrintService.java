@@ -186,7 +186,7 @@ public class WifiPrintService implements Runnable{
             List<SelectionDetail> dishList = (List<SelectionDetail>) entry.getValue();
 
             L.d(TAG,"ip:" + key + ", list size:" + dishList.size());
-            if(ipPrinterMap.get(key).getType() == 0 && dishList.size() > 0){
+            if(ipPrinterMap.get(key).getType() != 1 && dishList.size() > 0){
                 //订单排序
                 Collections.sort(ipSelectionsMap.get(key), new Comparator<SelectionDetail>() {
                     @Override
