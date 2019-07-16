@@ -144,6 +144,10 @@ public class AppData extends Thread{
         return getShopData(Applic.app.getApplicationContext()).getString("custom_" + key, "");
     }
 
+    public static String getServerIP() {
+        return getShopData(Applic.app.getApplicationContext()).getString("ServerIP","");
+    }
+
     public static HttpURLConnection prepareConnection(String uri) throws Exception {
         HttpURLConnection urlConnection;
         URL url = new URL(uri);

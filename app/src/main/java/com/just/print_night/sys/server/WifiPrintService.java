@@ -161,8 +161,20 @@ public class WifiPrintService implements Runnable{
             L.d(TAG,"ipContent not empty, means last print job not finished yet! returning not success flag.");
             return ERROR;                     //未打印完毕
         }
+        String serverIP = AppData.getServerIP();
+        if(StringUtils.isBlank(serverIP)){
+            if (manageDishesIntoMapAndWaitingForPrint(isCancel)) {
+                return SUCCESS;
+            }else {
+                return ERROR;
+            }
+        }else{
+            sendToServer();
+            return SUCCESS;
+        }
+    }
 
-
+    private void sendToServer() {
         //1、遍历每个选中的菜，并分别遍历加在其上的打印机。并在ipSelectionsMap上对应IP后面增加菜品
         for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
             List<M2M_MenuPrint> printerList = selectionDetail.getDish().getM2M_MenuPrintList();
@@ -170,7 +182,29 @@ public class WifiPrintService implements Runnable{
                 Printer printer = m2m.getPrint();
                 if(printer == null) {                   //should never happen, jist in case someone changed db.
                     ToastUtil.showToast("Selected dish not connected with any printer yet.");
-                    return ERROR;
+                    return;
+                }
+
+                String ip = printer.getIp();
+                L.d(TAG,"Adding a dish to ipSelectionsMap, ip:" + ip);
+
+                //TODO: translate the dish into a json stroing.
+            }
+        }
+
+        L.d(TAG, "Order is translated into ipContentMap map and ready for print.");
+        ToastUtil.showToast("PRINTING...");
+    }
+
+    private boolean manageDishesIntoMapAndWaitingForPrint(boolean isCancel) {
+        //1、遍历每个选中的菜，并分别遍历加在其上的打印机。并在ipSelectionsMap上对应IP后面增加菜品
+        for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
+            List<M2M_MenuPrint> printerList = selectionDetail.getDish().getM2M_MenuPrintList();
+            for(M2M_MenuPrint m2m: printerList) {
+                Printer printer = m2m.getPrint();
+                if(printer == null) {                   //should never happen, jist in case someone changed db.
+                    ToastUtil.showToast("Selected dish not connected with any printer yet.");
+                    return false;
                 }
 
                 String ip = printer.getIp();
@@ -260,7 +294,7 @@ public class WifiPrintService implements Runnable{
 
         L.d(TAG, "Order is translated into ipContentMap map and ready for print.");
         ToastUtil.showToast("PRINTING...");
-        return SUCCESS;
+        return true;
     }
 
     //The start time and end time are long format, need to be translate for print.
