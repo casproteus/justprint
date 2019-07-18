@@ -130,18 +130,17 @@ public class AppData extends Thread{
     public static void putCustomData(String key, String value) {
         getShopData(Applic.app.getApplicationContext()).putString("custom_" + key, value);
     }
+    public static String getCustomData(String key) {
+        return getShopData(Applic.app.getApplicationContext()).getString("custom_" + key, "");
+    }
+
 
     public static String getLastModifyTime(){
         return getShopData(Applic.app.getApplicationContext()).getString("LastSyncDate","");
     }
-
     public static void updataeLastModifyTime(String lastUpdateTime) {
         getShopData(Applic.app.getApplicationContext()).putString("LastSyncDate",
                 lastUpdateTime != null && lastUpdateTime.length() > 1 ? lastUpdateTime : String.valueOf(new Date().getTime()));
-    }
-
-    public static String getCustomData(String key) {
-        return getShopData(Applic.app.getApplicationContext()).getString("custom_" + key, "");
     }
 
     public static String getServerIP() {

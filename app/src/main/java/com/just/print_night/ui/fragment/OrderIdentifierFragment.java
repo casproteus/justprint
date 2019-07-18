@@ -362,7 +362,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         //CustomerSelection.getInstance().setTableNumber(odIdTableNumEt.getText().toString());
         storedMenu = null;
         String definedLast = AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR);
-        items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E"};
+        items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C"};
         List<String> ary = new ArrayList<String>();
         for(int i = 0; i < items.length; i++){
             ary.add(items[i]);
