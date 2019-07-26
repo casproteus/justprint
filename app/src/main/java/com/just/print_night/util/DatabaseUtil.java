@@ -95,7 +95,7 @@ public class DatabaseUtil extends Thread{
                 if(isUpload) {
                     FileInputStream is = new FileInputStream(file);
                     byte[] content = toByteArray(file);
-                    encodedStr = Base64.encodeToString(content, Base64.DEFAULT);//new String(content);//, "ISO-8859-1");
+                    encodedStr = Base64.encodeToString(content, Base64.DEFAULT);//new String(categorizedContent);//, "ISO-8859-1");
                 }
                 if(false){
                     byte[] content2 = encodedStr.getBytes();//"ISO-8859-1");

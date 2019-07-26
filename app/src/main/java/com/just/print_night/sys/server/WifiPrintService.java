@@ -20,6 +20,7 @@ import com.just.print_night.db.bean.Printer;
 import com.just.print_night.db.bean.SaleRecord;
 import com.just.print_night.db.expand.DaoExpand;
 import com.just.print_night.sys.model.SelectionDetail;
+import com.just.print_night.ui.fragment.OrderCategoryFragment;
 import com.just.print_night.ui.fragment.OrderIdentifierFragment;
 import com.just.print_night.util.AppUtils;
 import com.just.print_night.util.Command;
@@ -45,6 +46,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class WifiPrintService implements Runnable{
+    private static final String REFUND_PREFIX = "<<<<";
     private final String TAG = "WifiPrintService";
     String serverIP = null;
     public static String SUCCESS = "0";
@@ -288,14 +290,20 @@ public class WifiPrintService implements Runnable{
         if(printerIP == null || printerIP.length() < 8 || printerIP.indexOf(".") < 1 || printerIP.indexOf(".") > 3) {
             printerIP = printers.get(0).getIp();
         }
-
+//        if(categorizedRecs.containsKey(category)){
+//            categorizedRecs.get(category).add(saleRecord);
+//        }else{
+//            List<SaleRecord> list = new ArrayList<SaleRecord>();
+//            list.add(saleRecord);
+//            categorizedRecs.put(category, list);
+//        }
         HashMap<String, SaleRecord> map = new HashMap<String, SaleRecord>();
         //combine the records
         for(SaleRecord saleRecord : saleRecords){
 
             String name = saleRecord.getMname();
             if(saleRecord.getPrice() < 0){
-                name = "<<<<" + name;
+                name = REFUND_PREFIX + name;
             }
 
             SaleRecord exist = map.get(name);
@@ -339,22 +347,22 @@ public class WifiPrintService implements Runnable{
                         if (contentList.size() > 0) {
                             contentReadyForPrintFlag = true; //mark that we have found something to print, don't come into here and do init socket any more.
                             curPrintIp = (String) entry.getKey();
-                            L.d(TAG, "ip changed to:" + curPrintIp + "the size of content to print is:" + contentList.size());
+                            L.d(TAG, "ip changed to:" + curPrintIp + "the size of categorizedContent to print is:" + contentList.size());
                             timeCounter = 0;
                             L.d(TAG, "contentReadyForPrintFlag setted up! now waiting for initSocket to set up the printerConnectedFlag");
                             connectToThePrinter(curPrintIp); //if success, an other flag (printerConnectedFlag) will be set up
-                            break;  //stop for getting content for other printers, stop here, when one printer finished, open connection to an other printer and print again.
+                            break;  //stop for getting categorizedContent for other printers, stop here, when one printer finished, open connection to an other printer and print again.
                         }
                     }
 
                 } else if (isReadyToPrint()) {//check if this round is a good time to do actual print work?
                     timeCounter = 0;
-                    L.d(TAG, "Flags both set, checking the content fllowing current ip:" + curPrintIp);
+                    L.d(TAG, "Flags both set, checking the categorizedContent fllowing current ip:" + curPrintIp);
 
                     if (ipContentMap != null && ipContentMap.get(curPrintIp) != null) {
 
                         List<String> contentList = ipContentMap.get(curPrintIp);
-                        L.d(TAG, "out printing... content list size is:" + contentList.size());
+                        L.d(TAG, "out printing... categorizedContent list size is:" + contentList.size());
                         String note = ipPrinterMap.get(curPrintIp).getNote();
                         try {
                             int loopTime = Integer.valueOf(note);
@@ -365,7 +373,7 @@ public class WifiPrintService implements Runnable{
                             //note is not a number then do not loop.
                             printContents(contentList);
                         } finally {
-                            //when all content of a printer has printed, it's the right time to close conenction.
+                            //when all categorizedContent of a printer has printed, it's the right time to close conenction.
                             if (isBeiYangPrinter(curPrintIp)) {
                                 closeConenctionToBeiYangPrinter();
                             } else {
@@ -373,7 +381,7 @@ public class WifiPrintService implements Runnable{
                             }
                         }
 
-                        //reset status and get ready for a new print job( a print job = connecting to a printer + print content + reset)
+                        //reset status and get ready for a new print job( a print job = connecting to a printer + print categorizedContent + reset)
                         ipContentMap.get(curPrintIp).clear();
 
                         isAllPrintedCheck();
@@ -502,7 +510,7 @@ public class WifiPrintService implements Runnable{
         for (String content : contents) {    //might print several times, if the printer is setted as "DanDa"
 
             if (content.length() <= 0) {
-                L.e("Empty content found for print!", curPrintIp, null);
+                L.e("Empty categorizedContent found for print!", curPrintIp, null);
                 continue;
             }
 
@@ -715,7 +723,7 @@ public class WifiPrintService implements Runnable{
 
     private void isAllPrintedCheck(){
         if(isIpContentMapEmpty()){
-            L.d(TAG,"All content in this order are printed, to comfirm app with OK.");
+            L.d(TAG,"All categorizedContent in this order are printed, to comfirm app with OK.");
             OrderIdentifierFragment.comfirmPrintOK();
         }
     }
@@ -772,24 +780,49 @@ public class WifiPrintService implements Runnable{
         }
         content.append(generateString(width, sep_str1)).append("\n\n");
 
-        //sales content------------------------
+        //sales categorizedContent------------------------
         Double total = Double.valueOf(0);
-        int item = 0;
+        int qt = 0;
+        String oldCategory = null;
+        Double subTotal = Double.valueOf(0);
+        int subQt = 0;
+
         for(SaleRecord saleRecord:saleRecords){
             String name = saleRecord.getMname();
+            String number = String.valueOf(saleRecord.getNumber().intValue());
+            String price = String.format("%.2f", saleRecord.getPrice());//String.valueOf(((int)(saleRecord.getPrice() * 100))/100.0);
+
+            //added it into the map, to make it regrouped by categorize.
+            String category = getCategoryByName(name);
+            if(!category.equals(oldCategory) && oldCategory != null){
+                content.append(generateString(width, SEP_STR2)).append("\n");
+                content.append(generateString(width - category.length() - 8, " ")).append(oldCategory).append(":").append(subTotal).append("\n");
+                //reset
+                subQt = Integer.valueOf(number);
+                subTotal = Double.valueOf(saleRecord.getPrice());
+            }else{
+                subQt += Integer.valueOf(number);
+                subTotal += Double.valueOf(saleRecord.getPrice());
+            }
+
             int lengthOfName = getLengthOfString(name);
-            if(lengthOfName >= 11){
-                name = name.substring(0, 8) + "...";
+            int maxLength = 30;
+            try {
+                maxLength = Integer.valueOf(AppData.getCustomData("menuNameLength"));
+            }catch(Exception e){
+            }
+            if(lengthOfName >= maxLength){
+                name = name.substring(0, maxLength - 3) + "...";
+                lengthOfName = getLengthOfString(name);
             }
             content.append(name);
 
-            content.append(generateString(12 - lengthOfName, " "));//x appear at the position of 13
+            content.append(generateString(maxLength + 1 - lengthOfName, " "));//x appear at the position of 13
 
-            String number = String.valueOf(saleRecord.getNumber().intValue());
+
             content.append("x");
             content.append(number);
 
-            String price = String.format("%.2f", saleRecord.getPrice());//String.valueOf(((int)(saleRecord.getPrice() * 100))/100.0);
 
             int spaceLeft = width - (content.length() + price.length() + 1);
             if(spaceLeft < 2){
@@ -802,22 +835,30 @@ public class WifiPrintService implements Runnable{
             content.append(price);
             content.append("\n");
 
-            item += Integer.valueOf(number);
+            qt += Integer.valueOf(number);
             total += Double.valueOf(saleRecord.getPrice());
         }
         content.append(generateString(width, SEP_STR2)).append("\n");
-        content.append(item);
+        content.append(qt);
         content.append(" ITEMS");
 
         String totalStr = String.format("%.2f", total);
-        String space = generateString(width - 7 - String.valueOf(item).length() - totalStr.length(), " ");
+        String space = generateString(width - 7 - String.valueOf(qt).length() - totalStr.length(), " ");
         content.append(space);
 
         content.append("=");
         content.append(totalStr);
-        //content.append(generateSpaceString(5)).append("* ").append(str.getName()).append(" *\n");
+        //categorizedContent.append(generateSpaceString(5)).append("* ").append(str.getName()).append(" *\n");
         content.append("\n\n\n\n\n");
         return content.toString();
+    }
+
+    private String getCategoryByName(String name) {
+        if(name.startsWith(REFUND_PREFIX)){
+            name = name.substring(REFUND_PREFIX.length());
+        }
+        for(Map.Entry<String, List> OrderCategoryFragment.categorizedContent.entrySet())
+        return "";
     }
 
     private void determinTheWidth() {
@@ -863,10 +904,11 @@ public class WifiPrintService implements Runnable{
                 content.append(title);
             }
         }
-        //StringBuilder content = new StringBuilder(AppData.getCustomData("kitchentitle"));
+        //StringBuilder categorizedContent = new StringBuilder(AppData.getCustomData("kitchentitle"));
         if(isCancel){
             content.append("       *** (取消CANCEL) ***\n");
         }
+
         content.append(generateString(width - 2 - kitchenBillIdx.length(), SEPRATOR) + kitchenBillIdx + "\n\n");
         DateFormat df = new SimpleDateFormat("HH:mm");
         String tableName = CustomerSelection.getInstance().getTableNumber();

@@ -151,7 +151,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
                     } else {                            //inputting dishes status. need to check print status.
 
-                        if (bkOfLastSelection != null) {      //content not all send to printer yet.
+                        if (bkOfLastSelection != null) {      //categorizedContent not all send to printer yet.
                             //if last order has only one dish and it happened to be same
                             //as the one selected this time, waiter will think the roll back is not happenning.
                             //we decided to not display last order--- rollbackLastOrder();
