@@ -412,6 +412,7 @@ public class WifiPrintService implements Runnable{
     }
 
     private void manageDishesIntoStringToSendToServer(String serverIP) {
+        sendToServer(serverIP);
     }
 
     private void sendToServer(String serverIP) {
@@ -492,7 +493,12 @@ public class WifiPrintService implements Runnable{
         if (StringUtils.isBlank(font)) {
             font = AppData.getCustomData("font");
         }
-
+        if(isPrintingReport(contents)){
+            font = AppData.getCustomData("reportFont");
+            if(font == null || font.length() < 6) {
+                font = "27,33,0";
+            }
+        }
         for (String content : contents) {    //might print several times, if the printer is setted as "DanDa"
 
             if (content.length() <= 0) {
@@ -506,6 +512,18 @@ public class WifiPrintService implements Runnable{
                 doZiJiangPrint(font, content);
             }
         }
+    }
+
+    private boolean isPrintingReport(List<String> contents) {
+        int p = contents.get(0).indexOf(getReportFirstLineContent().toString());
+        return p == 0;
+    }
+
+    private StringBuilder getReportFirstLineContent() {
+        String mobileMark = AppData.getCustomData("mobileMark");
+        StringBuilder content = new StringBuilder(mobileMark == null ? "" : mobileMark);
+        String idx = AppData.getCustomData("reportIdx");
+        return content.append(idx == null || idx.length() == 0 ? "1" : idx);
     }
 
     private void connectToBeiYangPrinter(String printerIP){
@@ -729,13 +747,19 @@ public class WifiPrintService implements Runnable{
         }
 
         //determin the width of paper.
-        determinTheWidth();
+        width = 42;
+        String reportWidth = AppData.getCustomData("reportWidth");
+        try{
+            width = Integer.valueOf(reportWidth);
+        }catch(Exception e){
+        }
+
         String spaceStr = generateString((width - startTime.length())/2, " ");
 
-        String mobileMark = AppData.getCustomData("mobileMark");
-        StringBuilder content = new StringBuilder(mobileMark == null ? "" : mobileMark);
-        String idx = AppData.getCustomData("reportIdx");
-        content.append(idx == null || idx.length() == 0 ? "1" : idx).append("\n");
+        //start the report contnt---------------------------------------------------
+        StringBuilder content = getReportFirstLineContent().append("\n");
+
+        //the second line and the third line.
         content.append(generateString((width - 6)/2, " "));
         content.append("REPORT");
         content.append("\n\n\n");
@@ -747,28 +771,27 @@ public class WifiPrintService implements Runnable{
             sep_str1 = SEP_STR1;
         }
         content.append(generateString(width, sep_str1)).append("\n\n");
+
+        //sales content------------------------
         Double total = Double.valueOf(0);
         int item = 0;
         for(SaleRecord saleRecord:saleRecords){
             String name = saleRecord.getMname();
+            int lengthOfName = getLengthOfString(name);
+            if(lengthOfName >= 11){
+                name = name.substring(0, 8) + "...";
+            }
             content.append(name);
 
-            int lengthOfName = getLengthOfString(name);
-            StringBuilder content2 = new StringBuilder();
-            if(lengthOfName < 11){
-                content2.append(generateString(12 - lengthOfName, " "));//x appear at the position of 13
-            }else{
-                content2.append(" ");
-            }
+            content.append(generateString(12 - lengthOfName, " "));//x appear at the position of 13
 
             String number = String.valueOf(saleRecord.getNumber().intValue());
-            content2.append("x");
-            content2.append(number);
-            content.append(content2);
+            content.append("x");
+            content.append(number);
 
             String price = String.format("%.2f", saleRecord.getPrice());//String.valueOf(((int)(saleRecord.getPrice() * 100))/100.0);
 
-            int spaceLeft = width - (lengthOfName + content2.length() + price.length() + 1);
+            int spaceLeft = width - (content.length() + price.length() + 1);
             if(spaceLeft < 2){
                 content.append(" ");
             }else{
