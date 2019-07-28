@@ -16,6 +16,7 @@ import com.just.print_night.app.Applic;
 import com.just.print_night.db.bean.Category;
 import com.just.print_night.db.bean.M2M_MenuPrint;
 import com.just.print_night.db.bean.Mark;
+import com.just.print_night.db.bean.Menu;
 import com.just.print_night.db.bean.Printer;
 import com.just.print_night.db.bean.SaleRecord;
 import com.just.print_night.db.expand.DaoExpand;
@@ -786,7 +787,7 @@ public class WifiPrintService implements Runnable{
         String oldCategory = null;
         Double subTotal = Double.valueOf(0);
         int subQt = 0;
-
+        saleRecords = sortSaleRecordsByCategory(saleRecords);
         for(SaleRecord saleRecord:saleRecords){
             String name = saleRecord.getMname();
             String number = String.valueOf(saleRecord.getNumber().intValue());
@@ -796,15 +797,30 @@ public class WifiPrintService implements Runnable{
             String category = getCategoryByName(name);
             if(!category.equals(oldCategory) && oldCategory != null){
                 content.append(generateString(width, SEP_STR2)).append("\n");
-                content.append(generateString(width - category.length() - 8, " ")).append(oldCategory).append(":").append(subTotal).append("\n");
+                content.append(oldCategory).append(generateString(width - 25, " "))
+                        .append("qt=").append(subQt).append(" ")
+                        .append("sub=").append(String.format("%.2f", subTotal)).append("\n\n");
                 //reset
                 subQt = Integer.valueOf(number);
+                if(saleRecord.getPrice() < 0){
+                    subQt = 0 - subQt;
+                }
                 subTotal = Double.valueOf(saleRecord.getPrice());
             }else{
-                subQt += Integer.valueOf(number);
+                if(saleRecord.getPrice() < 0){
+                    subQt -= Integer.valueOf(number);
+                }else {
+                    subQt += Integer.valueOf(number);
+                }
                 subTotal += Double.valueOf(saleRecord.getPrice());
             }
+            oldCategory = category;
 
+            if(saleRecord.getPrice() < 0){
+                name = REFUND_PREFIX + name;
+            }
+
+            //adjust the length of item name.
             int lengthOfName = getLengthOfString(name);
             int maxLength = 30;
             try {
@@ -817,28 +833,38 @@ public class WifiPrintService implements Runnable{
             }
             content.append(name);
 
+            //number
             content.append(generateString(maxLength + 1 - lengthOfName, " "));//x appear at the position of 13
-
-
             content.append("x");
             content.append(number);
 
-
+            //price
             int spaceLeft = width - (content.length() + price.length() + 1);
             if(spaceLeft < 2){
                 content.append(" ");
             }else{
                 content.append(generateString(spaceLeft, " "));
             }
-
             content.append("=");
+            if(saleRecord.getPrice() > 0){
+                content.append(" ");
+            }
             content.append(price);
             content.append("\n");
 
+            //count qt and total price.
             qt += Integer.valueOf(number);
+            if(saleRecord.getPrice() < 0){
+                qt = 0 - qt;
+            }
             total += Double.valueOf(saleRecord.getPrice());
         }
         content.append(generateString(width, SEP_STR2)).append("\n");
+        content.append(oldCategory).append(generateString(width - 25, " "))
+                .append("qt=").append(subQt).append(" ")
+                .append("sub=").append(String.format("%.2f", subTotal)).append("\n\n");
+
+        content.append(generateString(width, SEP_STR1)).append("\n");
         content.append(qt);
         content.append(" ITEMS");
 
@@ -853,11 +879,34 @@ public class WifiPrintService implements Runnable{
         return content.toString();
     }
 
-    private String getCategoryByName(String name) {
-        if(name.startsWith(REFUND_PREFIX)){
-            name = name.substring(REFUND_PREFIX.length());
+    private List<SaleRecord> sortSaleRecordsByCategory(List<SaleRecord> saleRecords) {
+        Map<String, List<SaleRecord>> map = new HashMap<String, List<SaleRecord>>();
+        for (SaleRecord saleRecord : saleRecords) {
+            String category = getCategoryByName(saleRecord.getMname());
+            if(map.containsKey(category)){
+                map.get(category).add(saleRecord);
+            }else{
+                ArrayList<SaleRecord> list = new ArrayList<SaleRecord>();
+                list.add(saleRecord);
+                map.put(category, list);
+            }
         }
-        for(Map.Entry<String, List> OrderCategoryFragment.categorizedContent.entrySet())
+        List<SaleRecord> newOrderRecords = new ArrayList<>();
+        for (Map.Entry<String, List<SaleRecord>> entry: map.entrySet()) {
+            newOrderRecords.addAll(entry.getValue());
+        }
+        return newOrderRecords;
+    }
+
+    private String getCategoryByName(String name) {
+        for(Map.Entry<Category, List<Menu>> entry: OrderCategoryFragment.categorizedContent.entrySet()){
+            List<Menu> list = entry.getValue();
+            for (Menu menu: list) {
+                if(name.equals(menu.getMname())){
+                    return entry.getKey().getCname();
+                }
+            }
+        }
         return "";
     }
 
@@ -909,17 +958,19 @@ public class WifiPrintService implements Runnable{
             content.append("       *** (取消CANCEL) ***\n");
         }
 
-        content.append(generateString(width - 2 - kitchenBillIdx.length(), SEPRATOR) + kitchenBillIdx + "\n\n");
         DateFormat df = new SimpleDateFormat("HH:mm");
         String tableName = CustomerSelection.getInstance().getTableNumber();
         String dateStr = df.format(new Date());
-        String spaceStr = generateString(width - (2 + CustomerSelection.getInstance().getTableNumber().length() + dateStr.length()), SEPRATOR);
 
         if(width < 20){
             content.append("\n\n");
         }
-
-        content.append("(").append(tableName).append(")").append(spaceStr).append(dateStr).append("\n");
+        //table
+        content.append(generateString((width - tableName.length() - 2)/2, " ")).append("(").append(tableName).append(")").append("\n");
+        //kitchenBillIdx and time
+        content.append(kitchenBillIdx)
+                .append(generateString(width - kitchenBillIdx.length() - dateStr.length(), SEPRATOR))
+                .append(dateStr).append("\n");
 
         String sep_str1 = AppData.getCustomData("sep_str1");
         if(sep_str1 == null || sep_str1.length() == 0){

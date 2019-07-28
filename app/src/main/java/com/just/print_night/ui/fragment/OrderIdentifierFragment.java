@@ -376,9 +376,15 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 ary.add(String.valueOf(lastChar));
             }
         }
+        //add the custChars
+        String custChars = AppData.getCustomData("custChars");
+        if(custChars.length() == 0){
+            custChars = "SU";
+        }
+        for(int i = 0; i < custChars.length(); i++){
+            ary.add(custChars.substring(i, i + 1));
+        }
 
-        ary.add("S");
-        ary.add("U");
         ary.add("+");
         ary.add("togo");
         ary.add("canc");
@@ -652,7 +658,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 price *= -1;
             }
             SaleRecord saleRecord = new SaleRecord();
-            saleRecord.setMname(name);
+            saleRecord.setMname(menu.getID() + " " + name);
             saleRecord.setNumber(Double.valueOf(number));
             saleRecord.setPrice(price);
             saleRecordDao.insertOrReplace(saleRecord);
