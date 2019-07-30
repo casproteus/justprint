@@ -797,9 +797,12 @@ public class WifiPrintService implements Runnable{
             String category = getCategoryByName(name);
             if(!category.equals(oldCategory) && oldCategory != null){
                 content.append(generateString(width, SEP_STR2)).append("\n");
-                content.append(oldCategory).append(generateString(width - 25, " "))
-                        .append("qt=").append(subQt).append(" ")
-                        .append("sub=").append(String.format("%.2f", subTotal)).append("\n\n");
+                content.append(oldCategory);
+                StringBuilder subTotalLine = new StringBuilder("Qty=").append(subQt)
+                        .append(" Sub=").append(String.format("%.2f", subTotal));
+                content.append(generateString(width - oldCategory.length() - subTotalLine.length(), " "))
+                        .append(subTotalLine).append("\n\n");
+
                 //reset
                 subQt = Integer.valueOf(number);
                 if(saleRecord.getPrice() < 0){
@@ -860,9 +863,11 @@ public class WifiPrintService implements Runnable{
             total += Double.valueOf(saleRecord.getPrice());
         }
         content.append(generateString(width, SEP_STR2)).append("\n");
-        content.append(oldCategory).append(generateString(width - 25, " "))
-                .append("qt=").append(subQt).append(" ")
-                .append("sub=").append(String.format("%.2f", subTotal)).append("\n\n");
+        content.append(oldCategory);
+        StringBuilder subTotalLine = new StringBuilder("Qty=").append(subQt)
+                .append(" Sub=").append(String.format("%.2f", subTotal));
+        content.append(generateString(width - oldCategory.length() - subTotalLine.length(), " "))
+                .append(subTotalLine).append("\n\n");
 
         content.append(generateString(width, SEP_STR1)).append("\n");
         content.append(qt);
@@ -893,7 +898,14 @@ public class WifiPrintService implements Runnable{
         }
         List<SaleRecord> newOrderRecords = new ArrayList<>();
         for (Map.Entry<String, List<SaleRecord>> entry: map.entrySet()) {
-            newOrderRecords.addAll(entry.getValue());
+            List<SaleRecord> records = entry.getValue();
+            Collections.sort(records, new Comparator<SaleRecord>() {
+                @Override
+                public int compare(SaleRecord rec1, SaleRecord rec2) {
+                    return rec1.getId().compareTo(rec2.getId());
+                }
+            });
+            newOrderRecords.addAll(records);
         }
         return newOrderRecords;
     }
@@ -902,7 +914,7 @@ public class WifiPrintService implements Runnable{
         for(Map.Entry<Category, List<Menu>> entry: OrderCategoryFragment.categorizedContent.entrySet()){
             List<Menu> list = entry.getValue();
             for (Menu menu: list) {
-                if(name.equals(menu.getMname())){
+                if(name.equals(menu.getMname()) || name.equals(menu.getID() + " " + menu.getMname())){
                     return entry.getKey().getCname();
                 }
             }

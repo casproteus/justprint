@@ -279,13 +279,14 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             L.d(TAG, String.valueOf(view.getId()) + String.valueOf(i));
             switch (view.getId()) {
                 case R.id.buttonholder: //number buttons.
+
                     if (i < 10) {
                         InputText(Integer.toString((i + 1) % 10));
-                    } else if (i == items.length - 5) {
-                        InputText("S");
-                    } else if (i == items.length - 4) {
-                        InputText("U");
-                    } else if (i == items.length - 3) {
+//                    } else if (i < items.length - 5) {
+
+//                    } else if (i == items.length - 4) {
+//                        InputText("U");
+                    } else if (i == items.length - 3) {         //following are fixed buttons.
                         InputText("+");
                     } else if (i == items.length - 2) {
                         odIdTableTbtn.setText("TOGO");
@@ -296,10 +297,17 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         if (printCurrentSelection(true)) {    //arranged to print---didn't met the case that previous print not finished yet.
                             isCancel = true;
                         }
-                    } else if (items.length == 20 && i == 16) {
-                        InputText("H");
-                    } else {
-                        InputText(Character.toString((char) (i % 10 + 'A')));
+                    } else{
+                        String custChars = AppData.getCustomData("custChars");
+                        if(custChars.length() == 0){
+                            custChars = "SU";
+                        }
+                        int p = i - (items.length - 3 - custChars.length());
+                        if(p >= 0){
+                            InputText(custChars.substring(p, p + 1));
+                        }else {
+                            InputText(Character.toString((char) (i % 10 + 'A')));
+                        }
                     }
 
                     if (!odIdTableTbtn.isChecked()) {
@@ -384,7 +392,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         for(int i = 0; i < custChars.length(); i++){
             ary.add(custChars.substring(i, i + 1));
         }
-
+        //fixed buttons.
         ary.add("+");
         ary.add("togo");
         ary.add("canc");
