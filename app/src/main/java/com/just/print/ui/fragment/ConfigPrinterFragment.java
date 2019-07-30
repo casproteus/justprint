@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
@@ -16,7 +15,6 @@ import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
 import com.just.print.db.bean.Printer;
 import com.just.print.db.expand.DaoExpand;
-import com.just.print.db.expand.State;
 import com.just.print.sys.server.WifiPrintService;
 import com.just.print.ui.holder.ConfigPrinterViewHolder;
 import com.stupid.method.adapter.OnClickItemListener;
@@ -60,28 +58,28 @@ public class ConfigPrinterFragment extends BaseFragment implements
     private CheckBox modifyCheckBox = null;
 
     @XViewByID(R.id.modifyOrderPrint)
-    private RadioButton modifyOrderPrint = null;
+    private CheckBox modifyOrderPrint = null;
 
     @XViewByID(R.id.modifyClassPrint)
-    private RadioButton modifyClassPrint = null;
+    private CheckBox modifyClassPrint = null;
     @XViewByID(R.id.modifyNote)
     private TextView modifyNote = null;
 
     @XClick({R.id.verifyPassword})
     private void onVerifyPassword(View view) {
         String inputContent = this.password.getText().toString().trim();
-        String userPassword = AppData.getCustomData("adminPassword");
-        if(userPassword == null || userPassword.length() == 0){
-            userPassword = AppData.getLicense();
+        String adminPassword = AppData.getCustomData("adminPassword");
+        if(adminPassword == null || adminPassword.length() == 0){
+            adminPassword = AppData.getLicense();
         }
 
-        if(!userPassword.equals(inputContent)){
+        if(!adminPassword.equals(inputContent)){
             showToast("Please input the right password");
             return;
         }
 
         findViewById(R.id.confirmPassword).setVisibility(View.INVISIBLE);
-        findViewById(R.id.printersShow).setVisibility(View.VISIBLE);
+        findViewById(R.id.storeName).setVisibility(View.VISIBLE);
     }
 
     @XClick({R.id.addPrint})
@@ -89,29 +87,33 @@ public class ConfigPrinterFragment extends BaseFragment implements
             @XGetValueByView(fromId = R.id.pip, fromMethodName = "getText#toString#trim") String ip,
             @XGetValueByView(fromId = R.id.pname) TextView name,
             @XGetValueByView(fromId = R.id.checkBox) CheckBox checkBox,
-            @XGetValueByView(fromId = R.id.printType, fromMethodName = "getCheckedRadioButtonId") int checkid,
+            //@XGetValueByView(fromId = R.id.printType, fromMethodName = "getCheckedRadioButtonId") int checkid,
+            @XGetValueByView(fromId = R.id.orderPrint) CheckBox orderPrint,
+            @XGetValueByView(fromId = R.id.classPrint) CheckBox classPrint,
             @XGetValueByView(fromId = R.id.note) TextView note) {
 
         if (!isIP(ip)) {
             showToast("Please input correct IP address.");
             return;
         }
+        int type = 0;
+        if(orderPrint.isChecked() && !classPrint.isChecked()){
+            type = 1;
+        }else if(!orderPrint.isChecked() && classPrint.isChecked()){
+            type = 0;
+        }else if(!orderPrint.isChecked() && !classPrint.isChecked()){
+            type = 2;
+        }else if(orderPrint.isChecked() && classPrint.isChecked()){
+            type = 3;
+        }
+        AppData.createPrinter(ip.toString(),
+                name.getText().toString(),
+                checkBox.isChecked() ? 1 : 0,
+                type,//checkid == R.id.orderPrint ? 1 : 0,
+                note.getText().toString());
 
-        Printer printer = new Printer();
-        printer.setFirstPrint(checkBox.isChecked() ? 1 : 0);//是否全单打印,1 全单打印,0单独打印
-        printer.setPname(name.getText().toString());
-        printer.setIp(ip.toString());
-        printer.setType(checkid == R.id.orderPrint ? 1 : 0);// 1: 顺序打印,0 :类别打印
-        printer.setNote(note.getText().toString());
-        //        if (checkBox.isChecked()) {
-        //            //DaoExpand.updateAllPrintTo0(getDaoMaster().newSession().getPrinterDao());
-        //            printer.setFirstPrint(1);
-        //        }
         name.setText("");
         checkBox.setChecked(false);
-        printer.setState(State.def);
-        Applic.app.getDaoMaster().newSession().getPrinterDao().insert(printer);
-        printer.updateAndUpgrade();
         AppData.updataeLastModifyTime(null);
         loadPrinter();
     }
@@ -125,7 +127,8 @@ public class ConfigPrinterFragment extends BaseFragment implements
     @XClick({R.id.modifyPrint})
     private void modifyPrint(
             @XGetValueByView(fromId = R.id.modifyCheckBox) CheckBox modifyCheckBox,
-            @XGetValueByView(fromId = R.id.modifyPrintType2, fromMethodName = "getCheckedRadioButtonId") int checkid) {
+            @XGetValueByView(fromId = R.id.modifyOrderPrint) CheckBox modifyOrderPrint,
+            @XGetValueByView(fromId = R.id.modifyClassPrint) CheckBox modifyClassPrint) {
         if (mModifyCache != null) {
             if (!isIP(modifIP.getText().toString())) {
                 showToast("Please input correct ip");
@@ -135,7 +138,15 @@ public class ConfigPrinterFragment extends BaseFragment implements
             mModifyCache.setPname(modifName.getText().toString());
             mModifyCache.setIp(modifIP.getText().toString().trim());
             mModifyCache.setVersion(mModifyCache.getVersion() + 1);
-            mModifyCache.setType(checkid == R.id.modifyOrderPrint ? 1 : 0);// 1: 顺序打印,0 :类别打印
+            if(modifyOrderPrint.isChecked() && !modifyClassPrint.isChecked()){
+                mModifyCache.setType(1);// 1: 顺序打印,
+            }else if(!modifyOrderPrint.isChecked() && modifyClassPrint.isChecked()){
+                mModifyCache.setType(0);//0 :类别打印
+            }else if(!modifyOrderPrint.isChecked() && !modifyClassPrint.isChecked()){
+                mModifyCache.setType(2);// tbd
+            }else if(modifyOrderPrint.isChecked() && modifyClassPrint.isChecked()){
+                mModifyCache.setType(3);//按类别排序的全打
+            }
             //DaoExpand.updateAllPrintTo0(getDaoMaster().newSession().getPrinterDao());
             mModifyCache.setFirstPrint(modifyCheckBox.isChecked() ? 1 : 0);
             mModifyCache.setNote(modifyNote.getText().toString());
@@ -164,9 +175,15 @@ public class ConfigPrinterFragment extends BaseFragment implements
                 if(mModifyCache.getType() == 0){    //by category
                     modifyOrderPrint.setChecked(false);
                     modifyClassPrint.setChecked(true);
-                }else{                                  //by order time
+                }else if(mModifyCache.getType() == 1){                                  //by order time
                     modifyOrderPrint.setChecked(true);
                     modifyClassPrint.setChecked(false);
+                }else if(mModifyCache.getType() == 2){
+                    modifyOrderPrint.setChecked(false);
+                    modifyClassPrint.setChecked(false);
+                }else if(mModifyCache.getType() == 3){
+                    modifyOrderPrint.setChecked(true);
+                    modifyClassPrint.setChecked(true);
                 }
                 modifyNote.setText(mModifyCache.getNote());
 

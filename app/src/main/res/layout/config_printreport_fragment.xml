@@ -11,7 +11,7 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/notice"
+            android:id="@+id/notice2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"

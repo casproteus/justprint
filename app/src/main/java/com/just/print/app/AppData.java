@@ -3,6 +3,7 @@ package com.just.print.app;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.just.print.db.bean.Printer;
 import com.just.print.util.AppUtils;
 import com.just.print.util.L;
 import com.just.print.util.SharedPreferencesHelper;
@@ -61,6 +62,27 @@ public class AppData extends Thread{
         Applic.app.initDaoMaster(shopName);
     }
 
+    public static void createPrinter(
+            String ip,
+            String name,
+            int fullPrintMode, //是否全单打印,1 全单打印,0单独打印
+            int checkid,
+            String note) {
+        Printer printer = new Printer();
+        printer.setFirstPrint(fullPrintMode);
+        printer.setPname(name);
+        printer.setIp(ip);
+        printer.setType(checkid);// 1: 顺序打印,0 :类别打印
+        printer.setNote(note);
+        //        if (checkBox.isChecked()) {
+        //            //DaoExpand.updateAllPrintTo0(getDaoMaster().newSession().getPrinterDao());
+        //            printer.setFirstPrint(1);
+        //        }
+        printer.setState(com.just.print.db.expand.State.def);
+        Applic.app.getDaoMaster().newSession().getPrinterDao().insert(printer);
+        printer.updateAndUpgrade();
+    }
+
     public static void saveCustomizedLastCharOnPanel(Context context, String character) {
         getShopData(context).putString(KEY_CUST_LAST_CHAR, character);
     }
@@ -108,18 +130,21 @@ public class AppData extends Thread{
     public static void putCustomData(String key, String value) {
         getShopData(Applic.app.getApplicationContext()).putString("custom_" + key, value);
     }
+    public static String getCustomData(String key) {
+        return getShopData(Applic.app.getApplicationContext()).getString("custom_" + key, "");
+    }
+
 
     public static String getLastModifyTime(){
         return getShopData(Applic.app.getApplicationContext()).getString("LastSyncDate","");
     }
-
     public static void updataeLastModifyTime(String lastUpdateTime) {
         getShopData(Applic.app.getApplicationContext()).putString("LastSyncDate",
                 lastUpdateTime != null && lastUpdateTime.length() > 1 ? lastUpdateTime : String.valueOf(new Date().getTime()));
     }
 
-    public static String getCustomData(String key) {
-        return getShopData(Applic.app.getApplicationContext()).getString("custom_" + key, "");
+    public static String getServerIP() {
+        return getShopData(Applic.app.getApplicationContext()).getString("ServerIP","");
     }
 
     public static HttpURLConnection prepareConnection(String uri) throws Exception {

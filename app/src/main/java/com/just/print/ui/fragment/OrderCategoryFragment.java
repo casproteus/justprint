@@ -1,7 +1,6 @@
 package com.just.print.ui.fragment;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
@@ -47,7 +46,7 @@ public class OrderCategoryFragment extends BaseFragment {
         return R.layout.order_category_fragment;
     }
 
-
+    public static Map<Category, List<Menu>> categorizedContent = new LinkedHashMap<>();
     public XExpadnAdapter<Category, Menu> categoryExXAdapter;
 
     @Override
@@ -56,10 +55,10 @@ public class OrderCategoryFragment extends BaseFragment {
         categoryExXAdapter = new XExpadnAdapter<Category, Menu>(getContext(), TtitleCategoryViewHolder.class,
                 SubTitleMenuExpandViewHolder.class);
         odExCategory.setAdapter(categoryExXAdapter);
-        Map<Category, List<Menu>> mdata = new LinkedHashMap<>();
-        List<Category> list = DaoExpand.queryAllNotDeleted(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.DisplayIdx).list();
+
+        List<Category> categoryList = DaoExpand.queryAllNotDeleted(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.DisplayIdx).list();
         MenuDao dao = Applic.app.getDaoMaster().newSession().getMenuDao();
-        for (Category ca : list) {
+        for (Category ca : categoryList) {
             List<Menu> menus = DaoExpand.queryMenuByCategory(ca, dao);
             Collections.sort(menus, new Comparator<Menu>() {
                 @Override
@@ -120,9 +119,9 @@ public class OrderCategoryFragment extends BaseFragment {
                     return id1.length() - id2.length();
                 }
             });
-            mdata.put(ca, menus);
+            categorizedContent.put(ca, menus);
         }
-        categoryExXAdapter.addAll(mdata);
+        categoryExXAdapter.addAll(categorizedContent);
         categoryExXAdapter.setClickItemListener(new OnXItemClickListener() {
 
             @Override

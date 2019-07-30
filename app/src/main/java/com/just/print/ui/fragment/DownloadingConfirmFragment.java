@@ -2,6 +2,7 @@ package com.just.print.ui.fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -14,11 +15,12 @@ import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
 import com.stupid.method.reflect.annotation.XViewByID;
 
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 
-public class SynchronizeDBFragment extends BaseFragment{
+import java.text.SimpleDateFormat;
+
+public class DownloadingConfirmFragment extends BaseFragment{
 
     private HashMap<String,List<String>> contentForPrintMap;
 
@@ -34,13 +36,19 @@ public class SynchronizeDBFragment extends BaseFragment{
 
     @Override
     protected int getLayoutId() {
-        return R.layout.synchronize_db_fragment;
+        return R.layout.downloading_confirm_fragment;
     }
 
     @SuppressLint("NewApi")
     @Override
     public void onCreated(Bundle savedInstanceState) {
         new StupidReflect(this, getView()).init();
+
+        if(!"true".equals(AppData.getCustomData("AllowDownloadFromeOthers"))) {
+            findViewById(R.id.notice2).setVisibility(View.GONE);
+            findViewById(R.id.inputArea).setVisibility(View.GONE);
+        }
+
         store_name.setText(AppData.getShopName());
         //password.setText(AppData.getLicense());
         String lastSyncDate = AppData.getLastModifyTime();
@@ -52,7 +60,11 @@ public class SynchronizeDBFragment extends BaseFragment{
 
     @XClick({R.id.btnConfirmResetReportOK})
     private void onButtonOK(){
-        DatabaseUtil.syncDbOntoServer(store_name.getText().toString(), password.getText().toString(), false);
+        String license = password.getText().toString();
+        if(license.length() < 6){
+            license = AppData.getLicense();
+        }
+        DatabaseUtil.syncDbOntoServer(license, store_name.getText().toString(),false);
         getActivity().finish();
     }
 

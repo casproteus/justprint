@@ -1,8 +1,6 @@
 package com.just.print.app;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,13 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.just.print.db.bean.Mark;
-import com.just.print.db.expand.DaoExpand;
 import com.just.print.util.ToastUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by wangx on 2016/11/1.
