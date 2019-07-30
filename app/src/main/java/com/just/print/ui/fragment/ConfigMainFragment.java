@@ -9,7 +9,6 @@ import com.just.print.R;
 import com.just.print.app.AppData;
 import com.just.print.app.BaseFragment;
 import com.just.print.ui.activity.ConfigActivity;
-import com.just.print.util.DatabaseUtil;
 import com.just.print.util.StringUtils;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
@@ -39,7 +38,7 @@ public class ConfigMainFragment extends BaseFragment {
         } else {
             String userPassword = AppData.getCustomData("userPassword");
             if(userPassword == null || userPassword.length() == 0){
-                userPassword = AppData.getLicense();
+                userPassword = "88882288";
             }
 
             if(!userPassword.equals(inputContent)){
@@ -53,7 +52,7 @@ public class ConfigMainFragment extends BaseFragment {
     }
 
     @XClick({R.id.configMenuManager, R.id.configPrintManager, R.id.configTagManager,
-            R.id.configUserManager, R.id.configPrintReport, R.id.synchronizedb, R.id.reactivate})
+            R.id.configUserManager, R.id.configPrintReport, R.id.uploadDB, R.id.downloadDB, R.id.reactivate})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.configMenuManager:
@@ -71,9 +70,11 @@ public class ConfigMainFragment extends BaseFragment {
             case R.id.configPrintReport:
                 getEventBus().post(ConfigActivity.CHANGE_PAGE, ConfigPrintReportFragment.class);
                 break;
-            case R.id.synchronizedb:
-                //getEventBus().post(ConfigActivity.CHANGE_PAGE, SynchronizeDBFragment.class);
-                DatabaseUtil.syncDbOntoServer(AppData.getLicense(), AppData.getShopName());
+            case R.id.uploadDB:
+                getEventBus().post(ConfigActivity.CHANGE_PAGE, UploadingConfirmFragment.class);
+                break;
+            case R.id.downloadDB:
+                getEventBus().post(ConfigActivity.CHANGE_PAGE, DownloadingConfirmFragment.class);
                 break;
             case R.id.reactivate:
                 getEventBus().post(ConfigActivity.CHANGE_PAGE, ReActivateFragment.class);
