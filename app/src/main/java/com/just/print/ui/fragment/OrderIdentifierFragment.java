@@ -121,7 +121,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             case R.id.odIdOkBtn:
                 String adminPassword = AppData.getCustomData("adminPassword");
                 if(adminPassword == null || adminPassword.length() < 6){
-                    adminPassword = "EE11EE";
+                    adminPassword = "AA88AA";
                 }
                 if(adminPassword.equals(odIdTableTbtn.getText().toString()) || adminPassword.equals(odIdInput.getText().toString())){
                     //print report

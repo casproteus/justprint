@@ -121,6 +121,7 @@ public class OrderCategoryFragment extends BaseFragment {
             });
             categorizedContent.put(ca, menus);
         }
+        categoryExXAdapter.clear();
         categoryExXAdapter.addAll(categorizedContent);
         categoryExXAdapter.setClickItemListener(new OnXItemClickListener() {
 
