@@ -55,6 +55,7 @@ public class OrderCategoryFragment extends BaseFragment {
         categoryExXAdapter = new XExpadnAdapter<Category, Menu>(getContext(), TtitleCategoryViewHolder.class,
                 SubTitleMenuExpandViewHolder.class);
         odExCategory.setAdapter(categoryExXAdapter);
+        categorizedContent = new LinkedHashMap<>();
 
         List<Category> categoryList = DaoExpand.queryAllNotDeleted(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.DisplayIdx).list();
         MenuDao dao = Applic.app.getDaoMaster().newSession().getMenuDao();
