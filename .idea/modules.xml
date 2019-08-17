@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/generateddb/generateddb.iml" filepath="$PROJECT_DIR$/generateddb/generateddb.iml" />
-      <module fileurl="file://$PROJECT_DIR$/justprint.iml" filepath="$PROJECT_DIR$/justprint.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JustPrint.iml" filepath="$PROJECT_DIR$/JustPrint.iml" />
       <module fileurl="file://$PROJECT_DIR$/justprintdb/justprintdb.iml" filepath="$PROJECT_DIR$/justprintdb/justprintdb.iml" />
     </modules>
   </component>
