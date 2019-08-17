@@ -856,9 +856,10 @@ public class WifiPrintService implements Runnable{
             content.append("\n");
 
             //count qt and total price.
-            qt += Integer.valueOf(number);
             if(saleRecord.getPrice() < 0){
-                qt = 0 - qt;
+                qt -= Integer.valueOf(number);
+            }else {
+                qt += Integer.valueOf(number);
             }
             total += Double.valueOf(saleRecord.getPrice());
         }
