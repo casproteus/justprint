@@ -1,10 +1,9 @@
 *.iml
 .gradle
+.gitignore
 /local.properties
-/.idea/*
-/.idea/libraries
+.idea/gradle.xml
+.idea/*
 .DS_Store
 /build
 /captures
-*.gradle
-
