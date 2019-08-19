@@ -123,7 +123,8 @@ public class Mark {
     }
 
     public void updateAndUpgrade() {
-        version = com.just.print.db.expand.DaoExpand.queryMaxVersion(markDao);
+        //we use version as price so should not update version any more.
+        //version = com.just.print.db.expand.DaoExpand.queryMaxVersion(markDao);
         update();
     }
 
@@ -139,7 +140,9 @@ public class Mark {
 
     @Override
     public String toString() {
-        if(qt <= 1) {
+        if(qt == 0) {
+            return "";
+        }else if(qt == 1) {
             return name;
         }else{
             return name + " x" + qt;
