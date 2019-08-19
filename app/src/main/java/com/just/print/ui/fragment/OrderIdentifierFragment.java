@@ -100,7 +100,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     public static List<SelectionDetail> bkOfLastSelection;
     private static CharSequence bkOfLastTable;
     static int times = 0;
-    String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "H", "+", "togo", "canc"};
+    String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "H", "S", "U", "+", "togo", "canc"};
 
     @XClick({R.id.odIdConfigBtn, R.id.odIdSndBtn, R.id.odIdDelBtn, R.id.odIdOkBtn})
     private void exeControlCommand(View v) {
@@ -121,7 +121,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             case R.id.odIdOkBtn:
                 String adminPassword = AppData.getCustomData("adminPassword");
                 if(adminPassword == null || adminPassword.length() < 6){
-                    adminPassword = "5146676920";
+                    adminPassword = "AA88AA";
                 }
                 if(adminPassword.equals(odIdTableTbtn.getText().toString()) || adminPassword.equals(odIdInput.getText().toString())){
                     //print report
@@ -138,6 +138,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         //print code:
                         String result = WifiPrintService.getInstance().exePrintReportCommand(orders, reportStartDate, String.valueOf(new Date().getTime()));
                         if ("0".equals(result)) {
+                            findViewById(R.id.viewSwitcher).setVisibility(View.INVISIBLE);
+                            findViewById(R.id.topButtons).setVisibility(View.INVISIBLE);
                             findViewById(R.id.alertDlg).setVisibility(View.VISIBLE);
                         }
                     }
@@ -149,7 +151,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
                     } else {                            //inputting dishes status. need to check print status.
 
-                        if (bkOfLastSelection != null) {      //content not all send to printer yet.
+                        if (bkOfLastSelection != null) {      //categorizedContent not all send to printer yet.
                             //if last order has only one dish and it happened to be same
                             //as the one selected this time, waiter will think the roll back is not happenning.
                             //we decided to not display last order--- rollbackLastOrder();
@@ -183,6 +185,11 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     @XClick({R.id.buttonCancel})
     private void notResetReport(){
         findViewById(R.id.alertDlg).setVisibility(View.INVISIBLE);
+        findViewById(R.id.alertDlg).setMinimumHeight(0);
+        findViewById(R.id.topButtons).setY(0);
+        findViewById(R.id.topButtons).setVisibility(View.VISIBLE);
+        findViewById(R.id.viewSwitcher).setVisibility(View.VISIBLE);
+        findViewById(R.id.topButtons).invalidate();
     }
 
     @XClick({R.id.btnConfirmResetReportOK})
@@ -199,6 +206,11 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         AppData.putCustomData("reportIdx", String.valueOf(reportIdx + 1));
 
         findViewById(R.id.alertDlg).setVisibility(View.INVISIBLE);
+        findViewById(R.id.alertDlg).setMinimumHeight(0);
+        findViewById(R.id.topButtons).setY(0);
+        findViewById(R.id.topButtons).setVisibility(View.VISIBLE);
+        findViewById(R.id.viewSwitcher).setVisibility(View.VISIBLE);
+        findViewById(R.id.topButtons).invalidate();
     }
 
     private void updateSelectionOfCurrentDish() {
@@ -207,7 +219,11 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             boolean matched = false;
             for(int j = 0; j < marksOfCurDish.size(); j++){
                 if(marksOfCurDish.get(j).getName().equals(mark.getName())){
-                    marksOfCurDish.get(j).setQt(mark.getQt());
+                    if(mark.getQt() == 0){
+                        marksOfCurDish.remove(j);
+                    }else {
+                        marksOfCurDish.get(j).setQt(mark.getQt());
+                    }
                     matched = true;
                     break;
                 }
@@ -263,34 +279,38 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             L.d(TAG, String.valueOf(view.getId()) + String.valueOf(i));
             switch (view.getId()) {
                 case R.id.buttonholder: //number buttons.
-                    switch (i) {
-                        case 16:
-                            if(items.length == 20) {
-                                InputText("H");
-                            }else{
-                                InputText(Character.toString((char) (i % 10 + 'A')));
-                            }
-                            break;
-                        default:
-                            if (i < 10) {
-                                InputText(Integer.toString((i + 1) % 10));
-                            } else if( i == items.length - 3){
-                                InputText("+");
-                            } else if (i == items.length - 2) {
-                                odIdTableTbtn.setText("TOGO");
-                                CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
-                            } else if (i == items.length - 1) {
-                                odIdTableTbtn.setText("");
-                                //added the selected dish with negative price.
-                                if(printCurrentSelection(true)){    //arranged to print---didn't met the case that previous print not finished yet.
-                                    isCancel = true;
-                                }
-                            }else {
-                                InputText(Character.toString((char) (i % 10 + 'A')));
-                            }
-                            break;
+
+                    if (i < 10) {
+                        InputText(Integer.toString((i + 1) % 10));
+//                    } else if (i < items.length - 5) {
+
+//                    } else if (i == items.length - 4) {
+//                        InputText("U");
+                    } else if (i == items.length - 3) {         //following are fixed buttons.
+                        InputText("+");
+                    } else if (i == items.length - 2) {
+                        odIdTableTbtn.setText("TOGO");
+                        CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
+                    } else if (i == items.length - 1) {
+                        odIdTableTbtn.setText("");
+                        //added the selected dish with negative price.
+                        if (printCurrentSelection(true)) {    //arranged to print---didn't met the case that previous print not finished yet.
+                            isCancel = true;
+                        }
+                    } else{
+                        String custChars = AppData.getCustomData("custChars");
+                        if(custChars.length() == 0){
+                            custChars = "SU";
+                        }
+                        int p = i - (items.length - 3 - custChars.length());
+                        if(p >= 0){
+                            InputText(custChars.substring(p, p + 1));
+                        }else {
+                            InputText(Character.toString((char) (i % 10 + 'A')));
+                        }
                     }
-                    if(!odIdTableTbtn.isChecked()){
+
+                    if (!odIdTableTbtn.isChecked()) {
                         tmpMenu = SearchMenuFromDB(odIdInput.getText().toString());
                         if (null != tmpMenu) {
                             odIdfrName.setText(tmpMenu.getMname());
@@ -350,7 +370,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         //CustomerSelection.getInstance().setTableNumber(odIdTableNumEt.getText().toString());
         storedMenu = null;
         String definedLast = AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR);
-        items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E"};
+        items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C"};
         List<String> ary = new ArrayList<String>();
         for(int i = 0; i < items.length; i++){
             ary.add(items[i]);
@@ -364,7 +384,15 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 ary.add(String.valueOf(lastChar));
             }
         }
-
+        //add the custChars
+        String custChars = AppData.getCustomData("custChars");
+        if(custChars.length() == 0){
+            custChars = "SU";
+        }
+        for(int i = 0; i < custChars.length(); i++){
+            ary.add(custChars.substring(i, i + 1));
+        }
+        //fixed buttons.
         ary.add("+");
         ary.add("togo");
         ary.add("canc");
@@ -623,10 +651,14 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             Menu menu = selectionDetail.getDish();
             String name = menu.getMname();
             Double price = menu.getPrice() * number;
-            List<Mark> marks = selectionDetail.getMarkList();
-            if(marks != null){
-                for (Mark mark : marks) {
-                    price += ((float)mark.getVersion())/100.0 * mark.getQt();
+
+            //if set as conbine mark price into dish price.
+            if("true".equals(AppData.getCustomData("conbineMarkPrice"))) {
+                List<Mark> marks = selectionDetail.getMarkList();
+                if (marks != null) {
+                    for (Mark mark : marks) {
+                        price += ((float) mark.getVersion()) / 100.0 * mark.getQt();
+                    }
                 }
             }
 
@@ -634,10 +666,29 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 price *= -1;
             }
             SaleRecord saleRecord = new SaleRecord();
-            saleRecord.setMname(name);
+            saleRecord.setMname(menu.getID() + " " + name);
             saleRecord.setNumber(Double.valueOf(number));
             saleRecord.setPrice(price);
             saleRecordDao.insertOrReplace(saleRecord);
+
+            if (!"true".equals(AppData.getCustomData("combineMarkPrice"))) {  //by defalut mark price is not added into salesrecord, so, generate saleRecord for the marks.
+                List<Mark> marks = selectionDetail.getMarkList();
+                if (marks != null) {
+                    for (Mark mark : marks) {
+                        Double markPrice = ((float) mark.getVersion()) / 100.0 * mark.getQt();
+                        if(markPrice >= 0.01) {
+                            SaleRecord saleRecordForMark = new SaleRecord();
+                            saleRecordForMark.setMname(mark.getName());
+                            saleRecordForMark.setNumber(Double.valueOf(mark.getQt()));
+                            if(isCancel){
+                                markPrice *= -1;
+                            }
+                            saleRecordForMark.setPrice(markPrice);
+                            saleRecordDao.insertOrReplace(saleRecordForMark);
+                        }
+                    }
+                }
+            }
         }
         bkOfLastSelection = null;
         bkOfLastTable = "TB";
