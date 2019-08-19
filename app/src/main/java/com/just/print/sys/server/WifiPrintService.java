@@ -788,6 +788,7 @@ public class WifiPrintService implements Runnable{
         int qt = 0;
         String oldCategory = null;
         Double subTotal = Double.valueOf(0);
+        Double cancTotal = Double.valueOf(0);
         int subQt = 0;
         saleRecords = sortSaleRecordsByCategory(saleRecords);
         for(SaleRecord saleRecord:saleRecords){
@@ -810,11 +811,13 @@ public class WifiPrintService implements Runnable{
                 subQt = Integer.valueOf(number);
                 if(price < 0){
                     subQt = 0 - subQt;
+                    cancTotal += price;
                 }
                 subTotal = Double.valueOf(price);
             }else{
                 if(price < 0){
                     subQt -= Integer.valueOf(number);
+                    cancTotal += price;
                 }else {
                     subQt += Integer.valueOf(number);
                 }
@@ -834,7 +837,7 @@ public class WifiPrintService implements Runnable{
             }catch(Exception e){
             }
             if(lengthOfName >= maxLength){
-                name = name.substring(0, maxLength - 3) + "...";
+                name = trunkDishName(name, maxLength);
                 lengthOfName = getLengthOfString(name);
             }
             content.append(name);
@@ -878,15 +881,32 @@ public class WifiPrintService implements Runnable{
         content.append(qt);
         content.append(" ITEMS");
 
-        String totalStr = String.format("%.2f", total);
-        String space = generateString(width - 7 - String.valueOf(qt).length() - totalStr.length(), " ");
-        content.append(space);
-
-        content.append("=");
-        content.append(totalStr);
+        content.append(" Total=");
+        content.append(String.format("%.2f", total - cancTotal));
+        content.append(" Canc=");
+        content.append(String.format("%.2f", cancTotal));
+        content.append("  Net=");
+        content.append(String.format("%.2f", total));
         //categorizedContent.append(generateSpaceString(5)).append("* ").append(str.getName()).append(" *\n");
         content.append("\n\n\n\n\n");
         return content.toString();
+    }
+
+    private String trunkDishName(String content, int maxLength) {
+        int length = content.length();
+        int realWidth = 0;
+        for(int i = 0; i < length; i++) {
+            realWidth++;
+            char c = content.charAt(i);
+            if(c >=19968 && c <= 171941) {
+                realWidth++;
+                if(realWidth == maxLength){
+                    return content.substring(0, i - 3 ) + "...";
+                }
+            }
+        }
+
+        return content;
     }
 
     private List<SaleRecord> sortSaleRecordsByCategory(List<SaleRecord> saleRecords) {
