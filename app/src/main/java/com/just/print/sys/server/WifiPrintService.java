@@ -783,15 +783,19 @@ public class WifiPrintService implements Runnable{
 
         //sales categorizedContent------------------------
         Double total = Double.valueOf(0);
+        Double totalDisc = Double.valueOf(0);
+
         int qt = 0;
         String oldCategory = null;
         Double subTotal = Double.valueOf(0);
+        Double cancTotal = Double.valueOf(0);
         int subQt = 0;
         saleRecords = sortSaleRecordsByCategory(saleRecords);
         for(SaleRecord saleRecord:saleRecords){
             String name = saleRecord.getMname();
             String number = String.valueOf(saleRecord.getNumber().intValue());
-            String price = String.format("%.2f", saleRecord.getPrice());//String.valueOf(((int)(saleRecord.getPrice() * 100))/100.0);
+            Double price = saleRecord.getPrice();
+            String priceStr = String.format("%.2f", price);//String.valueOf(((int)(tmpPrice * 100))/100.0);
 
             //added it into the map, to make it regrouped by categorize.
             String category = getCategoryByName(name);
@@ -805,21 +809,23 @@ public class WifiPrintService implements Runnable{
 
                 //reset
                 subQt = Integer.valueOf(number);
-                if(saleRecord.getPrice() < 0){
+                if(price < 0){
                     subQt = 0 - subQt;
+                    cancTotal += price;
                 }
-                subTotal = Double.valueOf(saleRecord.getPrice());
+                subTotal = Double.valueOf(price);
             }else{
-                if(saleRecord.getPrice() < 0){
+                if(price < 0){
                     subQt -= Integer.valueOf(number);
+                    cancTotal += price;
                 }else {
                     subQt += Integer.valueOf(number);
                 }
-                subTotal += Double.valueOf(saleRecord.getPrice());
+                subTotal += Double.valueOf(price);
             }
             oldCategory = category;
 
-            if(saleRecord.getPrice() < 0){
+            if(price < 0){
                 name = REFUND_PREFIX + name;
             }
 
@@ -831,7 +837,7 @@ public class WifiPrintService implements Runnable{
             }catch(Exception e){
             }
             if(lengthOfName >= maxLength){
-                name = name.substring(0, maxLength - 3) + "...";
+                name = trunkDishName(name, maxLength);
                 lengthOfName = getLengthOfString(name);
             }
             content.append(name);
@@ -842,26 +848,27 @@ public class WifiPrintService implements Runnable{
             content.append(number);
 
             //price
-            int spaceLeft = width - (content.length() + price.length() + 1);
+            int spaceLeft = width - (content.length() + priceStr.length() + 1);
             if(spaceLeft < 2){
                 content.append(" ");
             }else{
                 content.append(generateString(spaceLeft, " "));
             }
             content.append("=");
-            if(saleRecord.getPrice() > 0){
+            if(price > 0){
                 content.append(" ");
             }
-            content.append(price);
+            content.append(priceStr);
             content.append("\n");
 
             //count qt and total price.
-            if(saleRecord.getPrice() < 0){
+            if(price < 0){
                 qt -= Integer.valueOf(number);
+                totalDisc += price;
             }else {
                 qt += Integer.valueOf(number);
+                total += Double.valueOf(price);
             }
-            total += Double.valueOf(saleRecord.getPrice());
         }
         content.append(generateString(width, SEP_STR2)).append("\n");
         content.append(oldCategory);
@@ -874,15 +881,32 @@ public class WifiPrintService implements Runnable{
         content.append(qt);
         content.append(" ITEMS");
 
-        String totalStr = String.format("%.2f", total);
-        String space = generateString(width - 7 - String.valueOf(qt).length() - totalStr.length(), " ");
-        content.append(space);
-
-        content.append("=");
-        content.append(totalStr);
+        content.append(" Total=");
+        content.append(String.format("%.2f", total - cancTotal));
+        content.append(" Canc=");
+        content.append(String.format("%.2f", cancTotal));
+        content.append("  Net=");
+        content.append(String.format("%.2f", total));
         //categorizedContent.append(generateSpaceString(5)).append("* ").append(str.getName()).append(" *\n");
         content.append("\n\n\n\n\n");
         return content.toString();
+    }
+
+    private String trunkDishName(String content, int maxLength) {
+        int length = content.length();
+        int realWidth = 0;
+        for(int i = 0; i < length; i++) {
+            realWidth++;
+            char c = content.charAt(i);
+            if(c >=19968 && c <= 171941) {
+                realWidth++;
+                if(realWidth == maxLength){
+                    return content.substring(0, i - 3 ) + "...";
+                }
+            }
+        }
+
+        return content;
     }
 
     private List<SaleRecord> sortSaleRecordsByCategory(List<SaleRecord> saleRecords) {
