@@ -19,6 +19,13 @@
         android:src="@drawable/change"
         />
 
+    <Space
+        android:id="@+id/space"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
     <ImageButton
         android:id="@+id/delCategory"
         style="?android:attr/buttonStyleSmall"

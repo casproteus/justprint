@@ -783,12 +783,12 @@ public class WifiPrintService implements Runnable{
 
         //sales categorizedContent------------------------
         Double total = Double.valueOf(0);
-        Double totalDisc = Double.valueOf(0);
+        Double cancTotal = Double.valueOf(0);
 
-        int qt = 0;
+        int qtTotal = 0;
+        int qtCancel = 0;
         String oldCategory = null;
         Double subTotal = Double.valueOf(0);
-        Double cancTotal = Double.valueOf(0);
         int subQt = 0;
         saleRecords = sortSaleRecordsByCategory(saleRecords);
         for(SaleRecord saleRecord:saleRecords){
@@ -811,18 +811,17 @@ public class WifiPrintService implements Runnable{
                 subQt = Integer.valueOf(number);
                 if(price < 0){
                     subQt = 0 - subQt;
-                    cancTotal += price;
                 }
                 subTotal = Double.valueOf(price);
             }else{
                 if(price < 0){
                     subQt -= Integer.valueOf(number);
-                    cancTotal += price;
                 }else {
                     subQt += Integer.valueOf(number);
                 }
                 subTotal += Double.valueOf(price);
             }
+
             oldCategory = category;
 
             if(price < 0){
@@ -861,12 +860,12 @@ public class WifiPrintService implements Runnable{
             content.append(priceStr);
             content.append("\n");
 
-            //count qt and total price.
+            //count total qt and total price. which will be displayed at the end of the report.
             if(price < 0){
-                qt -= Integer.valueOf(number);
-                totalDisc += price;
+                qtCancel += Integer.valueOf(number);
+                cancTotal += price;
             }else {
-                qt += Integer.valueOf(number);
+                qtTotal += Integer.valueOf(number);
                 total += Double.valueOf(price);
             }
         }
@@ -878,15 +877,12 @@ public class WifiPrintService implements Runnable{
                 .append(subTotalLine).append("\n\n");
 
         content.append(generateString(width, SEP_STR1)).append("\n");
-        content.append(qt);
-        content.append(" ITEMS");
-
-        content.append(" Total=");
-        content.append(String.format("%.2f", total - cancTotal));
-        content.append(" Canc=");
-        content.append(String.format("%.2f", cancTotal));
-        content.append("  Net=");
-        content.append(String.format("%.2f", total));
+        content.append(" ITEMS SENT:    ").append(qtTotal).append("\n");
+        content.append(" TOTAL SENT:    $").append(String.format("%.2f", total)).append("\n\n");
+        content.append(" ITEMS CANCEL:  ").append(qtCancel).append("\n");
+        content.append(" TOTAL CANCEL:  $").append(String.format("%.2f", cancTotal)).append("\n");
+        content.append(generateString(width, SEP_STR1)).append("\n");
+        content.append(" NET:           $").append(String.format("%.2f", total + cancTotal));
         //categorizedContent.append(generateSpaceString(5)).append("* ").append(str.getName()).append(" *\n");
         content.append("\n\n\n\n\n");
         return content.toString();
@@ -1003,7 +999,7 @@ public class WifiPrintService implements Runnable{
             content.append("\n\n");
         }
         //table
-        content.append(generateString((width - tableName.length() - 2)/2, " ")).append("(").append(tableName).append(")").append("\n");
+        content.append(generateString((width - tableName.length() - 2)/2, " ")).append("(").append(tableName).append(")").append("\n\n");
         //kitchenBillIdx and time
         content.append(kitchenBillIdx)
                 .append(generateString(width - kitchenBillIdx.length() - dateStr.length(), SEPRATOR))
