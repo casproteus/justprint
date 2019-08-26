@@ -145,7 +145,7 @@ public class WifiPrintService implements Runnable{
     private WifiPrintService(){
         wifiCommunication = new WifiCommunication(handler);
         reInitPrintRelatedMaps();
-        serverIP = AppData.getCustomData("ServerIP");
+        serverIP = AppData.getCustomData("serverip");
         executorService.execute(this);
         L.d(TAG,"Create Service Successful");
     }
@@ -170,15 +170,14 @@ public class WifiPrintService implements Runnable{
             return ERROR;                     //未打印完毕
         }
 
-        if(StringUtils.isBlank(serverIP)){
-            if (manageDishesIntoMapAndWaitingForPrint(isCancel)) {
-                return SUCCESS;
-            }else {
-                return ERROR;
-            }
-        }else{
-            manageDishesIntoStringToSendToServer(serverIP);
+        if(!StringUtils.isBlank(serverIP)){
+            sendToServer(serverIP);
+        }
+
+        if (manageDishesIntoMapAndWaitingForPrint(isCancel)) {
             return SUCCESS;
+        }else {
+            return ERROR;
         }
     }
 
@@ -420,31 +419,30 @@ public class WifiPrintService implements Runnable{
         }
     }
 
-    private void manageDishesIntoStringToSendToServer(String serverIP) {
-        sendToServer(serverIP);
-    }
-
     private void sendToServer(String serverIP) {
         //1、遍历每个选中的菜，并分别遍历加在其上的打印机。并在ipSelectionsMap上对应IP后面增加菜品
-        //if(CustomerSelection.getInstance().getSelectedDishes().size() > 0) {
+        if(CustomerSelection.getInstance().getSelectedDishes().size() > 0) {
             HttpURLConnection urlConnection = null;
             try {
-                urlConnection = AppData.prepareConnection("http://" + serverIP +"/menus");
+                urlConnection = AppData.prepareConnection("http://" + serverIP +"/newOrders");
 
-                JSONObject json = new JSONObject();//创建json对象
-                json.put("tag", URLEncoder.encode(AppData.getUserName(), "UTF-8"));//使用URLEncoder.encode对特殊和不可见字符进行编码
-                json.put("msg", URLEncoder.encode("this is a test", "UTF-8"));//把数据put进json对象中
-                String jsonstr = json.toString();//把JSON对象按JSON的编码格式转换为字符串
+                for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
+                    List<M2M_MenuPrint> printerList = selectionDetail.getDish().getM2M_MenuPrintList();
+                    JSONObject json = new JSONObject();//创建json对象
+                    json.put("tag", URLEncoder.encode(AppData.getUserName(), "UTF-8"));//使用URLEncoder.encode对特殊和不可见字符进行编码
+                    json.put("msg", URLEncoder.encode("this is a test", "UTF-8"));//把数据put进json对象中
+                    String jsonstr = json.toString();//把JSON对象按JSON的编码格式转换为字符串
+                }
 
                 AppData.writeOut(urlConnection, jsonstr);
 
-                if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {//得到服务端的返回码是否连接成功
 
+                if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {//得到服务端的返回码是否连接成功
                     String rjson = AppData.readBackFromConnection(urlConnection);
 
                     Log.d("zxy", "rjson=" + rjson);//rjson={"json":true}
                 } else {
-                    Log.d("L", "response code is:" + urlConnection.getResponseCode());
+                    Log.e("L", "response code is:" + urlConnection.getResponseCode());
                 }
             } catch (Exception e) {
                 Log.d("L", "Exception happened when sending log to server: " + serverIP +"/useraccounts/loglog");//rjson={"json":true}
@@ -453,26 +451,7 @@ public class WifiPrintService implements Runnable{
                     urlConnection.disconnect();//使用完关闭TCP连接，释放资源
                 }
             }
-        //}
-
-        for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
-            List<M2M_MenuPrint> printerList = selectionDetail.getDish().getM2M_MenuPrintList();
-            for(M2M_MenuPrint m2m: printerList) {
-                Printer printer = m2m.getPrint();
-                if(printer == null) {                   //should never happen, jist in case someone changed db.
-                    ToastUtil.showToast("Selected dish not connected with any printer yet.");
-                    return;
-                }
-
-                String ip = printer.getIp();
-                L.d(TAG,"Adding a dish to ipSelectionsMap, ip:" + ip);
-
-                //TODO: translate the dish into a json stroing.
-            }
         }
-
-        L.d(TAG, "Order is translated into ipContentMap map and ready for print.");
-        ToastUtil.showToast("PRINTING...");
     }
 
     private boolean isReadyToInitNewPrintJob(){
