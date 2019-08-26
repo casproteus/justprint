@@ -143,10 +143,6 @@ public class AppData extends Thread{
                 lastUpdateTime != null && lastUpdateTime.length() > 1 ? lastUpdateTime : String.valueOf(new Date().getTime()));
     }
 
-    public static String getServerIP() {
-        return getShopData(Applic.app.getApplicationContext()).getString("ServerIP","");
-    }
-
     public static HttpURLConnection prepareConnection(String uri) throws Exception {
         HttpURLConnection urlConnection;
         URL url = new URL(uri);
