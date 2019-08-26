@@ -201,12 +201,12 @@ public class WifiPrintService implements Runnable{
         //2、遍历ipSelectionsMap，如对应打印机type为0, 则对其后的value(dishes)按照类别进行排序
         L.d(TAG,"checking how many dishes under each printer...");
         for(Map.Entry entry: ipSelectionsMap.entrySet()){
-            String key = (String)entry.getKey();
-            List<SelectionDetail> dishList = (List<SelectionDetail>) entry.getValue();
+            String key = (String)entry.getKey();    //the key is printer ip
+            List<SelectionDetail> dishList = (List<SelectionDetail>) entry.getValue(); //get all dishes to be printed in this printer.
 
             L.d(TAG,"ip:" + key + ", list size:" + dishList.size());
             if(ipPrinterMap.get(key).getType() != 1 && dishList.size() > 0){
-                //订单排序
+                //order the dishes in this this printer.
                 Collections.sort(ipSelectionsMap.get(key), new Comparator<SelectionDetail>() {
                     @Override
                     public int compare(SelectionDetail dishesDetailModel, SelectionDetail t1) {
@@ -220,15 +220,14 @@ public class WifiPrintService implements Runnable{
 
         //3、再次遍历ipSelectionsMap, 封装打印信息
         //add a kitchenBill on top, so when there's issue in printer, user can found a bill was miss printed.
-        String kitchenBillIdx = AppData.getCustomData("kitchenBillIdx");
+        String kitchenBillIdx = AppData.getCustomData("kitchenBillIdx");  //and it can also be used to know which order come in first.
         if(StringUtils.isBlank(kitchenBillIdx)){
             kitchenBillIdx = "1";
         }
+        AppData.putCustomData("kitchenBillIdx", String.valueOf(Integer.valueOf(kitchenBillIdx) + 1));   //update thee kbi into higer value.
 
-        AppData.putCustomData("kitchenBillIdx", String.valueOf(Integer.valueOf(kitchenBillIdx) + 1));
-
-        String mobileIdx = AppData.getCustomData("mobileMark");
-        if(!StringUtils.isBlank(mobileIdx)){
+        String mobileIdx = AppData.getCustomData("mobileMark");     //used for knowing printed from which mobile.
+        if(!StringUtils.isBlank(mobileIdx)){                            //@TODO: should be improved by using pos to print, then no need this mobile Mark anymore.
             kitchenBillIdx = mobileIdx + kitchenBillIdx;
         }
 
@@ -242,7 +241,7 @@ public class WifiPrintService implements Runnable{
                     L.d("ERROR!", "the dishList are different from ipSelectionsMap.get(printerIP)!!!!");
                 }
                 Printer printer = ipPrinterMap.get(printerIP);
-                if(printer.getFirstPrint() == 1){  //全单封装
+                if(printer.getFirstPrint() == 1){  //全单封装---following each printerip(key), there will be only one formatted string
                     if(printer.getType() == 0){   //if category is set then cut by category.
                         List<SelectionDetail> tlist = new ArrayList<SelectionDetail>();
                         String currentCategory = null;
@@ -265,10 +264,10 @@ public class WifiPrintService implements Runnable{
                     }else{
                         ipContentMap.get(printerIP).add(formatContentForPrint(dishList, kitchenBillIdx, isCancel) + "\n\n\n\n\n");
                     }
-                }else{                                          //分单封装
+                }else{                                          //分单封装---following each key(printer ip), there will be a list of formatted string.
                     for(SelectionDetail selectionDetail : dishList){
-                        List<SelectionDetail> tlist = new ArrayList<SelectionDetail>();
-                        tlist.add(selectionDetail);
+                        List<SelectionDetail> tlist = new ArrayList<SelectionDetail>();     //use list to fullfill the parameter format of the format method,
+                        tlist.add(selectionDetail);                                         //only one dish will be added into this list.
                         ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx, isCancel) + "\n\n");
                     }
                 }
@@ -420,22 +419,32 @@ public class WifiPrintService implements Runnable{
     }
 
     private void sendToServer(String serverIP) {
-        //1、遍历每个选中的菜，并分别遍历加在其上的打印机。并在ipSelectionsMap上对应IP后面增加菜品
         if(CustomerSelection.getInstance().getSelectedDishes().size() > 0) {
             HttpURLConnection urlConnection = null;
             try {
                 urlConnection = AppData.prepareConnection("http://" + serverIP +"/newOrders");
-
+                JSONObject json = new JSONObject();//创建json对象
+                json.put("table", URLEncoder.encode(AppData.getUserName(), "UTF-8"));//使用URLEncoder.encode对特殊和不可见字符进行编码
+                json.put("billIndex", URLEncoder.encode("this is a test", "UTF-8"));//把数据put进json对象中
+                StringBuilder orderContent = new StringBuilder();
                 for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
-                    List<M2M_MenuPrint> printerList = selectionDetail.getDish().getM2M_MenuPrintList();
-                    JSONObject json = new JSONObject();//创建json对象
-                    json.put("tag", URLEncoder.encode(AppData.getUserName(), "UTF-8"));//使用URLEncoder.encode对特殊和不可见字符进行编码
-                    json.put("msg", URLEncoder.encode("this is a test", "UTF-8"));//把数据put进json对象中
-                    String jsonstr = json.toString();//把JSON对象按JSON的编码格式转换为字符串
+                    orderContent.append("DishStart:");
+                    orderContent.append(URLEncoder.encode(selectionDetail.getDish().getMname())).append("\n");
+                    orderContent.append(selectionDetail.getDish().getPrice()).append("\n");
+                    orderContent.append(selectionDetail.getDishNum()).append("\n");
+
+                    List<Mark> marks = selectionDetail.getMarkList();
+                    orderContent.append("MarkStart:");
+                    for(Mark mark : marks){
+                        orderContent.append(mark.getName()).append("\n");
+                        orderContent.append(mark.getQt()).append("\n");
+                        orderContent.append(mark.getState()).append("\n");
+                    }
+
+                    json.put("orderContent", orderContent.toString());
                 }
 
-                AppData.writeOut(urlConnection, jsonstr);
-
+                AppData.writeOut(urlConnection, json.toString());//把JSON对象按JSON的编码格式转换为字符串
 
                 if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {//得到服务端的返回码是否连接成功
                     String rjson = AppData.readBackFromConnection(urlConnection);
@@ -445,7 +454,7 @@ public class WifiPrintService implements Runnable{
                     Log.e("L", "response code is:" + urlConnection.getResponseCode());
                 }
             } catch (Exception e) {
-                Log.d("L", "Exception happened when sending log to server: " + serverIP +"/useraccounts/loglog");//rjson={"json":true}
+                Log.e("L", "Exception happened when sending dishes to server: " + serverIP);//rjson={"json":true}
             } finally {
                 if(urlConnection != null) {
                     urlConnection.disconnect();//使用完关闭TCP连接，释放资源
@@ -949,6 +958,7 @@ public class WifiPrintService implements Runnable{
         String SEPRATOR = isCancel ? "<" : " ";
 
         StringBuilder content = new StringBuilder();
+        //tiltle---could be used for kithch name, empty lines.......
         String title = AppData.getCustomData("kitchentitle");
         if(title.length() > 0){
             if(title.endsWith("lines")) {
@@ -965,11 +975,12 @@ public class WifiPrintService implements Runnable{
                 content.append(title);
             }
         }
-        //StringBuilder categorizedContent = new StringBuilder(AppData.getCustomData("kitchentitle"));
+        //if it's cancel, then add Cancel.........................
         if(isCancel){
             content.append("       *** (取消CANCEL) ***\n");
         }
 
+        //table name and bill index and  print time.......................
         DateFormat df = new SimpleDateFormat("HH:mm");
         String tableName = CustomerSelection.getInstance().getTableNumber();
         String dateStr = df.format(new Date());
@@ -983,7 +994,7 @@ public class WifiPrintService implements Runnable{
         content.append(kitchenBillIdx)
                 .append(generateString(width - kitchenBillIdx.length() - dateStr.length(), SEPRATOR))
                 .append(dateStr).append("\n");
-
+        //Seperator================================================
         String sep_str1 = AppData.getCustomData("sep_str1");
         if(sep_str1 == null || sep_str1.length() == 0){
             sep_str1 = SEP_STR1;
@@ -995,12 +1006,13 @@ public class WifiPrintService implements Runnable{
 
         content.append(generateString(width, sep_str1)).append("\n\n");
 
+        //Main contents starts here.........................................................
         for(SelectionDetail dd:list){
             StringBuilder sb = new StringBuilder();
-            sb.append(dd.getDish().getID());
+            sb.append(dd.getDish().getID());                //dish id
             sb.append(generateString(5 - dd.getDish().getID().length(), SEPRATOR));
-            sb.append(dd.getDish().getMname());
-            if(dd.getDishNum() > 1){
+            sb.append(dd.getDish().getMname());             //dish name
+            if(dd.getDishNum() > 1){                        //dish number
                 String space = SEPRATOR;
                 int occupiedLength = getLengthOfString(sb.toString());
                 sb.append(generateString(width - occupiedLength - (dd.getDishNum() < 10 ? 2 : 3), SEPRATOR));
@@ -1008,7 +1020,7 @@ public class WifiPrintService implements Runnable{
             }
             content.append(sb);
             content.append("\n");
-            if(dd.getMarkList() != null) {
+            if(dd.getMarkList() != null) {                  //dish marks.
                 for (Mark mark : dd.getMarkList()) {
                     content.append(generateString(5, SEPRATOR)).append("* ").append(mark).append(" *\n");
                 }
