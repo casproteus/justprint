@@ -617,7 +617,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
      while (true){
      i++;
      AppUtils.sleep(1000);
-     if( bkOfLastSelection == null && "TB".equals(bkOfLastTable)){
+     if( lastSelection == null && "TB".equals(bkOfLastTable)){
      return;
      }
      }
@@ -627,7 +627,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
      //when connection come back, it will be printed out.
      private void rollbackLastOrder() {
      //save the menu into database.
-     for(SelectionDetail selectionDetail : bkOfLastSelection){
+     for(SelectionDetail selectionDetail : lastSelection){
      CustomerSelection.getInstance().addSelectedDish(selectionDetail);
      }
 

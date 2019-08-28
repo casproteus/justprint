@@ -33,11 +33,11 @@ public class ConfigMenuViewHolder extends XViewHolder<Menu> {
     @Override
     public void onResetView(Menu menu, int i) {
         mname.setText(menu.getMname());
-        msg.setText("Code:" + menu.getID());
+        msg.setText(menu.getID());
         if (menu.getM2M_MenuPrintList() != null)
-            msg.append(" Printers: " + menu.getM2M_MenuPrintList().size());
+            msg.append(" P: " + menu.getM2M_MenuPrintList().size());
 
-        msg.append(" Price: " + menu.getPrice());
+        msg.append(" $: " + menu.getPrice());
 
     }
 }

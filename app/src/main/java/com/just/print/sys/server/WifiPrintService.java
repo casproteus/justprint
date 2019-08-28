@@ -7,7 +7,6 @@ import POSSDK.POSSDK;
 import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 import android_wifi_api.SearchPortInfo;
 
@@ -30,10 +29,6 @@ import com.just.print.util.StringUtils;
 import com.just.print.util.ToastUtil;
 import com.zj.wfsdk.WifiCommunication;
 
-import org.json.JSONObject;
-
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -417,6 +412,11 @@ public class WifiPrintService implements Runnable{
     private void sendToServer(String serverip) {
         DataSyncService instance = new DataSyncService();
         instance.serverip = serverip;
+
+        instance.lastSelection = new ArrayList<SelectionDetail>();
+        for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
+            instance.lastSelection.add(selectionDetail);
+        }
 
         instance.start();
     }

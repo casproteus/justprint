@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,11 +25,12 @@ import java.util.List;
  */
 public class DataSyncService extends Thread{
 
+    public ArrayList<SelectionDetail> lastSelection;
     protected String serverip;
 
     @Override
     public void run() {     //must use bk, because if use CustomerSelection.getInstance().getSelectedDishes(), it might be cleaned before thread started.
-        if(OrderIdentifierFragment.bkOfLastSelection.size() > 0) {
+        if(lastSelection != null && lastSelection.size() > 0) {
             HttpURLConnection urlConnection = null;
             try {
                 urlConnection = AppData.prepareConnection("http://" + serverip + "/security/newOrders");
@@ -36,7 +38,7 @@ public class DataSyncService extends Thread{
                 json.put("table", URLEncoder.encode(AppData.getUserName(), "UTF-8"));//使用URLEncoder.encode对特殊和不可见字符进行编码
                 json.put("billIndex", URLEncoder.encode("this is a test", "UTF-8"));//把数据put进json对象中
                 StringBuilder orderContent = new StringBuilder();
-                for (SelectionDetail selectionDetail : OrderIdentifierFragment.bkOfLastSelection) {
+                for (SelectionDetail selectionDetail : lastSelection) {
                     orderContent.append("DishStart:");
                     orderContent.append(URLEncoder.encode(selectionDetail.getDish().getMname())).append("\n");
                     orderContent.append(selectionDetail.getDish().getPrice()).append("\n");

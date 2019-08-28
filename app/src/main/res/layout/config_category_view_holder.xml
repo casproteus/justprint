@@ -22,7 +22,7 @@
     <Space
         android:id="@+id/space"
         style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
+        android:layout_width="10dp"
         android:layout_height="wrap_content"
         />
 

@@ -14,7 +14,7 @@
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.3">
+            android:layout_weight="0.4">
 
             <Button
                 android:id="@+id/showCategory"
@@ -35,7 +35,7 @@
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.7">
+            android:layout_weight="0.6">
 
             <Button
                 android:id="@+id/showMenu"
