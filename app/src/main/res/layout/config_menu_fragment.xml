@@ -29,6 +29,7 @@
                 android:layout_below="@+id/showCategory"
                 android:layout_centerHorizontal="true"
                 android:choiceMode="singleChoice"
+                android:listSelector="@android:color/darker_gray"
                 android:dividerHeight="3dp" />
         </RelativeLayout>
 

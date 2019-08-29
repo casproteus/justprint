@@ -83,18 +83,19 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
                     Category cag = categoryXAdapter.get(i);
                     long cid = cag.getId();
                     List<Menu> mList = menuDao._queryCategory_MenuList(cid);
-                    for(Menu menu:mList) {
-                        //delete menu-printer maps
-                        List<M2M_MenuPrint> m2mList = menu.getM2M_MenuPrintList();
-                        for(M2M_MenuPrint m2m:m2mList) {
-                            m2m.delete();
-                        }
 
-                        // delete menu.
-                        menu.delete();
-                    }
-                    categoryXAdapter.get(i).logicDelete();
-                    loadCategory();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage("Are you sure to delete \"" + cag.getCname() + "\"?")
+                            .setTitle("Notice");
+                    builder.setNegativeButton("Delete", new CategoryDeleteListener(mList, cag));
+                    builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    builder.show();
+
                     break;
                 case R.id.modifyMenu:
                     findViewById(R.id.categoryLayout).setVisibility(View.GONE);
@@ -138,17 +139,62 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
                     }
                     */
                     M2M_MenuPrintDao m2mDao = Applic.app.getDaoMaster().newSession().getM2M_MenuPrintDao();
-                    List<M2M_MenuPrint> m2mList = menuXAdapter.get(i).getM2M_MenuPrintList();
 
-                    for(M2M_MenuPrint m2m:m2mList) {
-                        m2m.delete();
-                    }
-                    menuDao.delete(menuXAdapter.get(i));
-                    loadMenu();
+                    new AlertDialog.Builder(getActivity())
+                            .setMessage("Are you sure to delete \"" + menuXAdapter.get(i).getMname() + "\"?")
+                            .setTitle("Notice")
+                            .setNegativeButton("Delete", new MenuDeleteListener(menuXAdapter.get(i)))
+                            .setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }).show();
+
                     break;
             }
         }
     };
+
+    private class CategoryDeleteListener implements DialogInterface.OnClickListener{
+        List<Menu> menus;
+        Category category;
+        public CategoryDeleteListener(List<Menu> menus, Category category){
+            this.menus = menus;
+            this.category = category;
+        }
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            for(Menu menu:menus) {
+                //delete menu-printer maps
+                List<M2M_MenuPrint> m2mList = menu.getM2M_MenuPrintList();
+                for(M2M_MenuPrint m2m:m2mList) {
+                    m2m.delete();
+                }
+                // delete menu.
+                menu.delete();
+            }
+            category.logicDelete();
+            loadCategory();
+        }
+    }
+
+    private class MenuDeleteListener implements DialogInterface.OnClickListener{
+        Menu menu;
+        public MenuDeleteListener(Menu menu){
+            this.menu = menu;
+        }
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            dialog.dismiss();
+            List<M2M_MenuPrint> m2mList = menu.getM2M_MenuPrintList();
+            for(M2M_MenuPrint m2m:m2mList) {
+                m2m.delete();
+            }
+            menuDao.delete(menu);
+            loadMenu();
+        }
+    }
 
     private void onChangeCategory(Category category) {
         mCategory = category;

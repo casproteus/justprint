@@ -35,9 +35,9 @@ public class ConfigMenuViewHolder extends XViewHolder<Menu> {
         mname.setText(menu.getMname());
         msg.setText(menu.getID());
         if (menu.getM2M_MenuPrintList() != null)
-            msg.append(" P: " + menu.getM2M_MenuPrintList().size());
+            msg.append("   P" + menu.getM2M_MenuPrintList().size());
 
-        msg.append(" $: " + menu.getPrice());
+        msg.append("   $" + menu.getPrice());
 
     }
 }
