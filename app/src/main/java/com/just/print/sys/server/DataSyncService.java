@@ -50,6 +50,7 @@ public class DataSyncService extends Thread{
                         orderContent.append(mark.getName()).append("\n");
                         orderContent.append(mark.getQt()).append("\n");
                         orderContent.append(mark.getState()).append("\n");
+                        orderContent.append(mark.getVersion()).append("\n");
                     }
 
                     json.put("orderContent", orderContent.toString());
