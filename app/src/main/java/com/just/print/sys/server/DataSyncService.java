@@ -40,14 +40,14 @@ public class DataSyncService extends Thread{
                 StringBuilder orderContent = new StringBuilder();
                 for (SelectionDetail selectionDetail : lastSelection) {
                     orderContent.append("DishStart:");
-                    orderContent.append(URLEncoder.encode(selectionDetail.getDish().getMname())).append("\n");
+                    orderContent.append(URLEncoder.encode(selectionDetail.getDish().getMname(), "UTF-8")).append("\n");
                     orderContent.append(selectionDetail.getDish().getPrice()).append("\n");
                     orderContent.append(selectionDetail.getDishNum()).append("\n");
 
                     List<Mark> marks = selectionDetail.getMarkList();
                     orderContent.append("MarkStart:");
                     for (Mark mark : marks) {
-                        orderContent.append(mark.getName()).append("\n");
+                        orderContent.append(URLEncoder.encode(mark.getName(), "UTF-8")).append("\n");
                         orderContent.append(mark.getQt()).append("\n");
                         orderContent.append(mark.getState()).append("\n");
                         orderContent.append(mark.getVersion()).append("\n");
