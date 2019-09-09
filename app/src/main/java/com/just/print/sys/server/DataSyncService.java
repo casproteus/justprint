@@ -4,7 +4,10 @@ import android.os.CountDownTimer;
 import android.util.Log;
 
 import com.just.print.app.AppData;
+import com.just.print.app.Applic;
+import com.just.print.db.bean.Category;
 import com.just.print.db.bean.Mark;
+import com.just.print.db.bean.Menu;
 import com.just.print.net.UDPService;
 import com.just.print.sys.model.AbsModel;
 import com.just.print.sys.model.SelectionDetail;
@@ -40,8 +43,14 @@ public class DataSyncService extends Thread{
                 StringBuilder orderContent = new StringBuilder();
                 for (SelectionDetail selectionDetail : lastSelection) {
                     orderContent.append("DishStart:");
-                    orderContent.append(URLEncoder.encode(selectionDetail.getDish().getMname())).append("\n");
+                    Menu menu = selectionDetail.getDish();
+                    Category categoryStr = Applic.app.getDaoMaster().newSession().getCategoryDao().load(menu.getCid());
+                    orderContent.append(URLEncoder.encode(categoryStr.getCname())).append("\n");
+
+                    orderContent.append(URLEncoder.encode(menu.getMname())).append("\n");
+
                     orderContent.append(selectionDetail.getDish().getPrice()).append("\n");
+
                     orderContent.append(selectionDetail.getDishNum()).append("\n");
 
                     List<Mark> marks = selectionDetail.getMarkList();
