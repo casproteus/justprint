@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.just.print.ui.SquareLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.just.print_night.ui.SquareLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/edittext_bg">
@@ -16,4 +16,4 @@
         android:text="Large Text" />
 
 
-</com.just.print.ui.SquareLayout>
+</com.just.print_night.ui.SquareLayout>
