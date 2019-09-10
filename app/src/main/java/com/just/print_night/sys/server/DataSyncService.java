@@ -3,7 +3,10 @@ package com.just.print_night.sys.server;
 import android.util.Log;
 
 import com.just.print_night.app.AppData;
+import com.just.print_night.app.Applic;
+import com.just.print_night.db.bean.Category;
 import com.just.print_night.db.bean.Mark;
+import com.just.print_night.db.bean.Menu;
 import com.just.print_night.sys.model.SelectionDetail;
 
 import org.json.JSONObject;
@@ -34,7 +37,11 @@ public class DataSyncService extends Thread{
                 StringBuilder orderContent = new StringBuilder();
                 for (SelectionDetail selectionDetail : lastSelection) {
                     orderContent.append("DishStart:");
-                    orderContent.append(URLEncoder.encode(selectionDetail.getDish().getMname(), "UTF-8")).append("\n");
+                    Menu menu = selectionDetail.getDish();
+                    Category categoryStr = Applic.app.getDaoMaster().newSession().getCategoryDao().load(menu.getCid());
+                    orderContent.append(URLEncoder.encode(categoryStr.getCname(), "UTF-8")).append("\n");
+                    orderContent.append(URLEncoder.encode(menu.getMname(), "UTF-8")).append("\n");
+
                     orderContent.append(selectionDetail.getDish().getPrice()).append("\n");
                     orderContent.append(selectionDetail.getDishNum()).append("\n");
 
@@ -68,6 +75,4 @@ public class DataSyncService extends Thread{
             }
         }
     }
-
-
 }
