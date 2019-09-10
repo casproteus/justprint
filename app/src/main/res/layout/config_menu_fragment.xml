@@ -14,7 +14,7 @@
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.3">
+            android:layout_weight="0.4">
 
             <Button
                 android:id="@+id/showCategory"
@@ -28,13 +28,15 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/showCategory"
                 android:layout_centerHorizontal="true"
-                android:choiceMode="singleChoice" />
+                android:choiceMode="singleChoice"
+                android:listSelector="@android:color/darker_gray"
+                android:dividerHeight="3dp" />
         </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.7">
+            android:layout_weight="0.6">
 
             <Button
                 android:id="@+id/showMenu"
@@ -50,7 +52,9 @@
                 android:layout_height="match_parent"
                 android:layout_below="@+id/showMenu"
                 android:layout_centerHorizontal="true"
-                android:choiceMode="singleChoice" />
+                android:choiceMode="singleChoice"
+                android:divider="@android:drawable/divider_horizontal_bright"
+                android:dividerHeight="3dp" />
         </RelativeLayout>
     </LinearLayout>
 

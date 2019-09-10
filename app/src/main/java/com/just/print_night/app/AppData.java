@@ -143,10 +143,6 @@ public class AppData extends Thread{
                 lastUpdateTime != null && lastUpdateTime.length() > 1 ? lastUpdateTime : String.valueOf(new Date().getTime()));
     }
 
-    public static String getServerIP() {
-        return getShopData(Applic.app.getApplicationContext()).getString("ServerIP","");
-    }
-
     public static HttpURLConnection prepareConnection(String uri) throws Exception {
         HttpURLConnection urlConnection;
         URL url = new URL(uri);
@@ -188,7 +184,14 @@ public class AppData extends Thread{
         if(AppUtils.hasInternet(Applic.app.getApplicationContext())){
             HttpURLConnection urlConnection = null;
             try {
-                urlConnection = prepareConnection(AppData.SERVER_URL + "/activeJustPrintAccount");
+                String serverURL = AppData.getCustomData("server_url");
+                if(serverURL == null && serverURL.length() < 10) {
+                    serverURL = AppData.SERVER_URL;
+                }
+                if(!serverURL.startsWith("http://")){
+                    serverURL = "http://" + serverURL;
+                }
+                urlConnection = prepareConnection(serverURL + "/activeJustPrintAccount");
 
                 StringBuilder content = new StringBuilder(AppData.getLicense());
                 content.append(",");

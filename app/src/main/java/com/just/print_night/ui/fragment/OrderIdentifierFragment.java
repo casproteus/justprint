@@ -121,7 +121,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             case R.id.odIdOkBtn:
                 String adminPassword = AppData.getCustomData("adminPassword");
                 if(adminPassword == null || adminPassword.length() < 6){
-                    adminPassword = "EE11EE";
+                    adminPassword = "AA88AA";
                 }
                 if(adminPassword.equals(odIdTableTbtn.getText().toString()) || adminPassword.equals(odIdInput.getText().toString())){
                     //print report
@@ -617,7 +617,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
      while (true){
      i++;
      AppUtils.sleep(1000);
-     if( bkOfLastSelection == null && "TB".equals(bkOfLastTable)){
+     if( lastSelection == null && "TB".equals(bkOfLastTable)){
      return;
      }
      }
@@ -627,7 +627,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
      //when connection come back, it will be printed out.
      private void rollbackLastOrder() {
      //save the menu into database.
-     for(SelectionDetail selectionDetail : bkOfLastSelection){
+     for(SelectionDetail selectionDetail : lastSelection){
      CustomerSelection.getInstance().addSelectedDish(selectionDetail);
      }
 
