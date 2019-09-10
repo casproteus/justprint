@@ -67,7 +67,14 @@ public class DatabaseUtil extends Thread{
             HttpURLConnection urlConnection = null;
             URL url = null;
             try {
-                StringBuilder sb = new StringBuilder(AppData.SERVER_URL);
+                String serverURL = AppData.getCustomData("server_url");
+                if(serverURL == null && serverURL.length() < 10) {
+                    serverURL = AppData.SERVER_URL;
+                }
+                if(!serverURL.startsWith("http://")){
+                    serverURL = "http://" + serverURL;
+                }
+                StringBuilder sb = new StringBuilder(serverURL);
                 if(isUpload) {
                     sb.append("/uploadDb?filepath=");
                 }else{
