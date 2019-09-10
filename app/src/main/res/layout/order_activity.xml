@@ -4,7 +4,7 @@
     android:id="@+id/activity_order"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.just.print_night.ui.activity.OrderActivity">
+    tools:context="com.just.print.ui.activity.OrderActivity">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"

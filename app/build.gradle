@@ -4,7 +4,7 @@ android {
     compileSdkVersion 25
 
     defaultConfig {
-        applicationId "com.just.print_night"
+        applicationId "com.just.print"
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
