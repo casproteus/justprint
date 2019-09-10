@@ -31,21 +31,7 @@ public class Activate extends BaseActivity {
         }
 
         String inputedSN = String.valueOf(textView.getText());
-
-        int p = inputedSN.indexOf("-v:");
-        if(p > 0){
-            AppData.putCustomData("version", inputedSN.substring(p+3).trim());
-            inputedSN = inputedSN.substring(0,p).trim();
-        }
-
-
-        if (inputedSN.length() != 6) {
-            showToast("Please input correct license code");
-            return;
-        }
-
-        AppData.setLicense(inputedSN);
-        new AppData().start();
+        AppData.setLicense(inputedSN, textView);
 
         while(true) {
             //when inputted activate code, should not go to login activity(that activaty will check name and store name then go to Main Interface)

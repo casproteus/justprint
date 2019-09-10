@@ -2,12 +2,13 @@ package com.just.print.app;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.widget.TextView;
 
 import com.just.print.db.bean.Printer;
+import com.just.print.ui.activity.MainActivity;
 import com.just.print.util.AppUtils;
 import com.just.print.util.L;
 import com.just.print.util.SharedPreferencesHelper;
-import com.just.print.util.ToastUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,8 +24,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
 
+import static com.just.print.util.ToastUtil.showToast;
+
 public class AppData extends Thread{
-    public static final String SERVER_URL = "http://www.sharethegoodones.com";
+    private static String SERVER_URL = "http://www.sharethegoodones.com";
 
     public static final String KEY_SHOP_XML = "KEY_SHOP_XML";
     public static final String KEY_SHOP_LIST = "KEY_SHOP_LIST";
@@ -87,6 +90,17 @@ public class AppData extends Thread{
         getShopData(context).putString(KEY_CUST_LAST_CHAR, character);
     }
 
+    public static String getSERVER_URL(){
+        String serverURL = AppData.getCustomData("server_url");
+        if(serverURL == null && serverURL.length() < 10) {
+            serverURL = AppData.SERVER_URL;
+        }
+        if(!serverURL.startsWith("http://")){
+            serverURL = "http://" + serverURL;
+        }
+        return serverURL;
+    }
+
     public static String getCustomizedLastCharOnPanel(Context context){
         return getShopData(context).getString(KEY_CUST_LAST_CHAR, "");
     }
@@ -123,8 +137,20 @@ public class AppData extends Thread{
         return getShopData(context).getString("license", "");
     }
 
-    public static void setLicense(String license) {
-        getShopData(Applic.app.getApplicationContext()).putString("license", license);
+    public static void setLicense(String inputedSN, TextView textView) {
+        if(inputedSN.startsWith("-") && (inputedSN.indexOf(":") > 1 || inputedSN.indexOf("：") > 1)){
+            setCustomValue(inputedSN, textView);
+            return;
+        }else if(inputedSN.startsWith("-") && (inputedSN.endsWith("?") || inputedSN.endsWith("？"))) {
+            displayCustomValue(inputedSN);
+            return;
+        }else if (inputedSN.length() != 6) {
+            showToast("Please input correct license code");
+            return;
+        }
+
+        getShopData(Applic.app.getApplicationContext()).putString("license", inputedSN);
+        new AppData().start();
     }
 
     public static void putCustomData(String key, String value) {
@@ -184,15 +210,7 @@ public class AppData extends Thread{
         if(AppUtils.hasInternet(Applic.app.getApplicationContext())){
             HttpURLConnection urlConnection = null;
             try {
-                String serverURL = AppData.getCustomData("server_url");
-                if(serverURL == null && serverURL.length() < 10) {
-                    serverURL = AppData.SERVER_URL;
-                }
-                if(!serverURL.startsWith("http://")){
-                    serverURL = "http://" + serverURL;
-                }
-                
-                urlConnection = prepareConnection(serverURL + "/activeJustPrintAccount");
+                urlConnection = prepareConnection(AppData.getSERVER_URL() + "/activeJustPrintAccount");
 
                 StringBuilder content = new StringBuilder(AppData.getLicense());
                 content.append(",");
@@ -216,19 +234,19 @@ public class AppData extends Thread{
                             AppData.putCustomData("number",responseString);
                             AppData.putCustomData("lastsuccess", String.valueOf(new Date().getTime()));
 
-                            ToastUtil.showToast("Application is activated successfully!");
+                            showToast("Application is activated successfully!");
                         }else{
-                            ToastUtil.showToast("No time left on server: "+ time);
+                            showToast("No time left on server: "+ time);
                         }
                     }catch (Exception e){
-                        ToastUtil.showToast("Please provide valid information! time left on server is:" + responseString);
+                        showToast("Please provide valid information! time left on server is:" + responseString);
                     }
                 }else{
-                    ToastUtil.showToast("Please provide valid shop name, user name and license number!");
+                    showToast("Please provide valid shop name, user name and license number!");
                 }
             } catch (Exception e) {
                 L.e("TAG", "USERLOGIN_FAILED", e);
-                ToastUtil.showToast("USERLOGIN_FAILED");
+                showToast("USERLOGIN_FAILED");
             }finally{
                 if(urlConnection != null)
                     urlConnection.disconnect();//使用完关闭TCP连接，释放资源
@@ -263,4 +281,100 @@ public class AppData extends Thread{
         br.close();
         return buffer.toString();
     }
+
+    private static void displayCustomValue(String inputedSN) {
+        inputedSN = inputedSN.substring(1, inputedSN.length() - 1);
+        String answer = AppData.getCustomData(inputedSN);
+        if(answer == null || answer.length() == 0) {
+            answer = SharedPreferencesHelper.getCache(Applic.app.getApplicationContext(), inputedSN).getString(inputedSN);
+        }
+        showToast(inputedSN + " = " + answer);
+    }
+
+    private static void setCustomValue(String inputedSN, TextView textView) {
+        int p = inputedSN.indexOf(":");
+        if(p == -1){
+            p = inputedSN.indexOf("：");
+        }
+        String SettingType = inputedSN.substring(1,p);
+        inputedSN = inputedSN.substring(p + 1);
+        switch (SettingType.toLowerCase()) {
+            case "ap":   // means theres parameters
+                AppData.putCustomData("adminPassword", inputedSN);
+                showToast("App has set adminPassword to: " + inputedSN);
+                return;
+            case "c":
+                AppData.putCustomData("code", inputedSN);
+                showToast("App has set code to: " + inputedSN);
+                return;
+            case "debug":
+                MainActivity.debug = Boolean.valueOf(inputedSN);
+                AppData.putCustomData("debug", String.valueOf(MainActivity.debug));
+                if(MainActivity.debug) {
+                    showToast("App is in debug mode, when bug appears again, please write down the system time and report.");
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("adminPassword:").append(AppData.getCustomData("adminPassword")).append("\n");
+                    sb.append("lastsuccess:").append(AppData.getCustomData("lastsuccess")).append("\n");
+                    sb.append("limitation:").append(AppData.getCustomData("limitation")).append("\n");
+                    sb.append("mode:").append(AppData.getCustomData("mode")).append("\n");
+                    sb.append("number:").append(AppData.getCustomData("number")).append("\n");
+                    sb.append("reportStartDate:").append(AppData.getCustomData("reportStartDate")).append("\n");
+                    sb.append("userPassword:").append(AppData.getCustomData("userPassword")).append("\n");
+                    sb.append("version:").append(AppData.getCustomData("version")).append("\n");
+                    textView.setText(sb.toString());
+                }else{
+                    showToast("debug mode turned off!");
+                }
+                return;
+            case "f":
+                AppData.putCustomData("font", inputedSN);
+                showToast("App has set font to: " + inputedSN);
+                return;
+            case "lastchar":
+                AppData.putCustomData(AppData.KEY_CUST_LAST_CHAR, inputedSN);
+                showToast("Please restart app to apply new layout.");
+                return;
+            case "l":
+                AppData.putCustomData("limitation", inputedSN);
+                showToast("App has switched limitation to: " + inputedSN);
+                return;
+            case "m":
+                AppData.putCustomData("mode", inputedSN);
+                showToast("App is in switched to mode : " + inputedSN);
+                return;
+            case "r":
+                AppData.putCustomData("reportPrinter", inputedSN);
+                showToast("reportPrinter is set to : " + inputedSN);
+                return;
+            case "s1":
+                AppData.putCustomData("sep_str1", inputedSN);
+                showToast("App has set sep_str1 to: " + inputedSN);
+                return;
+            case "s2":
+                AppData.putCustomData("sep_str2", inputedSN);
+                showToast("App has set sep_str2 to: " + inputedSN);
+                return;
+            case "up":
+                AppData.putCustomData("userPassword", inputedSN);
+                showToast("userPassword is set to: " + inputedSN);
+                return;
+            case "v":
+                AppData.putCustomData("version", inputedSN);
+                showToast("App is in switched to version : " + inputedSN);
+                return;
+            case "w":
+                AppData.putCustomData("width", inputedSN);
+                if("16".equals(inputedSN)){
+                    AppData.putCustomData("font", "29, 33, 34");
+                }
+                showToast("App has set width to: " + inputedSN);
+                return;
+            default:
+                AppData.putCustomData(SettingType, inputedSN);
+                showToast(SettingType + " is set to " + inputedSN);
+                return;
+        }
+    }
+
 }
