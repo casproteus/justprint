@@ -1,20 +1,14 @@
 package com.just.print.sys.server;
 
-import android.os.CountDownTimer;
 import android.util.Log;
 
 import com.just.print.app.AppData;
 import com.just.print.db.bean.Mark;
-import com.just.print.net.UDPService;
-import com.just.print.sys.model.AbsModel;
 import com.just.print.sys.model.SelectionDetail;
-import com.just.print.ui.fragment.OrderIdentifierFragment;
-import com.just.print.ui.holder.OrderIdentifierItemViewHolder;
 
 import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
