@@ -9,7 +9,6 @@ import com.just.print_night.ui.activity.MainActivity;
 import com.just.print_night.util.AppUtils;
 import com.just.print_night.util.L;
 import com.just.print_night.util.SharedPreferencesHelper;
-import com.just.print_night.util.ToastUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
