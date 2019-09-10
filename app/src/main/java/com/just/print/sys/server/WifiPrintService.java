@@ -907,8 +907,8 @@ public class WifiPrintService implements Runnable{
         }
     }
 
-    private String formatContentForPrint(List<SelectionDetail> list, String kitchenBillIdx, boolean isCancel){
-        L.d(TAG,"formatContentForPrint");
+    private String formatContentForPrint(List<SelectionDetail> list, String kitchenBillIdx, boolean isCancel) {
+        L.d(TAG, "formatContentForPrint");
 
         determinTheWidth();
 
@@ -918,23 +918,23 @@ public class WifiPrintService implements Runnable{
         StringBuilder content = new StringBuilder();
         //tiltle---could be used for kithch name, empty lines.......
         String title = AppData.getCustomData("kitchentitle");
-        if(title.length() > 0){
-            if(title.endsWith("lines")) {
+        if (title.length() > 0) {
+            if (title.endsWith("lines")) {
                 title = title.substring(0, title.length() - 6).trim();
                 try {
                     int qt = Integer.valueOf(title);
                     for (int i = 0; i < qt; i++) {
                         content.append("\n");
                     }
-                }catch(Exception e){
+                } catch (Exception e) {
                     L.e("WifiPrint", "when seeting title", e);
                 }
-            }else{
+            } else {
                 content.append(title);
             }
         }
         //if it's cancel, then add Cancel.........................
-        if(isCancel){
+        if (isCancel) {
             content.append("       *** (取消CANCEL) ***\n");
         }
 
@@ -943,11 +943,17 @@ public class WifiPrintService implements Runnable{
         String tableName = CustomerSelection.getInstance().getTableNumber();
         String dateStr = df.format(new Date());
 
-        if(width < 20){
+        if (width < 20) {
             content.append("\n\n");
         }
         //table name
-        content.append(generateString((width - tableName.length() - 2)/2, " ")).append("(").append(tableName).append(")").append("\n\n");
+        String tablename_position = AppData.getCustomData("tablename_position");
+        if ("left".equals(tablename_position)){
+            content.append(generateString((width - tableName.length() - 2) / 2, " "));
+        }else if("right".equals(tablename_position)){
+            content.append(generateString(width - tableName.length() - 2, " "));
+        }
+        content.append("(").append(tableName).append(")").append("\n\n");
         //kitchenBillIdx and time
         content.append(kitchenBillIdx)
                 .append(generateString(width - kitchenBillIdx.length() - dateStr.length(), SEPRATOR))
