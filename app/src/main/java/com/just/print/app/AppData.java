@@ -92,7 +92,7 @@ public class AppData extends Thread{
 
     public static String getSERVER_URL(){
         String serverURL = AppData.getCustomData("server_url");
-        if(serverURL == null && serverURL.length() < 10) {
+        if(serverURL == null || serverURL.length() < 10) {
             serverURL = AppData.SERVER_URL;
         }
         if(!serverURL.startsWith("http://")){
