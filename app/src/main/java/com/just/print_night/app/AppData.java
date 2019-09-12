@@ -36,6 +36,8 @@ public class AppData extends Thread{
     private static final String KEY_SHOP_NAME = "shopName";
     public static final String KEY_CUST_LAST_CHAR = "KEY_CUST_LAST_CHAR";
 
+    public static String curBillIdx;
+
     private static SharedPreferencesHelper getShopData(Context context) {
         return SharedPreferencesHelper.getCache(context, KEY_SHOP_XML);
     }
@@ -92,7 +94,7 @@ public class AppData extends Thread{
 
     public static String getSERVER_URL(){
         String serverURL = AppData.getCustomData("server_url");
-        if(serverURL == null && serverURL.length() < 10) {
+        if(serverURL == null || serverURL.length() < 10) {
             serverURL = AppData.SERVER_URL;
         }
         if(!serverURL.startsWith("http://")){

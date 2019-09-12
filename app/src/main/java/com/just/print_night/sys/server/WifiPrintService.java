@@ -131,6 +131,7 @@ public class WifiPrintService implements Runnable{
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     private static WifiPrintService instance = null;
+
     public static WifiPrintService getInstance(){
         if(instance == null){
             instance = new WifiPrintService();
@@ -165,6 +166,7 @@ public class WifiPrintService implements Runnable{
             return ERROR;                     //未打印完毕
         }
 
+        popKitchenBillIdx();
         if(!StringUtils.isBlank(serverip)){
             sendToServer(serverip);
         }
@@ -183,7 +185,7 @@ public class WifiPrintService implements Runnable{
             for(M2M_MenuPrint m2m: printerList) {
                 Printer printer = m2m.getPrint();
                 if(printer == null) {                   //should never happen, jist in case someone changed db.
-                    ToastUtil.showToast("Selected dish not connected with any printer yet.");
+                    ToastUtil.showToast("Printer not exist anymore. please check" + m2m.toString());
                     return false;
                 }
 
@@ -215,11 +217,7 @@ public class WifiPrintService implements Runnable{
 
         //3、再次遍历ipSelectionsMap, 封装打印信息
         //add a kitchenBill on top, so when there's issue in printer, user can found a bill was miss printed.
-        String kitchenBillIdx = AppData.getCustomData("kitchenBillIdx");  //and it can also be used to know which order come in first.
-        if(StringUtils.isBlank(kitchenBillIdx)){
-            kitchenBillIdx = "1";
-        }
-        AppData.putCustomData("kitchenBillIdx", String.valueOf(Integer.valueOf(kitchenBillIdx) + 1));   //update thee kbi into higer value.
+        String kitchenBillIdx = AppData.curBillIdx;
 
         String mobileIdx = AppData.getCustomData("mobileMark");     //used for knowing printed from which mobile.
         if(!StringUtils.isBlank(mobileIdx)){                            //@TODO: should be improved by using pos to print, then no need this mobile Mark anymore.
@@ -276,6 +274,14 @@ public class WifiPrintService implements Runnable{
         return true;
     }
 
+    private void popKitchenBillIdx() {
+        AppData.curBillIdx = AppData.getCustomData("kitchenBillIdx");  //and it can also be used to know which order come in first.
+        if(StringUtils.isBlank(AppData.curBillIdx)){
+            AppData.curBillIdx = "1";
+        }
+        AppData.putCustomData("kitchenBillIdx", String.valueOf(Integer.valueOf(AppData.curBillIdx) + 1));   //update thee kbi into higer value.
+    }
+
     //The start time and end time are long format, need to be translate for print.
     public String exePrintReportCommand(List<SaleRecord> saleRecords, String startTime, String endTime){
         L.d("ConfigPrintReportFragment","exePrintCommand");
@@ -316,8 +322,6 @@ public class WifiPrintService implements Runnable{
         ipContentMap.get(printerIP).add(formatContentForPrintReport(combinedSaleRecords, startTime, endTime));
 
         ToastUtil.showToast("PRINTING REPORT ON " + printerIP);
-        //reset kitchenbillIndex
-        AppData.putCustomData("kitchenBillIdx", "1");
         return SUCCESS;
     }
 
@@ -671,7 +675,7 @@ public class WifiPrintService implements Runnable{
     private void isAllPrintedCheck(){
         if(isIpContentMapEmpty()){
             L.d(TAG,"All categorizedContent in this order are printed, to comfirm app with OK.");
-            OrderIdentifierFragment.comfirmPrintOK();
+            OrderIdentifierFragment.confirmPrintOK();
         }
     }
 //    public void closeWifiService(){
@@ -720,7 +724,14 @@ public class WifiPrintService implements Runnable{
         content.append("\n\n\n");
         content.append(startTime).append("--").append(endTime);
         content.append("\n");
-
+        int lastBillNo = 0;
+        try {
+            lastBillNo = Integer.valueOf(AppData.getCustomData("kitchenBillIdx")) - 1;
+        }catch (Exception e){
+            L.e("WifiPrintService ", "Exception when getting kitchenBillIdx for report, the last bill was found to be:" + lastBillNo, e);
+        }
+        content.append("last bill : #").append(lastBillNo);
+        content.append("\n");
         String sep_str1 = AppData.getCustomData("sep_str1");
         if(sep_str1 == null || sep_str1.length() == 0){
             sep_str1 = SEP_STR1;
@@ -907,8 +918,8 @@ public class WifiPrintService implements Runnable{
         }
     }
 
-    private String formatContentForPrint(List<SelectionDetail> list, String kitchenBillIdx, boolean isCancel){
-        L.d(TAG,"formatContentForPrint");
+    private String formatContentForPrint(List<SelectionDetail> list, String kitchenBillIdx, boolean isCancel) {
+        L.d(TAG, "formatContentForPrint");
 
         determinTheWidth();
 
@@ -918,40 +929,62 @@ public class WifiPrintService implements Runnable{
         StringBuilder content = new StringBuilder();
         //tiltle---could be used for kithch name, empty lines.......
         String title = AppData.getCustomData("kitchentitle");
-        if(title.length() > 0){
-            if(title.endsWith("lines")) {
+        if (title.length() > 0) {
+            if (title.endsWith("lines")) {
                 title = title.substring(0, title.length() - 6).trim();
                 try {
                     int qt = Integer.valueOf(title);
                     for (int i = 0; i < qt; i++) {
                         content.append("\n");
                     }
-                }catch(Exception e){
+                } catch (Exception e) {
                     L.e("WifiPrint", "when seeting title", e);
                 }
-            }else{
+            } else {
                 content.append(title);
             }
         }
         //if it's cancel, then add Cancel.........................
-        if(isCancel){
+        if (isCancel) {
             content.append("       *** (取消CANCEL) ***\n");
         }
-
+        if (width < 20) {
+            content.append("\n\n");
+        }
         //table name and bill index and  print time.......................
         DateFormat df = new SimpleDateFormat("HH:mm");
         String tableName = CustomerSelection.getInstance().getTableNumber();
         String dateStr = df.format(new Date());
 
-        if(width < 20){
-            content.append("\n\n");
+        if("1".equals(AppData.getCustomData("format_style"))){
+            String billIdx_Position = AppData.getCustomData("title_position");
+            if ("left".equals(billIdx_Position)) {
+                //add no space.
+            } else if ("right".equals(billIdx_Position)) {
+                content.append(generateString(width - kitchenBillIdx.length(), " "));
+            }else{  //center is the default
+                content.append(generateString((width - kitchenBillIdx.length()) / 2, " "));
+            }
+            content.append(kitchenBillIdx).append("\n\n");
+            //kitchenBillIdx and time
+            content.append("(").append(tableName).append(")").append(generateString(width - tableName.length() - 2 - dateStr.length(), SEPRATOR))
+                    .append(dateStr).append("\n");
+        }else {
+            //table name
+            String tablename_position = AppData.getCustomData("title_position");
+            if ("left".equals(tablename_position)) {
+                //add nothing
+            } else if ("right".equals(tablename_position)) {
+                content.append(generateString(width - tableName.length() - 2, " "));
+            }else{  //center is the default
+                content.append(generateString((width - tableName.length() - 2) / 2, " "));
+            }
+            content.append("(").append(tableName).append(")").append("\n\n");
+            //kitchenBillIdx and time
+            content.append(kitchenBillIdx)
+                    .append(generateString(width - kitchenBillIdx.length() - dateStr.length(), SEPRATOR))
+                    .append(dateStr).append("\n");
         }
-        //table name
-        content.append(generateString((width - tableName.length() - 2)/2, " ")).append("(").append(tableName).append(")").append("\n\n");
-        //kitchenBillIdx and time
-        content.append(kitchenBillIdx)
-                .append(generateString(width - kitchenBillIdx.length() - dateStr.length(), SEPRATOR))
-                .append(dateStr).append("\n");
         //Seperator================================================
         String sep_str1 = AppData.getCustomData("sep_str1");
         if(sep_str1 == null || sep_str1.length() == 0){

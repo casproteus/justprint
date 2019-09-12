@@ -90,6 +90,8 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
         //when printed succcesfully, clean all records, and update now as the next reportStartDate
         saleRecordDao.deleteAll();
         AppData.putCustomData("reportStartDate", String.valueOf(now));
+        AppData.putCustomData("kitchenBillIdx", "1");        //reset kitchenbillIndex
+
         int reportIdx = 1;
         try{
             reportIdx = Integer.valueOf(AppData.getCustomData("reportIdx"));

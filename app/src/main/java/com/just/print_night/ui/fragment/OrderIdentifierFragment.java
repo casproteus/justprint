@@ -197,6 +197,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         //when printed succcesfully, clean all records, and update now as the next reportStartDate
         Applic.app.getDaoMaster().newSession().getSaleRecordDao().deleteAll();
         AppData.putCustomData("reportStartDate", String.valueOf(new Date().getTime()));
+        AppData.putCustomData("kitchenBillIdx", "1");        //reset kitchenbillIndex
         int reportIdx = 1;
         try{
             reportIdx = Integer.valueOf(AppData.getCustomData("reportIdx"));
@@ -611,7 +612,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     }
 
     /**no one is calling this mehtod now, because we not response feels like app goes wrong. and user might input again.
-     //waiting 15 seconds or untile comfirmPrintOK() is called.
+     //waiting 15 seconds or untile confirmPrintOK() is called.
      private void waitForPrintSuccess(){
      int i = 0;
      while (true){
@@ -638,7 +639,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
      }*/
 
-    public static void comfirmPrintOK(){
+    public static void confirmPrintOK(){
 
         if(bkOfLastSelection == null){
             return;
