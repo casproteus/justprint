@@ -36,6 +36,8 @@ public class AppData extends Thread{
     private static final String KEY_SHOP_NAME = "shopName";
     public static final String KEY_CUST_LAST_CHAR = "KEY_CUST_LAST_CHAR";
 
+    public static String curBillIdx;
+
     private static SharedPreferencesHelper getShopData(Context context) {
         return SharedPreferencesHelper.getCache(context, KEY_SHOP_XML);
     }
