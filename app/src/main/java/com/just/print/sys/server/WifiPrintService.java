@@ -675,7 +675,7 @@ public class WifiPrintService implements Runnable{
     private void isAllPrintedCheck(){
         if(isIpContentMapEmpty()){
             L.d(TAG,"All categorizedContent in this order are printed, to comfirm app with OK.");
-            OrderIdentifierFragment.comfirmPrintOK();
+            OrderIdentifierFragment.confirmPrintOK();
         }
     }
 //    public void closeWifiService(){
