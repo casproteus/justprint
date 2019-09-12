@@ -724,7 +724,13 @@ public class WifiPrintService implements Runnable{
         content.append("\n\n\n");
         content.append(startTime).append("--").append(endTime);
         content.append("\n");
-        content.append("last bill:").append(generateString(3, " ")).append(AppData.getCustomData("TLBPT"));
+        int lastBillNo = 0;
+        try {
+            lastBillNo = Integer.valueOf(AppData.getCustomData("kitchenBillIdx")) - 1;
+        }catch (Exception e){
+            L.e("WifiPrintService ", "Exception when getting kitchenBillIdx for report, the last bill was found to be:" + lastBillNo, e);
+        }
+        content.append("last bill : #").append(lastBillNo);
         content.append("\n");
         String sep_str1 = AppData.getCustomData("sep_str1");
         if(sep_str1 == null || sep_str1.length() == 0){
@@ -946,10 +952,9 @@ public class WifiPrintService implements Runnable{
             content.append("\n\n");
         }
         //table name and bill index and  print time.......................
-        DateFormat df = new SimpleDateFormat("MM/dd HH:mm");
+        DateFormat df = new SimpleDateFormat("HH:mm");
         String tableName = CustomerSelection.getInstance().getTableNumber();
         String dateStr = df.format(new Date());
-        AppData.putCustomData("TLBPT", dateStr);    //this information will be used when printing the report. so we know if employee has supplied the all the kitchen bills.
 
         if("1".equals(AppData.getCustomData("format_style"))){
             String billIdx_Position = AppData.getCustomData("title_position");
