@@ -87,7 +87,7 @@ public class OrderMenuFragment extends BaseFragment implements View.OnClickListe
 
             @Override
             public void afterTextChanged(Editable s) {
-                CustomerSelection.getInstance().setTableNumber(odMnTableNumEt.getText().toString());
+                CustomerSelection.getInstance().setTableName(odMnTableNumEt.getText().toString());
             }
         });
         menuXAdapter = new XAdapter2<SelectionDetail>(getContext(), OrderMenuViewHolder.class);

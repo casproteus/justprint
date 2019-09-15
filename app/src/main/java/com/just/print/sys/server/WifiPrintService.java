@@ -416,7 +416,7 @@ public class WifiPrintService implements Runnable{
     private void sendToServer(String serverip) {
         DataSyncService instance = new DataSyncService();
         instance.serverip = serverip;
-
+        instance.tableID = CustomerSelection.getInstance().getTableName();
         instance.lastSelection = new ArrayList<SelectionDetail>();
         for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
             instance.lastSelection.add(selectionDetail);
@@ -953,7 +953,7 @@ public class WifiPrintService implements Runnable{
         }
         //table name and bill index and  print time.......................
         DateFormat df = new SimpleDateFormat("HH:mm");
-        String tableName = CustomerSelection.getInstance().getTableNumber();
+        String tableName = CustomerSelection.getInstance().getTableName();
         String dateStr = df.format(new Date());
 
         if("1".equals(AppData.getCustomData("format_style"))){

@@ -148,7 +148,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 }else if( viewSwitcher.getDisplayedChild() == 0) {
                     if (odIdTableTbtn.isChecked()) {    //waiting for input table num status. always allowed!
                         odIdTableTbtn.setChecked(false);
-                        CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
+                        CustomerSelection.getInstance().setTableName(odIdTableTbtn.getText().toString());
                     } else {                            //inputting dishes status. need to check print status.
 
                         if (bkOfLastSelection != null) {      //categorizedContent not all send to printer yet.
@@ -291,7 +291,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         InputText("+");
                     } else if (i == items.length - 2) {
                         odIdTableTbtn.setText("TOGO");
-                        CustomerSelection.getInstance().setTableNumber(odIdTableTbtn.getText().toString());
+                        CustomerSelection.getInstance().setTableName(odIdTableTbtn.getText().toString());
                     } else if (i == items.length - 1) {
                         odIdTableTbtn.setText("");
                         //added the selected dish with negative price.
@@ -368,7 +368,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         getEventBus().register(EVENT_ADD_MENU, this);
         new StupidReflect(this, getView()).init();
         //设置餐桌号用
-        //CustomerSelection.getInstance().setTableNumber(odIdTableNumEt.getText().toString());
+        //CustomerSelection.getInstance().setTableName(odIdTableNumEt.getText().toString());
         storedMenu = null;
         String definedLast = AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR);
         items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C"};
