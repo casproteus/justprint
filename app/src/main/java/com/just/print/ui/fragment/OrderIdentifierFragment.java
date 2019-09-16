@@ -1,5 +1,7 @@
 package com.just.print.ui.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.GridView;
@@ -29,7 +31,6 @@ import com.just.print.ui.holder.OrderIdentifierMarkViewHolder;
 import com.just.print.ui.holder.OrderMenuViewHolder;
 import com.just.print.util.L;
 import com.just.print.util.StringUtils;
-import com.just.print.util.ToastUtil;
 import com.stupid.method.adapter.IXOnItemClickListener;
 import com.stupid.method.adapter.OnClickItemListener;
 import com.stupid.method.adapter.XAdapter2;
@@ -98,7 +99,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     private List<Mark> shortCutMarks;
 
     public static List<SelectionDetail> bkOfLastSelection;
-    private static CharSequence bkOfLastTable;
+//    private static CharSequence bkOfLastTable;
     static int times = 0;
     String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "H", "S", "U", "+", "togo", "canc"};
 
@@ -150,14 +151,15 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         odIdTableTbtn.setChecked(false);
                         CustomerSelection.getInstance().setTableName(odIdTableTbtn.getText().toString());
                     } else {                            //inputting dishes status. need to check print status.
-
-                        if (bkOfLastSelection != null) {      //categorizedContent not all send to printer yet.
-                            //if last order has only one dish and it happened to be same
-                            //as the one selected this time, waiter will think the roll back is not happenning.
-                            //we decided to not display last order--- rollbackLastOrder();
-                            ToastUtil.showToast("Printing...Please wait.");
-                            return;
-                        } else if (storedMenu != null) {     //last order send to printer well.
+//this is marked off because we changed to allow user to add new order, just when user try to send will do a check and pump to ask if will go on.
+//                        if (bkOfLastSelection != null) {      //categorizedContent not all send to printer yet.
+//                            //if last order has only one dish and it happened to be same
+//                            //as the one selected this time, waiter will think the roll back is not happenning.
+//                            //we decided to not display last order--- rollbackLastOrder();
+//                            ToastUtil.showToast("Printing...Please wait.");
+//                            return;
+//                        } else
+                        if (storedMenu != null) {     //last order send to printer well.
                             addDish();
                             odIdInput.setText("");
                             odIdfrName.setText("");
@@ -240,7 +242,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         loadOrderMenu();
     }
 
-    private boolean printCurrentSelection(boolean isCancel) {
+    private boolean printCurrentSelection(final boolean isCancel) {
         List<SelectionDetail> selectionDetails = CustomerSelection.getInstance().getSelectedDishes();
         if(selectionDetails == null || selectionDetails.size() == 0){
             showToast("Nothing selected!");
@@ -248,24 +250,30 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         }else {
             String result = WifiPrintService.getInstance().exePrintCommand(isCancel);
             if (WifiPrintService.ERROR.equals(result)) {
-                if (times < 1) {
-                    showToast("Last print not done yet. Please wait.");
-                    times++;
-                } else if (times < 2) {
-                    showToast("Last print not done yet. Press Send Again To Resend it!");
-                    times++;
-                } else {
-                    WifiPrintService.getInstance().reInitPrintRelatedMaps();
-                    if (WifiPrintService.SUCCESS.equals(WifiPrintService.getInstance().exePrintCommand(isCancel))) {
-                        times = 0;
-                        clearOrderMenu();
+                // pup up a dialog to ask if user want to continue.....
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setMessage("Last print not done yet (some printer might went wrong and need to check out). Are you sure to continue? ");
+                builder.setTitle("WARNING").setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        //do we need to clean bkSelections?????
+                        confirmPrintOK();
+                        //clean the printer maps, to make sure it can pass the check when call itself again to send content to printer.
+                        WifiPrintService.getInstance().reInitPrintRelatedMaps();
+                        printCurrentSelection(isCancel);
                     }
-                    showToast("Order was re-send!");
-                }
+                });
+                builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                builder.show();
                 return false;
             } else {
-                times = 0;
-                clearOrderMenu();
+                backupAndClearOrderMenu();
                 return true;
             }
         }
@@ -595,7 +603,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         odIdMarksGrid.setAdapter(markShorCutXAdapter);
     }
 
-    private void clearOrderMenu() {
+    private void backupAndClearOrderMenu() {
         //bk and clear selected menu
         bkOfLastSelection = new ArrayList<SelectionDetail>();
         for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
@@ -604,7 +612,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         CustomerSelection.getInstance().clearMenu();
 
         //bk and clear bkOfLastTable
-        bkOfLastTable = odIdTableTbtn.getText();
+        //bkOfLastTable = odIdTableTbtn.getText();
         odIdTableTbtn.setText("");
         odIdTableTbtn.setChecked(true);
         loadOrderMenu();
@@ -640,60 +648,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
      }*/
 
     public static void confirmPrintOK(){
-
-        if(bkOfLastSelection == null){
-            return;
-        }
-
-        //save the menu into database.
-        SaleRecordDao saleRecordDao = Applic.app.getDaoMaster().newSession().getSaleRecordDao();
-        for(SelectionDetail selectionDetail : bkOfLastSelection){
-            int number = selectionDetail.getDishNum();
-            Menu menu = selectionDetail.getDish();
-            String name = menu.getMname();
-            Double price = menu.getPrice() * number;
-
-            //if set as conbine mark price into dish price.
-            if("true".equals(AppData.getCustomData("conbineMarkPrice"))) {
-                List<Mark> marks = selectionDetail.getMarkList();
-                if (marks != null) {
-                    for (Mark mark : marks) {
-                        price += ((float) mark.getVersion()) / 100.0 * mark.getQt();
-                    }
-                }
-            }
-
-            if(isCancel){
-                price *= -1;
-            }
-            SaleRecord saleRecord = new SaleRecord();
-            saleRecord.setMname(menu.getID() + " " + name);
-            saleRecord.setNumber(Double.valueOf(number));
-            saleRecord.setPrice(price);
-            saleRecordDao.insertOrReplace(saleRecord);
-
-            if (!"true".equals(AppData.getCustomData("combineMarkPrice"))) {  //by defalut mark price is not added into salesrecord, so, generate saleRecord for the marks.
-                List<Mark> marks = selectionDetail.getMarkList();
-                if (marks != null) {
-                    for (Mark mark : marks) {
-                        Double markPrice = ((float) mark.getVersion()) / 100.0 * mark.getQt();
-                        if(markPrice >= 0.01) {
-                            SaleRecord saleRecordForMark = new SaleRecord();
-                            saleRecordForMark.setMname(mark.getName());
-                            saleRecordForMark.setNumber(Double.valueOf(mark.getQt()));
-                            if(isCancel){
-                                markPrice *= -1;
-                            }
-                            saleRecordForMark.setPrice(markPrice);
-                            saleRecordDao.insertOrReplace(saleRecordForMark);
-                        }
-                    }
-                }
-            }
-        }
         bkOfLastSelection = null;
-        bkOfLastTable = "TB";
-
         isCancel = false;
+        //bkOfLastTable = "TB";
     }
+
 }

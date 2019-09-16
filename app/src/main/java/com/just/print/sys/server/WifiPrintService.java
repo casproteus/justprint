@@ -18,6 +18,7 @@ import com.just.print.db.bean.Mark;
 import com.just.print.db.bean.Menu;
 import com.just.print.db.bean.Printer;
 import com.just.print.db.bean.SaleRecord;
+import com.just.print.db.dao.SaleRecordDao;
 import com.just.print.db.expand.DaoExpand;
 import com.just.print.sys.model.SelectionDetail;
 import com.just.print.ui.fragment.OrderCategoryFragment;
@@ -159,6 +160,8 @@ public class WifiPrintService implements Runnable{
         }
     }
 
+    //if the ipContnetMap(the final map which contains the content to be printed) not empty, will return error.
+    //other wise will send to serer and report.(no matter the content will be printed succesfully or not, because if not printed by accident, they will manully write kitchen a bill.
     public String exePrintCommand(boolean isCancel){
         L.d(TAG,"start to translate selection into ipContent for printing.");
         if(!isIpContentMapEmpty()){
@@ -167,11 +170,14 @@ public class WifiPrintService implements Runnable{
         }
 
         popKitchenBillIdx();
-        if(!StringUtils.isBlank(serverip)){
+
+        saveSaleRecToDB(isCancel);                              //save to db
+
+        if(!StringUtils.isBlank(serverip)){                     //send to server
             sendToServer(serverip);
         }
-
-        if (manageDishesIntoMapAndWaitingForPrint(isCancel)) {
+        
+        if (manageDishesIntoMapAndWaitingForPrint(isCancel)) { //send to printer
             return SUCCESS;
         }else {
             return ERROR;
@@ -282,6 +288,55 @@ public class WifiPrintService implements Runnable{
         AppData.putCustomData("kitchenBillIdx", String.valueOf(Integer.valueOf(AppData.curBillIdx) + 1));   //update thee kbi into higer value.
     }
 
+    private static void saveSaleRecToDB(boolean isCancel) {
+        //save the menu into database.
+        SaleRecordDao saleRecordDao = Applic.app.getDaoMaster().newSession().getSaleRecordDao();
+        for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
+            int number = selectionDetail.getDishNum();
+            Menu menu = selectionDetail.getDish();
+            String name = menu.getMname();
+            Double price = menu.getPrice() * number;
+
+            //if set as conbine mark price into dish price.
+            if("true".equals(AppData.getCustomData("conbineMarkPrice"))) {
+                List<Mark> marks = selectionDetail.getMarkList();
+                if (marks != null) {
+                    for (Mark mark : marks) {
+                        price += ((float) mark.getVersion()) / 100.0 * mark.getQt();
+                    }
+                }
+            }
+
+            if(isCancel){
+                price *= -1;
+            }
+            SaleRecord saleRecord = new SaleRecord();
+            saleRecord.setMname(menu.getID() + " " + name);
+            saleRecord.setNumber(Double.valueOf(number));
+            saleRecord.setPrice(price);
+            saleRecordDao.insertOrReplace(saleRecord);
+
+            if (!"true".equals(AppData.getCustomData("combineMarkPrice"))) {  //by defalut mark price is not added into salesrecord, so, generate saleRecord for the marks.
+                List<Mark> marks = selectionDetail.getMarkList();
+                if (marks != null) {
+                    for (Mark mark : marks) {
+                        Double markPrice = ((float) mark.getVersion()) / 100.0 * mark.getQt();
+                        if(markPrice >= 0.01) {
+                            SaleRecord saleRecordForMark = new SaleRecord();
+                            saleRecordForMark.setMname(mark.getName());
+                            saleRecordForMark.setNumber(Double.valueOf(mark.getQt()));
+                            if(isCancel){
+                                markPrice *= -1;
+                            }
+                            saleRecordForMark.setPrice(markPrice);
+                            saleRecordDao.insertOrReplace(saleRecordForMark);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     //The start time and end time are long format, need to be translate for print.
     public String exePrintReportCommand(List<SaleRecord> saleRecords, String startTime, String endTime){
         L.d("ConfigPrintReportFragment","exePrintCommand");
@@ -331,7 +386,7 @@ public class WifiPrintService implements Runnable{
 
         int timeCounter = 0;
         while (true) {
-            //check if this round is a good time to reset a curPrintIp and load new contnet to print.
+            //check if this round is a good time to reset a curPrintIp and load new contnet to print.(two flags are both false)
             if (isReadyToInitNewPrintJob()) {
                 //stop at the first non-empty entry, (non-empty means the values hidden in this printerIp is non-empty.)
                 //and initSocket to the printer key pointing to.
@@ -340,9 +395,9 @@ public class WifiPrintService implements Runnable{
                     List<String> contentList = (List<String>) entry.getValue();
 
                     if (contentList.size() > 0) {
-                        contentReadyForPrintFlag = true; //mark that we have found something to print, don't come into here and do init socket any more.
                         curPrintIp = (String) entry.getKey();
                         L.d(TAG, "ip changed to:" + curPrintIp + "the size of categorizedContent to print is:" + contentList.size());
+                        contentReadyForPrintFlag = true; //mark that we have found something to print, don't come into here and do init socket any more.
                         timeCounter = 0;
                         L.d(TAG, "contentReadyForPrintFlag setted up! now waiting for initSocket to set up the printerConnectedFlag");
                         connectToThePrinter(curPrintIp); //if success, an other flag (printerConnectedFlag) will be set up
@@ -350,7 +405,7 @@ public class WifiPrintService implements Runnable{
                     }
                 }
 
-            } else if (isReadyToPrint()) {//check if this round is a good time to do actual print work?
+            } else if (isReadyToPrint()) {//check if this round is a good time to do actual print work? (two flags are both true)
                 timeCounter = 0;
                 L.d(TAG, "Flags both set, checking the categorizedContent fllowing current ip:" + curPrintIp);
 
@@ -385,7 +440,7 @@ public class WifiPrintService implements Runnable{
                     L.e(TAG, "Unexpected empty Content found when printing to printer: :" + curPrintIp, null);
                     ToastUtil.showToast("Unexpected empty Content found! when printing to printer: " + curPrintIp);
                 }
-            } else {
+            } else { //if there's onely 1 flag are false, that flag must be printerConnectedFlag.
                 L.d(TAG, "printerConnectedFlag:" + printerConnectedFlag);
                 timeCounter++;
                 if (timeCounter == 8) {
@@ -416,7 +471,7 @@ public class WifiPrintService implements Runnable{
     private void sendToServer(String serverip) {
         DataSyncService instance = new DataSyncService();
         instance.serverip = serverip;
-        instance.tableID = CustomerSelection.getInstance().getTableName();
+        instance.tableName = CustomerSelection.getInstance().getTableName();
         instance.lastSelection = new ArrayList<SelectionDetail>();
         for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
             instance.lastSelection.add(selectionDetail);
