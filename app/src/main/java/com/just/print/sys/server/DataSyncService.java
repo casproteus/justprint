@@ -24,7 +24,7 @@ import java.util.List;
 public class DataSyncService extends Thread{
 
     public ArrayList<SelectionDetail> lastSelection;
-    public String tableID;
+    public String tableName;
     protected String serverip;
 
     @Override
@@ -34,7 +34,7 @@ public class DataSyncService extends Thread{
             try {
                 urlConnection = AppData.prepareConnection("http://" + serverip + "/security/newOrders");
                 JSONObject json = new JSONObject();//创建json对象
-                json.put("table", URLEncoder.encode(StringUtils.isBlank(tableID) ? AppData.getUserName() : tableID, "UTF-8"));//使用URLEncoder.encode对特殊和不可见字符进行编码
+                json.put("table", URLEncoder.encode(StringUtils.isBlank(tableName) ? AppData.getUserName() : tableName, "UTF-8"));//使用URLEncoder.encode对特殊和不可见字符进行编码
                 json.put("billIndex", URLEncoder.encode(AppData.curBillIdx, "UTF-8"));//把数据put进json对象中
                 StringBuilder orderContent = new StringBuilder();
                 for (SelectionDetail selectionDetail : lastSelection) {
