@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 
 public class OrderCategoryFragment extends BaseFragment {
+    private static List<Category> categoryList;
+    private static Map<Category, List<Menu>> categorizedContent;
 
     //add second level menu
     @XViewByID(R.id.odExCategory)
@@ -46,7 +48,6 @@ public class OrderCategoryFragment extends BaseFragment {
         return R.layout.order_category_fragment;
     }
 
-    public static Map<Category, List<Menu>> categorizedContent = new LinkedHashMap<>();
     public XExpadnAdapter<Category, Menu> categoryExXAdapter;
 
     @Override
@@ -55,75 +56,9 @@ public class OrderCategoryFragment extends BaseFragment {
         categoryExXAdapter = new XExpadnAdapter<Category, Menu>(getContext(), TtitleCategoryViewHolder.class,
                 SubTitleMenuExpandViewHolder.class);
         odExCategory.setAdapter(categoryExXAdapter);
-        categorizedContent = new LinkedHashMap<>();
 
-        List<Category> categoryList = DaoExpand.queryAllNotDeleted(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.DisplayIdx).list();
-        MenuDao dao = Applic.app.getDaoMaster().newSession().getMenuDao();
-        for (Category ca : categoryList) {
-            List<Menu> menus = DaoExpand.queryMenuByCategory(ca, dao);
-            Collections.sort(menus, new Comparator<Menu>() {
-                @Override
-                public int compare(Menu m1, Menu m2) {
-                    String id1 = m1.getID();
-                    String id2 = m2.getID();
-                    int minLen = id1.length() > id2.length() ? id2.length() : id1.length();
-                    for(int i = 0; i < minLen; i++){
-                        char c1 = id1.charAt(i);
-                        char c2 = id2.charAt(i);
-                        if(c1 >= '0' && c1 <= '9' && c2 >= '0' && c2 <= '9') { //if it's number, then treat specially.
-                            String s1 = id1.substring(i);
-                            String s2 = id2.substring(i);
-                            try{
-                                return Integer.valueOf(s1) - Integer.valueOf(s2);
-                            }catch (Exception e){
-                                try {
-                                    int numInseid1 = 0;
-                                    boolean matched1 = false;
-                                    for (int j = 0; j < s1.length(); j++) {
-                                        char ch1 = s1.charAt(j);
-                                        if (ch1 >= '0' && ch1 <= '9') {
-                                            continue;
-                                        } else {
-                                            numInseid1 = Integer.valueOf(s1.substring(0, j));
-                                            matched1 = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!matched1) {
-                                        numInseid1 = Integer.valueOf(s1);
-                                    }
-
-                                    int numInseid2 = 0;
-                                    boolean matched2 = false;
-                                    for (int j = 0; j < s2.length(); j++) {
-                                        char ch1 = s2.charAt(j);
-                                        if (ch1 >= '0' && ch1 <= '9') {
-                                            continue;
-                                        } else {
-                                            numInseid2 = Integer.valueOf(s2.substring(0, j));
-                                            matched2 = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!matched2) {
-                                        numInseid2 = Integer.valueOf(s2);
-                                    }
-                                    return numInseid1 == numInseid2 ? s1.compareTo(s2) : numInseid1 - numInseid2;
-                                }catch(Exception exp){
-                                    exp.printStackTrace();
-                                }
-                            }
-                        }else if(c1 != c2){
-                            return c1 - c2;
-                        }
-                    }
-                    return id1.length() - id2.length();
-                }
-            });
-            categorizedContent.put(ca, menus);
-        }
         categoryExXAdapter.clear();
-        categoryExXAdapter.addAll(categorizedContent);
+        categoryExXAdapter.addAll(getCategorizedContent());
         categoryExXAdapter.setClickItemListener(new OnXItemClickListener() {
 
             @Override
@@ -156,6 +91,85 @@ public class OrderCategoryFragment extends BaseFragment {
         showToast("Added successfully");
     }
 
+    public static List<Category> getCategoryList(){
+        if(categoryList == null) {
+            categoryList = DaoExpand.queryAllNotDeleted(Applic.app.getDaoMaster().newSession().getCategoryDao()).orderAsc(CategoryDao.Properties.DisplayIdx).list();
+        }
+        return categoryList;
+    }
+
+    public static Map<Category, List<Menu>> getCategorizedContent(){
+        if(categorizedContent == null){
+            categorizedContent = new LinkedHashMap<>();
+            MenuDao dao = Applic.app.getDaoMaster().newSession().getMenuDao();
+            for (Category ca : getCategoryList()) {
+                List<Menu> menus = DaoExpand.queryMenuByCategory(ca, dao);
+                Collections.sort(menus, new Comparator<Menu>() {
+                    @Override
+                    public int compare(Menu m1, Menu m2) {
+                        String id1 = m1.getID();
+                        String id2 = m2.getID();
+                        int minLen = id1.length() > id2.length() ? id2.length() : id1.length();
+                        for (int i = 0; i < minLen; i++) {
+                            char c1 = id1.charAt(i);
+                            char c2 = id2.charAt(i);
+                            if (c1 >= '0' && c1 <= '9' && c2 >= '0' && c2 <= '9') { //if it's number, then treat specially.
+                                String s1 = id1.substring(i);
+                                String s2 = id2.substring(i);
+                                try {
+                                    return Integer.valueOf(s1) - Integer.valueOf(s2);
+                                } catch (Exception e) {
+                                    try {
+                                        int numInseid1 = 0;
+                                        boolean matched1 = false;
+                                        for (int j = 0; j < s1.length(); j++) {
+                                            char ch1 = s1.charAt(j);
+                                            if (ch1 >= '0' && ch1 <= '9') {
+                                                continue;
+                                            } else {
+                                                numInseid1 = Integer.valueOf(s1.substring(0, j));
+                                                matched1 = true;
+                                                break;
+                                            }
+                                        }
+                                        if (!matched1) {
+                                            numInseid1 = Integer.valueOf(s1);
+                                        }
+
+                                        int numInseid2 = 0;
+                                        boolean matched2 = false;
+                                        for (int j = 0; j < s2.length(); j++) {
+                                            char ch1 = s2.charAt(j);
+                                            if (ch1 >= '0' && ch1 <= '9') {
+                                                continue;
+                                            } else {
+                                                numInseid2 = Integer.valueOf(s2.substring(0, j));
+                                                matched2 = true;
+                                                break;
+                                            }
+                                        }
+                                        if (!matched2) {
+                                            numInseid2 = Integer.valueOf(s2);
+                                        }
+                                        return numInseid1 == numInseid2 ? s1.compareTo(s2) : numInseid1 - numInseid2;
+                                    } catch (Exception exp) {
+                                        exp.printStackTrace();
+                                    }
+                                }
+                            } else if (c1 != c2) {
+                                return c1 - c2;
+                            }
+                        }
+                        return id1.length() - id2.length();
+                    }
+                });
+                categorizedContent.put(ca, menus);
+            }
+        }
+        return categorizedContent;
+    }
+
+    //===================the add menu action listener===============================================================================
     @XViewByID(R.id.showTitle)
     TextView showTitle;
     @XViewByID(R.id.showCount)

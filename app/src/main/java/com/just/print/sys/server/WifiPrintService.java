@@ -944,7 +944,7 @@ public class WifiPrintService implements Runnable{
     }
 
     private String getCategoryByName(String name) {
-        for(Map.Entry<Category, List<Menu>> entry: OrderCategoryFragment.categorizedContent.entrySet()){
+        for(Map.Entry<Category, List<Menu>> entry: OrderCategoryFragment.getCategorizedContent().entrySet()){
             List<Menu> list = entry.getValue();
             for (Menu menu: list) {
                 if(name.equals(menu.getMname()) || name.equals(menu.getID() + " " + menu.getMname())){

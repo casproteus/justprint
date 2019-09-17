@@ -4,7 +4,10 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -16,6 +19,7 @@ import com.just.print.app.AppData;
 import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
 import com.just.print.app.EventBus;
+import com.just.print.db.bean.Category;
 import com.just.print.db.bean.Mark;
 import com.just.print.db.bean.Menu;
 import com.just.print.db.bean.SaleRecord;
@@ -25,6 +29,7 @@ import com.just.print.sys.model.SelectionDetail;
 import com.just.print.sys.server.CustomerSelection;
 import com.just.print.sys.server.WifiPrintService;
 import com.just.print.ui.activity.ConfigActivity;
+import com.just.print.ui.activity.MainActivity;
 import com.just.print.ui.holder.OrderMarksSelectionViewHolder;
 import com.just.print.ui.holder.OrderIdentifierItemViewHolder;
 import com.just.print.ui.holder.OrderIdentifierMarkViewHolder;
@@ -38,6 +43,7 @@ import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
 import com.stupid.method.reflect.annotation.XViewByID;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -70,6 +76,12 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     @XViewByID(R.id.odIdFrLoutMenuList)
     private ListView odIdFrLoutMenuList;
 
+    @XViewByID(R.id.odIdDelBtn)
+    private ListView odIdDelBtn;
+
+    @XViewByID(R.id.odIdOkBtn)
+    private ListView odIdOkBtn;
+
     @XViewByID(R.id.odIdInput)
     private TextView odIdInput;
 
@@ -101,7 +113,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     public static List<SelectionDetail> bkOfLastSelection;
 //    private static CharSequence bkOfLastTable;
     static int times = 0;
-    String[] items = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "H", "S", "U", "+", "togo", "canc"};
+    String[] items;// = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "H", "S", "U", "+", "togo", "canc"};
 
     @XClick({R.id.odIdConfigBtn, R.id.odIdSndBtn, R.id.odIdDelBtn, R.id.odIdOkBtn})
     private void exeControlCommand(View v) {
@@ -378,34 +390,61 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         //设置餐桌号用
         //CustomerSelection.getInstance().setTableName(odIdTableNumEt.getText().toString());
         storedMenu = null;
-        String definedLast = AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR);
-        items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C"};
-        List<String> ary = new ArrayList<String>();
-        for(int i = 0; i < items.length; i++){
-            ary.add(items[i]);
+        //the model of the menus.
+        if("2".equals(AppData.getCustomData("appmode"))) {
+            //remove some component.
+            findViewById(R.id.odIdDelBtn).setVisibility(View.GONE);
+            findViewById(R.id.odIdOkBtn).setVisibility(View.GONE);
+            String col = AppData.getCustomData("column");
+            try {
+                ((GridView) findViewById(R.id.odIdLoutItemsGv)).setNumColumns(Integer.valueOf(col));
+            }catch(Exception e){
+                //ignore, it's normal user didn't change the setting. then leave it to be 2.
+            }
+            //todo:add the categories button.
+            //((LinearLayout)findViewById(R.id.topButtons)).addView(new ImageButton(null));
+            //preepare the items.
+            List<Category> categories = OrderCategoryFragment.getCategoryList();
+            List<Menu> menus = categories.size() > 0 ?
+                OrderCategoryFragment.getCategorizedContent().get(categories.get(0)) : new ArrayList<Menu>();
+            items = new String[menus.size()];
+            for (int i = 0; i < menus.size(); i++) {
+                items[i] = menus.get(i).getID();
+            }
+        }else{
+            //the "must have" buttons
+            items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C"};
+            List<String> ary = new ArrayList<String>();
+            for (int i = 0; i < items.length; i++) {
+                ary.add(items[i]);
+            }
+            //the flexible buttons which difined by KEY_CUST_LAST_CHAR
+            String definedLast = AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR);
+            if (!StringUtils.isBlank(definedLast)) {
+                char maxChar = definedLast.charAt(0);
+                char lastChar = items[items.length - 1].charAt(0);
+                while (lastChar < maxChar) {
+                    lastChar++;
+                    ary.add(String.valueOf(lastChar));
+                }
+            }
+            //add the custChars, if not defined, then add an s and a u.
+            String custChars = AppData.getCustomData("custChars");
+            if (custChars.length() == 0) {
+                custChars = "SU";
+            }
+            for (int i = 0; i < custChars.length(); i++) {
+                ary.add(custChars.substring(i, i + 1));
+            }
+            //other fixed buttons.
+            ary.add("+");
+            ary.add("togo");
+            ary.add("canc");
+
+            items = ary.toArray(items);
         }
 
-        if(!StringUtils.isBlank(definedLast)) {
-            char maxChar = definedLast.charAt(0);
-            char lastChar = items[items.length - 1].charAt(0);
-            while(lastChar < maxChar){
-                lastChar++;
-                ary.add(String.valueOf(lastChar));
-            }
-        }
-        //add the custChars
-        String custChars = AppData.getCustomData("custChars");
-        if(custChars.length() == 0){
-            custChars = "SU";
-        }
-        for(int i = 0; i < custChars.length(); i++){
-            ary.add(custChars.substring(i, i + 1));
-        }
-        //fixed buttons.
-        ary.add("+");
-        ary.add("togo");
-        ary.add("canc");
-        items = ary.toArray(items);
+
 
         itemXAdapter = new XAdapter2<String>(getActivity(), Arrays.asList(items), OrderIdentifierItemViewHolder.class);
         itemXAdapter.setClickItemListener(this.itemXAdapterClick);
