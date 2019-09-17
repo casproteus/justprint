@@ -258,15 +258,16 @@
                     <GridView
                         android:id="@+id/odIdLoutItemsGv"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="4"
                         android:numColumns="2"
                         android:textSize="24sp"
                         android:textStyle="bold"></GridView>
-                    <!-- send button-->
+                    <!-- send button @NOTE:seems must give it a height, and have to give it a weight-->
                     <Button
                         android:id="@+id/odIdSndBtn"
                         android:layout_width="match_parent"
-                        android:layout_height="200px"
+                        android:layout_height="60dp"
                         android:layout_weight="1"
                         android:background="@android:color/background_dark"
                         android:text="SEND"
