@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:padding="@dimen/activity_horizontal_margin"
+    android:padding="2dp"
     android:orientation="vertical"
     tools:context="com.just.print.ui.fragment.OrderIdentifierFragment">
 
@@ -67,7 +67,7 @@
             android:hint="Mark" />
     </LinearLayout>
 -->
-
+    <!--warning dialog when user do print report.....-->
     <LinearLayout
         android:id="@+id/alertDlg"
         android:layout_width="match_parent"
@@ -90,7 +90,7 @@
                     android:layout_weight="1"
                     android:text="Do you want to reset report?" />
             </LinearLayout>
-
+            <!-- buttons on warning dialog -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -116,10 +116,13 @@
 
         </LinearLayout>
     </LinearLayout>
+
+    <!--main dialog -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+        <!-- top buttons -->
         <LinearLayout
             android:id="@+id/topButtons"
             android:layout_width="match_parent"
@@ -165,17 +168,18 @@
             android:layout_height="wrap_content"
             android:inAnimation="@android:anim/slide_in_left"
             android:outAnimation="@android:anim/slide_out_right">
-
+            <!--dishes menu-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
+                <!--area of tables and selected dishes-->
                 <LinearLayout
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:orientation="vertical"
                     android:layout_weight="1">
+                    <!--mark short cuts-->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -214,7 +218,7 @@
                             android:numColumns="2">
                         </GridView>
                     </LinearLayout>
-
+                    <!--selected dishes-->
                     <ListView
                         android:id="@+id/odIdFrLoutMenuList"
                         android:layout_width="wrap_content"
@@ -226,12 +230,13 @@
 
                     </ListView>
                 </LinearLayout>
-
+                <!--menu area-->
                 <LinearLayout
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:orientation="vertical"
                     android:layout_weight="1">
+                    <!--input content-->
                     <LinearLayout
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
@@ -249,15 +254,15 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"/>
                     </LinearLayout>
+                    <!--key board-->
                     <GridView
                         android:id="@+id/odIdLoutItemsGv"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:numColumns="2"
                         android:textSize="24sp"
-                        android:textStyle="bold">
-                    </GridView>
-
+                        android:textStyle="bold"></GridView>
+                    <!-- send button-->
                     <Button
                         android:id="@+id/odIdSndBtn"
                         android:layout_width="match_parent"
@@ -271,7 +276,7 @@
                 </LinearLayout>
 
             </LinearLayout>
-
+            <!--marks menu-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -22,9 +22,12 @@
 
         <service android:name="com.just.print.net.UDPService" />
 
-        <activity android:name="com.just.print.ui.activity.ConfigActivity" android:screenOrientation="portrait"/>
+        <!--activity android:name="com.just.print.ui.activity.ConfigActivity" android:screenOrientation="portrait"/>
         <activity android:name="com.just.print.ui.activity.LoginActivity" android:screenOrientation="portrait" />
-        <activity android:name="com.just.print.ui.activity.OrderActivity" android:screenOrientation="portrait" />
+        <activity android:name="com.just.print.ui.activity.OrderActivity" android:screenOrientation="portrait" /-->
+        <activity android:name="com.just.print.ui.activity.ConfigActivity"/>
+        <activity android:name="com.just.print.ui.activity.LoginActivity"/>
+        <activity android:name="com.just.print.ui.activity.OrderActivity"/>
         <activity
             android:name=".ui.activity.SildingMenuListViewDemo"
             android:label="@string/title_activity_silding_menu_list_view_demo"  android:screenOrientation="portrait"/>
