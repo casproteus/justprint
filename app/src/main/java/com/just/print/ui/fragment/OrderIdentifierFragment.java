@@ -88,6 +88,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     @XViewByID(R.id.odIdfrName)
     private TextView odIdfrName;
 
+    @XViewByID(R.id.odIdCategoryGrid)
+    private GridView odIdCategoryGrid;
+
     @XViewByID(R.id.odIdLoutItemsGv)
     private GridView odIdLoutItemsGv;
 
@@ -105,6 +108,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     XAdapter2<Mark> markShorCutXAdapter;
     XAdapter2<Menu> menuXAdapter;
     XAdapter2<SelectionDetail> dishesXAdapter;
+    XAdapter2<String> categoryXAdapter;
     XAdapter2<String> itemXAdapter;
     XAdapter2<Mark> markAllXAdapter;
 
@@ -113,15 +117,134 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     public static List<SelectionDetail> bkOfLastSelection;
 //    private static CharSequence bkOfLastTable;
     static int times = 0;
+    String[] categoryNames = {""};
     String[] items;// = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "H", "S", "U", "+", "togo", "canc"};
 
-    @XClick({R.id.odIdConfigBtn, R.id.odIdSndBtn, R.id.odIdDelBtn, R.id.odIdOkBtn})
+    @Override
+    public void onCreated(Bundle savedInstanceState) {
+        getEventBus().register(EVENT_ADD_MENU, this);
+        new StupidReflect(this, getView()).init();
+        //设置餐桌号用
+        //CustomerSelection.getInstance().setTableName(odIdTableNumEt.getText().toString());
+        storedMenu = null;
+        //the model of the menus.
+        if(AppData.isMode2()) {
+            //prepare the categoryNames and items.
+            List<Category> categories = OrderCategoryFragment.getCategoryList();
+            categoryNames = new String[categories.size()];
+            for (int i = 0; i < categories.size(); i++) {
+                categoryNames[i] = categories.get(i).getCname();
+            }
+
+            List<Menu> menus;
+            findViewById(R.id.odIdInfo).setVisibility(View.GONE);
+            findViewById(R.id.odIdSndBtn).setVisibility(View.GONE);
+
+            if(categories.size() > 1) {
+                //remove control buttons(will use send to go to back end(when selected dishes are empty)
+                findViewById(R.id.topButtons).setVisibility(View.GONE);
+                ((GridView)findViewById(R.id.odIdCategoryGrid)).setNumColumns(categories.size());
+                menus = OrderCategoryFragment.getCategorizedContent().get(categories.get(0));
+            }else{
+                findViewById(R.id.odIdCategoryGrid).setVisibility(View.GONE);
+                if(categories.size() == 0){
+                    menus = new ArrayList<Menu>();
+                }
+                menus = OrderCategoryFragment.getCategorizedContent().get(categories.get(0));
+            }
+
+            //might need more col for menu.
+            String col = AppData.getCustomData("column");
+            try {
+                ((GridView) findViewById(R.id.odIdLoutItemsGv)).setNumColumns(Integer.valueOf(col));
+            }catch(Exception e){
+                //ignore, it's normal user didn't change the setting. then leave it to be 2.
+            }
+
+            //get the menu for current category.
+            items = new String[menus.size()];
+            for (int i = 0; i < menus.size(); i++) {
+                items[i] = menus.get(i).getID();
+            }
+        }else{
+            findViewById(R.id.odIdCategoryGrid).setVisibility(View.GONE);
+            findViewById(R.id.odIdTools).setVisibility(View.GONE);
+            //the "must have" buttons
+            items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C"};
+            List<String> ary = new ArrayList<String>();
+            for (int i = 0; i < items.length; i++) {
+                ary.add(items[i]);
+            }
+            //the flexible buttons which difined by KEY_CUST_LAST_CHAR
+            String definedLast = AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR);
+            if (!StringUtils.isBlank(definedLast)) {
+                char maxChar = definedLast.charAt(0);
+                char lastChar = items[items.length - 1].charAt(0);
+                while (lastChar < maxChar) {
+                    lastChar++;
+                    ary.add(String.valueOf(lastChar));
+                }
+            }
+            //add the custChars, if not defined, then add an s and a u.
+            String custChars = AppData.getCustomData("custChars");
+            if (custChars.length() == 0) {
+                custChars = "SU";
+            }
+            for (int i = 0; i < custChars.length(); i++) {
+                ary.add(custChars.substring(i, i + 1));
+            }
+            //other fixed buttons.
+            ary.add("+");
+            ary.add("togo");
+            ary.add("canc");
+
+            items = ary.toArray(items);
+        }
+
+        categoryXAdapter = new XAdapter2<String>(getActivity(), Arrays.asList(categoryNames), OrderIdentifierItemViewHolder.class);
+        categoryXAdapter.setClickItemListener(this.categoryXAdapterClick);
+        odIdCategoryGrid.setAdapter(categoryXAdapter);
+
+        itemXAdapter = new XAdapter2<String>(getActivity(), Arrays.asList(items), OrderIdentifierItemViewHolder.class);
+        itemXAdapter.setClickItemListener(this.itemXAdapterClick);
+        odIdLoutItemsGv.setAdapter(itemXAdapter);
+
+        odIdTableTbtn.setTextOn(null);
+        odIdTableTbtn.setTextOff(null);
+        odIdTableTbtn.setText("");
+        odIdTableTbtn.setChecked(true);
+        odIdTableTbtn.setOnClickListener(this);
+
+        //initSelected dishes part.
+        dishesXAdapter = new XAdapter2<SelectionDetail>(getContext(), OrderMenuViewHolder.class);
+        dishesXAdapter.setClickItemListener(this);
+        dishesXAdapter.setData(CustomerSelection.getInstance().getSelectedDishes());
+        odIdFrLoutMenuList.setAdapter(dishesXAdapter);
+
+        //add Marks
+        allMarks = sortMarks(DaoExpand.queryNotDeletedAll(Applic.getMarkDao()));
+        //add shortcut Marks.
+        initShortCutMarks();
+
+        //init MarkSelection panel
+        markAllXAdapter = new XAdapter2<Mark>(getContext(), OrderMarksSelectionViewHolder.class);
+        markAllXAdapter.setClickItemListener(this);
+        markAllXAdapter.setData(allMarks);
+        markAllList.setAdapter(markAllXAdapter);
+    }
+
+    @XClick({R.id.odIdConfigBtn,R.id.odIdConfigBtn2, R.id.odIdSndBtn, R.id.odIdSndBtn2, R.id.odIdDelBtn, R.id.odIdOkBtn, R.id.odIdCancel})
     private void exeControlCommand(View v) {
         switch (v.getId()) {
             case R.id.odIdConfigBtn:
+            case R.id.odIdConfigBtn2:
                 startActivity(new Intent(getContext(), ConfigActivity.class));
                 break;
+            case R.id.odIdCancel:
+                printCurrentSelection(true);
+                break;
             case R.id.odIdSndBtn:
+            case R.id.odIdSndBtn2:
                 printCurrentSelection(false);
                 break;
             case R.id.odIdDelBtn:
@@ -132,6 +255,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 }
                 break;
             case R.id.odIdOkBtn:
+                if(AppData.isMode2()){
+                    findViewById(R.id.topButtons).setVisibility(View.GONE);
+                }
                 String adminPassword = AppData.getCustomData("adminPassword");
                 if(adminPassword == null || adminPassword.length() < 6){
                     adminPassword = "AA88AA";
@@ -300,43 +426,46 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             L.d(TAG, String.valueOf(view.getId()) + String.valueOf(i));
             switch (view.getId()) {
                 case R.id.buttonholder: //number buttons.
-
-                    if (i < 10) {
-                        InputText(Integer.toString((i + 1) % 10));
-//                    } else if (i < items.length - 5) {
-
-//                    } else if (i == items.length - 4) {
-//                        InputText("U");
-                    } else if (i == items.length - 3) {         //following are fixed buttons.
-                        InputText("+");
-                    } else if (i == items.length - 2) {
-                        odIdTableTbtn.setText("TOGO");
-                        CustomerSelection.getInstance().setTableName(odIdTableTbtn.getText().toString());
-                    } else if (i == items.length - 1) {
-                        odIdTableTbtn.setText("");
-                        //added the selected dish with negative price.
-                        if (printCurrentSelection(true)) {    //arranged to print---didn't met the case that previous print not finished yet.
-                            isCancel = true;
+                    if ("2".equals(AppData.getCustomData("appmode"))) {
+                        storedMenu = SearchMenuFromDB(items[i]);
+                        addDish();
+                        if (dishesXAdapter != null) {
+                            loadOrderMenu();
                         }
-                    } else{
-                        String custChars = AppData.getCustomData("custChars");
-                        if(custChars.length() == 0){
-                            custChars = "SU";
-                        }
-                        int p = i - (items.length - 3 - custChars.length());
-                        if(p >= 0){
-                            InputText(custChars.substring(p, p + 1));
-                        }else {
-                            InputText(Character.toString((char) (i % 10 + 'A')));
-                        }
-                    }
-
-                    if (!odIdTableTbtn.isChecked()) {
-                        tmpMenu = SearchMenuFromDB(odIdInput.getText().toString());
-                        if (null != tmpMenu) {
-                            odIdfrName.setText(tmpMenu.getMname());
+                    } else {
+                        if (i < 10) {
+                            InputText(Integer.toString((i + 1) % 10));
+                        } else if (i == items.length - 3) {         //following are fixed buttons.
+                            InputText("+");
+                        } else if (i == items.length - 2) {
+                            odIdTableTbtn.setText("TOGO");
+                            CustomerSelection.getInstance().setTableName(odIdTableTbtn.getText().toString());
+                        } else if (i == items.length - 1) {
+                            odIdTableTbtn.setText("");
+                            //added the selected dish with negative price.
+                            if (printCurrentSelection(true)) {    //arranged to print---didn't met the case that previous print not finished yet.
+                                isCancel = true;
+                            }
                         } else {
-                            odIdfrName.setText("");
+                            String custChars = AppData.getCustomData("custChars");
+                            if (custChars.length() == 0) {
+                                custChars = "SU";
+                            }
+                            int p = i - (items.length - 3 - custChars.length());
+                            if (p >= 0) {
+                                InputText(custChars.substring(p, p + 1));
+                            } else {
+                                InputText(Character.toString((char) (i % 10 + 'A')));
+                            }
+                        }
+
+                        if (!odIdTableTbtn.isChecked()) {
+                            tmpMenu = SearchMenuFromDB(odIdInput.getText().toString());
+                            if (null != tmpMenu) {
+                                odIdfrName.setText(tmpMenu.getMname());
+                            } else {
+                                odIdfrName.setText("");
+                            }
                         }
                     }
                     break;
@@ -370,6 +499,20 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         }
     };
 
+    //currently it's used by number buttons and the note tag buttons. both types are buttons in holder.
+    IXOnItemClickListener categoryXAdapterClick = new IXOnItemClickListener() {
+        @Override
+        public void onClickItem(View view, int i) {
+            L.d(TAG, "onClickCategory" + view.getId() + String.valueOf(i));
+
+            List<Menu> menus = OrderCategoryFragment.getCategorizedContent().get(OrderCategoryFragment.getCategoryList().get(i));
+            items = new String[menus.size()];
+            for (i = 0; i < menus.size(); i++) {
+                items[i] = menus.get(i).getID();
+            }
+            itemXAdapter.setData(Arrays.asList(items));
+        }
+    };
 
     @Override
     protected int getLayoutId() {
@@ -381,97 +524,6 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         if (EVENT_ADD_MENU.equals(eventName)) {
             loadOrderMenu();
         }
-    }
-
-    @Override
-    public void onCreated(Bundle savedInstanceState) {
-        getEventBus().register(EVENT_ADD_MENU, this);
-        new StupidReflect(this, getView()).init();
-        //设置餐桌号用
-        //CustomerSelection.getInstance().setTableName(odIdTableNumEt.getText().toString());
-        storedMenu = null;
-        //the model of the menus.
-        if("2".equals(AppData.getCustomData("appmode"))) {
-            //remove some component.
-            findViewById(R.id.odIdDelBtn).setVisibility(View.GONE);
-            findViewById(R.id.odIdOkBtn).setVisibility(View.GONE);
-            String col = AppData.getCustomData("column");
-            try {
-                ((GridView) findViewById(R.id.odIdLoutItemsGv)).setNumColumns(Integer.valueOf(col));
-            }catch(Exception e){
-                //ignore, it's normal user didn't change the setting. then leave it to be 2.
-            }
-            //todo:add the categories button.
-            //((LinearLayout)findViewById(R.id.topButtons)).addView(new ImageButton(null));
-            //preepare the items.
-            List<Category> categories = OrderCategoryFragment.getCategoryList();
-            List<Menu> menus = categories.size() > 0 ?
-                OrderCategoryFragment.getCategorizedContent().get(categories.get(0)) : new ArrayList<Menu>();
-            items = new String[menus.size()];
-            for (int i = 0; i < menus.size(); i++) {
-                items[i] = menus.get(i).getID();
-            }
-        }else{
-            //the "must have" buttons
-            items = new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C"};
-            List<String> ary = new ArrayList<String>();
-            for (int i = 0; i < items.length; i++) {
-                ary.add(items[i]);
-            }
-            //the flexible buttons which difined by KEY_CUST_LAST_CHAR
-            String definedLast = AppData.getCustomData(AppData.KEY_CUST_LAST_CHAR);
-            if (!StringUtils.isBlank(definedLast)) {
-                char maxChar = definedLast.charAt(0);
-                char lastChar = items[items.length - 1].charAt(0);
-                while (lastChar < maxChar) {
-                    lastChar++;
-                    ary.add(String.valueOf(lastChar));
-                }
-            }
-            //add the custChars, if not defined, then add an s and a u.
-            String custChars = AppData.getCustomData("custChars");
-            if (custChars.length() == 0) {
-                custChars = "SU";
-            }
-            for (int i = 0; i < custChars.length(); i++) {
-                ary.add(custChars.substring(i, i + 1));
-            }
-            //other fixed buttons.
-            ary.add("+");
-            ary.add("togo");
-            ary.add("canc");
-
-            items = ary.toArray(items);
-        }
-
-
-
-        itemXAdapter = new XAdapter2<String>(getActivity(), Arrays.asList(items), OrderIdentifierItemViewHolder.class);
-        itemXAdapter.setClickItemListener(this.itemXAdapterClick);
-        odIdLoutItemsGv.setAdapter(itemXAdapter);
-
-        odIdTableTbtn.setTextOn(null);
-        odIdTableTbtn.setTextOff(null);
-        odIdTableTbtn.setText("");
-        odIdTableTbtn.setChecked(true);
-        odIdTableTbtn.setOnClickListener(this);
-
-        //initSelected dishes part.
-        dishesXAdapter = new XAdapter2<SelectionDetail>(getContext(), OrderMenuViewHolder.class);
-        dishesXAdapter.setClickItemListener(this);
-        dishesXAdapter.setData(CustomerSelection.getInstance().getSelectedDishes());
-        odIdFrLoutMenuList.setAdapter(dishesXAdapter);
-
-        //add Marks
-        allMarks = sortMarks(DaoExpand.queryNotDeletedAll(Applic.getMarkDao()));
-        //add shortcut Marks.
-        initShortCutMarks();
-
-        //init MarkSelection panel
-        markAllXAdapter = new XAdapter2<Mark>(getContext(), OrderMarksSelectionViewHolder.class);
-        markAllXAdapter.setClickItemListener(this);
-        markAllXAdapter.setData(allMarks);
-        markAllList.setAdapter(markAllXAdapter);
     }
 
     @Override
@@ -547,7 +599,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     }
 
     private void showMarksPanel(){   //final onChoiceMarks choiceMarks) {
-
+        if(AppData.isMode2()){
+            findViewById(R.id.topButtons).setVisibility(View.VISIBLE);
+        }
         if (marksOfCurDish == null) {
             marksOfCurDish = new ArrayList<Mark>();
         }

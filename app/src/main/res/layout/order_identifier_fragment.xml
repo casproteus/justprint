@@ -175,6 +175,12 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <!-- categories -->
+                <GridView
+                    android:id="@+id/odIdCategoryGrid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:numColumns="2">
+                </GridView>
                 <!-- selected dishes and mnu-->
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -245,6 +251,7 @@
                         android:layout_weight="1">
                         <!--input content-->
                         <LinearLayout
+                            android:id="@+id/odIdInfo"
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
@@ -261,6 +268,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"/>
                         </LinearLayout>
+
                         <!--key board-->
                         <GridView
                             android:id="@+id/odIdLoutItemsGv"
@@ -281,6 +289,44 @@
                             android:textColor="@android:color/holo_red_dark"
                             android:textSize="24sp"
                             android:textStyle="bold" />
+                        <!--ToolBar-->
+                        <LinearLayout
+                            android:id="@+id/odIdTools"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <ToggleButton
+                                android:id="@+id/odIdTable2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/tag_bg"
+                                android:layout_marginBottom="2dp"
+                                android:button="@null"
+                                android:paddingBottom="5dp"
+                                android:paddingLeft="10dp"
+                                android:paddingRight="10dp"
+                                android:textOff=""
+                                android:textOn=""
+                                android:layout_weight="1" />
+                            <ImageButton
+                                android:id="@+id/odIdCancel"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:src="@drawable/erase"/>
+                            <ImageButton
+                                android:id="@+id/odIdConfigBtn2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:src="@drawable/setting"/>
+                            <ImageButton
+                                android:id="@+id/odIdSndBtn2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginBottom="2dp"
+                                android:layout_weight="1"
+                                android:src="@drawable/ok" />
+                        </LinearLayout>
                     </LinearLayout>
 
                 </LinearLayout>
