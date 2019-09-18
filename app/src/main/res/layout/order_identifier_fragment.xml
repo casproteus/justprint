@@ -166,13 +166,13 @@
         <ViewSwitcher
             android:id="@+id/viewSwitcher"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:inAnimation="@android:anim/slide_in_left"
             android:outAnimation="@android:anim/slide_out_right">
             <!--categories and menu-->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical">
                 <!-- categories -->
                 <GridView
@@ -184,7 +184,7 @@
                 <!-- selected dishes and mnu-->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="horizontal">
                     <!--area of tables and selected dishes-->
                     <LinearLayout
@@ -243,6 +243,7 @@
 
                         </ListView>
                     </LinearLayout>
+
                     <!--menu area-->
                     <LinearLayout
                         android:layout_width="fill_parent"
@@ -278,6 +279,7 @@
                             android:numColumns="2"
                             android:textSize="24sp"
                             android:textStyle="bold"></GridView>
+
                         <!-- send button @NOTE:seems must give it a height, and have to give it a weight-->
                         <Button
                             android:id="@+id/odIdSndBtn"
@@ -293,7 +295,8 @@
                         <LinearLayout
                             android:id="@+id/odIdTools"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true">
                             <ToggleButton
                                 android:id="@+id/odIdTable2"
                                 android:layout_width="match_parent"
