@@ -76,6 +76,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     @XViewByID(R.id.odIdFrLoutMenuList)
     private ListView odIdFrLoutMenuList;
 
+    @XViewByID(R.id.odIdTable2)
+    private static ToggleButton odIdTable2;
+
     @XViewByID(R.id.odIdDelBtn)
     private ListView odIdDelBtn;
 
@@ -166,6 +169,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             for (int i = 0; i < menus.size(); i++) {
                 items[i] = menus.get(i).getID();
             }
+
+            odIdTable2.setText(AppData.getCustomData("kitchenBillIdx"));
         }else{
             findViewById(R.id.odIdCategoryGrid).setVisibility(View.GONE);
             findViewById(R.id.odIdTools).setVisibility(View.GONE);
@@ -710,6 +715,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         odIdTableTbtn.setChecked(true);
         loadOrderMenu();
 
+        odIdTable2.setText(AppData.getCustomData("kitchenBillIdx"));
     }
 
     /**no one is calling this mehtod now, because we not response feels like app goes wrong. and user might input again.
