@@ -472,6 +472,9 @@ public class WifiPrintService implements Runnable{
         DataSyncService instance = new DataSyncService();
         instance.serverip = serverip;
         instance.tableName = CustomerSelection.getInstance().getTableName();
+        if(StringUtils.isBlank(instance.tableName)){
+            instance.tableName = AppData.curBillIdx; //shouldn't use AppData.getCust... which is already increased.
+        }
         instance.lastSelection = new ArrayList<SelectionDetail>();
         for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
             instance.lastSelection.add(selectionDetail);
