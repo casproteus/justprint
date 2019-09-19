@@ -51,9 +51,9 @@ public class DataSyncService extends Thread{
                     orderContent.append("MarkStart:");
                     for (Mark mark : marks) {
                         orderContent.append(URLEncoder.encode(mark.getName(), "UTF-8")).append("\n");
-                        orderContent.append(mark.getQt()).append("\n");
-                        orderContent.append(mark.getState()).append("\n");
-                        orderContent.append(mark.getVersion()).append("\n");
+                        orderContent.append(mark.getQt()).append("\n");     //number
+                        orderContent.append(mark.getState()).append("\n");  //displayIndex
+                        orderContent.append(mark.getVersion()).append("\n");//price
                     }
 
                     json.put("orderContent", orderContent.toString());
