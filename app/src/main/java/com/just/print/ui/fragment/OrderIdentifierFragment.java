@@ -399,6 +399,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         //clean the printer maps, to make sure it can pass the check when call itself again to send content to printer.
                         WifiPrintService.getInstance().addProblematicPrinter(result);
                         WifiPrintService.getInstance().reInitPrintRelatedMaps();
+                        WifiPrintService.getInstance().resetFlags();
                         printCurrentSelection(isCancel);
                     }
                 });
