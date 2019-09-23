@@ -25,6 +25,11 @@ import com.stupid.method.reflect.annotation.XViewByID;
  * the interface is for inputting shop name and user name.
  */
 public class LoginFragment extends BaseFragment implements UDPService.UDPCallback {
+    private static String registeredName;
+    public static String getUserName() {
+        return registeredName;
+    }
+
     @Override
     protected int getLayoutId() {
         return R.layout.login_fragment;
@@ -36,10 +41,10 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
     @Override
     public void onCreated(Bundle savedInstanceState) {
         new StupidReflect(this, getView()).init();
-        String UserName = AppData.getUserName(getContext());
+        registeredName = AppData.getUserName(getContext());
         String shopName = AppData.getShopName(getContext());
-        if (!StringUtils.isEmpty(UserName)) {
-            userName.setText(UserName);
+        if (!StringUtils.isEmpty(registeredName)) {
+            userName.setText(registeredName);
             userName.setEnabled(false);
             findViewById(R.id.confirmUserName).setVisibility(View.GONE);
             findViewById(R.id.storeName).setVisibility(View.VISIBLE);

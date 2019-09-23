@@ -21,6 +21,7 @@ import com.just.print.db.bean.SaleRecord;
 import com.just.print.db.dao.SaleRecordDao;
 import com.just.print.db.expand.DaoExpand;
 import com.just.print.sys.model.SelectionDetail;
+import com.just.print.ui.fragment.LoginFragment;
 import com.just.print.ui.fragment.OrderCategoryFragment;
 import com.just.print.ui.fragment.OrderIdentifierFragment;
 import com.just.print.util.AppUtils;
@@ -154,9 +155,10 @@ public class WifiPrintService implements Runnable{
 
         List<Printer> printerList = DaoExpand.queryNotDeletedAll(Applic.app.getDaoMaster().newSession().getPrinterDao());//读取打印机位置
         for(Printer printer:printerList){
-            ipPrinterMap.put(printer.getIp(),printer);
-            ipContentMap.put(printer.getIp(),new ArrayList<String>());
-            ipSelectionsMap.put(printer.getIp(),new ArrayList<SelectionDetail>());
+            String ip = printer.getIp();
+            ipPrinterMap.put(ip,printer);
+            ipContentMap.put(ip,new ArrayList<String>());
+            ipSelectionsMap.put(ip,new ArrayList<SelectionDetail>());
         }
     }
 
@@ -164,9 +166,10 @@ public class WifiPrintService implements Runnable{
     //other wise will send to serer and report.(no matter the content will be printed succesfully or not, because if not printed by accident, they will manully write kitchen a bill.
     public String exePrintCommand(boolean isCancel){
         L.d(TAG,"start to translate selection into ipContent for printing.");
-        if(!isIpContentMapEmpty()){
+        String ip = getIPofNonEmptyIpContentMapEntry();
+        if(ip != null){
             L.d(TAG,"ipContent not empty, means last print job not finished yet! returning not success flag.");
-            return ERROR;                     //未打印完毕
+            return ip;                     //未打印完毕
         }
 
         popKitchenBillIdx();
@@ -191,10 +194,10 @@ public class WifiPrintService implements Runnable{
             for(M2M_MenuPrint m2m: printerList) {
                 Printer printer = m2m.getPrint();
                 if(printer == null) {                   //should never happen, jist in case someone changed db.
-                    ToastUtil.showToast("Printer not exist anymore. please check" + m2m.toString());
-                    return false;
+//                    ToastUtil.showToast("Printer not exist anymore. please check" + m2m.toString());
+//                    return false;
+                    continue;       //we should allow user to sell dish need no print out, like cocacola~
                 }
-
                 String ip = printer.getIp();
                 L.d(TAG,"Adding a dish to ipSelectionsMap, ip:" + ip);
                 ipSelectionsMap.get(ip).add(selectionDetail);
@@ -225,7 +228,7 @@ public class WifiPrintService implements Runnable{
         //add a kitchenBill on top, so when there's issue in printer, user can found a bill was miss printed.
         String kitchenBillIdx = AppData.curBillIdx;
 
-        String mobileIdx = AppData.getCustomData("userName");     //used for knowing printed from which mobile.
+        String mobileIdx = LoginFragment.getUserName();     //used for knowing printed from which mobile.
         if(!StringUtils.isBlank(mobileIdx)){                            //@TODO: should be improved by using pos to print, then no need this mobile Mark anymore.
             kitchenBillIdx = mobileIdx + kitchenBillIdx;
         }
@@ -380,6 +383,11 @@ public class WifiPrintService implements Runnable{
         return SUCCESS;
     }
 
+    private List<String> errorPrinterList = new ArrayList<String>();
+    public void addProblematicPrinter(String ip){
+        errorPrinterList.add(ip);
+    }
+
     public void run(){
 
         beiYangPrinters = prepareBeiYangPrinterStr();
@@ -393,9 +401,10 @@ public class WifiPrintService implements Runnable{
                 for (Map.Entry entry : ipContentMap.entrySet()) {
 
                     List<String> contentList = (List<String>) entry.getValue();
+                    String printerIP = (String) entry.getKey();
 
-                    if (contentList.size() > 0) {
-                        curPrintIp = (String) entry.getKey();
+                    if (contentList.size() > 0 && !errorPrinterList.contains(printerIP)) {
+                        curPrintIp = printerIP;
                         L.d(TAG, "ip changed to:" + curPrintIp + "the size of categorizedContent to print is:" + contentList.size());
                         contentReadyForPrintFlag = true; //mark that we have found something to print, don't come into here and do init socket any more.
                         timeCounter = 0;
@@ -537,7 +546,7 @@ public class WifiPrintService implements Runnable{
     }
 
     private StringBuilder getReportFirstLineContent() {
-        String mobileMark = AppData.getCustomData("mobileMark");
+        String mobileMark = LoginFragment.getUserName();
         StringBuilder content = new StringBuilder(mobileMark == null ? "" : mobileMark);
         String idx = AppData.getCustomData("reportIdx");
         return content.append(idx == null || idx.length() == 0 ? "1" : idx);
@@ -731,7 +740,7 @@ public class WifiPrintService implements Runnable{
     }
 
     private void isAllPrintedCheck(){
-        if(isIpContentMapEmpty()){
+        if(getIPofNonEmptyIpContentMapEntry() == null){
             L.d(TAG,"All categorizedContent in this order are printed, to comfirm app with OK.");
             OrderIdentifierFragment.confirmPrintOK();
         }
@@ -1025,19 +1034,24 @@ public class WifiPrintService implements Runnable{
             }
             content.append(kitchenBillIdx).append("\n\n");
             //kitchenBillIdx and time
-            content.append("(").append(tableName).append(")").append(generateString(width - tableName.length() - 2 - dateStr.length(), SEPRATOR))
+            if(tableName != null && tableName.length() > 0) {
+                content.append("(").append(tableName).append(")");
+            }
+            content.append(generateString(width - tableName.length() - 2 - dateStr.length(), SEPRATOR))
                     .append(dateStr).append("\n");
         }else {
             //table name
-            String tablename_position = AppData.getCustomData("title_position");
-            if ("left".equals(tablename_position)) {
-                //add nothing
-            } else if ("right".equals(tablename_position)) {
-                content.append(generateString(width - tableName.length() - 2, " "));
-            }else{  //center is the default
-                content.append(generateString((width - tableName.length() - 2) / 2, " "));
+            if(tableName != null && tableName.length() > 0) {
+                String tablename_position = AppData.getCustomData("title_position");
+                if ("left".equals(tablename_position)) {
+                    //add nothing
+                } else if ("right".equals(tablename_position)) {
+                    content.append(generateString(width - tableName.length() - 2, " "));
+                } else {  //center is the default
+                    content.append(generateString((width - tableName.length() - 2) / 2, " "));
+                }
+                content.append("(").append(tableName).append(")").append("\n\n");
             }
-            content.append("(").append(tableName).append(")").append("\n\n");
             //kitchenBillIdx and time
             content.append(kitchenBillIdx)
                     .append(generateString(width - kitchenBillIdx.length() - dateStr.length(), SEPRATOR))
@@ -1099,14 +1113,14 @@ public class WifiPrintService implements Runnable{
         return sb.toString();
     }
 
-    private boolean isIpContentMapEmpty(){
+    private String getIPofNonEmptyIpContentMapEntry(){
         for(Map.Entry entry : ipContentMap.entrySet()){
             List<String> listTypeValue = (List<String>)entry.getValue();
             if(listTypeValue.size() > 0){
-                return false;
+                return entry.getKey().toString();
             }
         }
-        return true;
+        return null;
     }
 
 }

@@ -385,11 +385,11 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             showToast("Nothing selected!");
             return false;
         }else {
-            String result = WifiPrintService.getInstance().exePrintCommand(isCancel);
-            if (WifiPrintService.ERROR.equals(result)) {
+            final String result = WifiPrintService.getInstance().exePrintCommand(isCancel);
+            if (result.startsWith("192.") || result.startsWith("10.")) {
                 // pup up a dialog to ask if user want to continue.....
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setMessage("Last print not completed. Continue? ");
+                builder.setMessage("Last print on " + result + " not completed. Continue? ");
                 builder.setTitle("WARNING").setNegativeButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -397,6 +397,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         //do we need to clean bkSelections?????
                         confirmPrintOK();
                         //clean the printer maps, to make sure it can pass the check when call itself again to send content to printer.
+                        WifiPrintService.getInstance().addProblematicPrinter(result);
                         WifiPrintService.getInstance().reInitPrintRelatedMaps();
                         printCurrentSelection(isCancel);
                     }
