@@ -206,6 +206,10 @@ public class AppData extends Thread{
         bw.close();//使用完关闭
     }
 
+    public static boolean isMode2() {
+        return "2".equals(getCustomData("appmode"));
+    }
+
     @Override
     public void run() {
         super.run();

@@ -290,10 +290,12 @@ public class ConfigMenuFragment extends BaseFragment{//} implements IXOnItemLong
             showToast("Please input valid price. e.g. 15.99");
             return;
         }
-
+        //should allow dish without printer in mode 2
         if (addPrints == null || addPrints.size() == 0) {
-            showToast("Please select printer");
-            return;
+            if(!AppData.isMode2()) {
+                showToast("Please select printer");
+                return;
+            }
         }
 
 

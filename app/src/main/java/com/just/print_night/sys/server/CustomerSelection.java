@@ -8,7 +8,7 @@ import java.util.List;
 public class CustomerSelection {
 
     private static CustomerSelection instance;
-    private String tableNumber;
+    private String tableName;
     private List<SelectionDetail> selectedDishes;
     private List<String> mkList;
 
@@ -20,7 +20,7 @@ public class CustomerSelection {
     }
 
     private CustomerSelection() {
-        tableNumber ="";
+        tableName ="";
         selectedDishes = new ArrayList<SelectionDetail>();
     }
 
@@ -48,11 +48,11 @@ public class CustomerSelection {
         return selectedDishes;
     }
 
-    public String getTableNumber() {
-        return tableNumber;
+    public String getTableName() {
+        return tableName;
     }
 
-    public void setTableNumber(String tableNumber) {
-        this.tableNumber = tableNumber;
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 }
