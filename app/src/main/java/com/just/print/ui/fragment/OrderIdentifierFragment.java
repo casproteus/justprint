@@ -395,7 +395,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             if (WifiPrintService.ERROR.equals(result)) {
                 // pup up a dialog to ask if user want to continue.....
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setMessage("Last print not done yet (some printer might went wrong and need to check out). Are you sure to continue? ");
+                builder.setMessage("Last print not completed. Continue? ");
                 builder.setTitle("WARNING").setNegativeButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

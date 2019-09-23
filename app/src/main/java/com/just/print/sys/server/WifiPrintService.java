@@ -225,7 +225,7 @@ public class WifiPrintService implements Runnable{
         //add a kitchenBill on top, so when there's issue in printer, user can found a bill was miss printed.
         String kitchenBillIdx = AppData.curBillIdx;
 
-        String mobileIdx = AppData.getCustomData("mobileMark");     //used for knowing printed from which mobile.
+        String mobileIdx = AppData.getCustomData("userName");     //used for knowing printed from which mobile.
         if(!StringUtils.isBlank(mobileIdx)){                            //@TODO: should be improved by using pos to print, then no need this mobile Mark anymore.
             kitchenBillIdx = mobileIdx + kitchenBillIdx;
         }
