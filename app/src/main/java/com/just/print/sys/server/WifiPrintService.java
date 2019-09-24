@@ -385,7 +385,9 @@ public class WifiPrintService implements Runnable{
 
     private List<String> errorPrinterList = new ArrayList<String>();
     public void addProblematicPrinter(String ip){
-        errorPrinterList.add(ip);
+        if(!errorPrinterList.contains(ip)) {
+            errorPrinterList.add(ip);
+        }
     }
 
     public void run(){
@@ -595,6 +597,10 @@ public class WifiPrintService implements Runnable{
          L.e("Failed to close printer status port.", curPrintIp, null);
          }**/
 
+        resetFlags();
+    }
+
+    public void resetFlags() {
         printerConnectedFlag = false;
         contentReadyForPrintFlag = false;
     }
@@ -1117,7 +1123,9 @@ public class WifiPrintService implements Runnable{
         for(Map.Entry entry : ipContentMap.entrySet()){
             List<String> listTypeValue = (List<String>)entry.getValue();
             if(listTypeValue.size() > 0){
-                return entry.getKey().toString();
+                if(!errorPrinterList.contains(entry.getKey())) {
+                    return entry.getKey().toString();
+                }
             }
         }
         return null;
