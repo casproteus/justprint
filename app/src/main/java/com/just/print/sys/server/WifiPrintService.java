@@ -998,7 +998,7 @@ public class WifiPrintService implements Runnable{
         String title = AppData.getCustomData("kitchentitle");
         if (title.length() > 0) {
             if (title.endsWith("lines")) {
-                title = title.substring(0, title.length() - 6).trim();
+                title = title.substring(0, title.length() - 5).trim();
                 try {
                     int qt = Integer.valueOf(title);
                     for (int i = 0; i < qt; i++) {
