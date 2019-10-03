@@ -136,14 +136,12 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             List<Menu> menus;
             findViewById(R.id.odIdInfo).setVisibility(View.GONE);
             findViewById(R.id.odIdSndBtn).setVisibility(View.GONE);
-
+            findViewById(R.id.topButtons).setVisibility(View.GONE);
             if(categories.size() > 1) {
-                //remove control buttons(will use send to go to back end(when selected dishes are empty)
-                findViewById(R.id.topButtons).setVisibility(View.GONE);
                 ((GridView)findViewById(R.id.odIdCategoryGrid)).setNumColumns(categories.size());
                 menus = OrderCategoryFragment.getCategorizedContent().get(categories.get(0));
             }else{
-                findViewById(R.id.odIdCategoryGrid).setVisibility(View.GONE);
+                //findViewById(R.id.odIdCategoryGrid).setVisibility(View.GONE);
                 if(categories.size() == 0){
                     menus = new ArrayList<Menu>();
                 }else {
@@ -685,14 +683,19 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 sortedMarks.add(mark);
             }
         }
+        for(int i = 0; i < 23 - sortedMarks.size(); i++){
+            sortedMarks.add(new Mark());
+        }
         return sortedMarks;
     }
 
     private void initShortCutMarks() {
         shortCutMarks = new ArrayList<Mark>(3);
         List<Mark> marks = new ArrayList<Mark>();
-        marks.add(allMarks.size() < 1 ? new Mark("M1") : allMarks.get(0));
-        marks.add(allMarks.size() < 2 ? new Mark("M2") : allMarks.get(1));
+        //because we want to make sure the panel which contains the grid view has curtain height,
+        //so we've made sure the allMarks must have at least values.
+        marks.add(allMarks.get(0));
+        marks.add(allMarks.get(1));
         markShorCutXAdapter = new XAdapter2<Mark>(getActivity(), marks, OrderIdentifierMarkViewHolder.class);
         markShorCutXAdapter.setClickItemListener(this.itemXAdapterClick);
         odIdMarksGrid.setAdapter(markShorCutXAdapter);
