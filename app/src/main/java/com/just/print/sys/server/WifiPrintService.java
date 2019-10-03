@@ -1105,7 +1105,7 @@ public class WifiPrintService implements Runnable{
             }
             content.append(generateString(width, sep_str2)).append("\n");
         }
-        if("true".equals(AppData.getCustomData("showprice"))) {
+        if("true".equals(AppData.getCustomData("priceonkitchenbill"))) {
             return content.append(priceOfBill).append("\n").toString();
         }else {
             return content.substring(0, content.length() - (width + 1));
