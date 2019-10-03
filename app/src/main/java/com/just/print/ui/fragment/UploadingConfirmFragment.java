@@ -37,7 +37,7 @@ public class UploadingConfirmFragment extends BaseFragment{
         }
     }
 
-    @XClick({R.id.btnConfirmResetReportOK})
+    @XClick({R.id.btnConfirmUploadOK})
     private void onButtonOK(){
         DatabaseUtil.syncDbOntoServer(AppData.getLicense(), AppData.getShopName(),true);
         getActivity().finish();

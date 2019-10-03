@@ -58,7 +58,7 @@ public class DownloadingConfirmFragment extends BaseFragment{
         lastModified.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Long.valueOf(lastSyncDate)));
     }
 
-    @XClick({R.id.btnConfirmResetReportOK})
+    @XClick({R.id.btnConfirmDownloadOK})
     private void onButtonOK(){
         String license = password.getText().toString();
         if(license.length() < 6){
