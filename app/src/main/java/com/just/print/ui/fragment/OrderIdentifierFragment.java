@@ -146,8 +146,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 findViewById(R.id.odIdCategoryGrid).setVisibility(View.GONE);
                 if(categories.size() == 0){
                     menus = new ArrayList<Menu>();
+                }else {
+                    menus = OrderCategoryFragment.getCategorizedContent().get(categories.get(0));
                 }
-                menus = OrderCategoryFragment.getCategorizedContent().get(categories.get(0));
             }
 
             //might need more col for menu.
