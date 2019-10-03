@@ -174,20 +174,20 @@ public class WifiPrintService implements Runnable{
 
         popKitchenBillIdx();
 
-        saveSaleRecToDB(isCancel);                              //save to db
+        Double priceOfBill = saveSaleRecToDB(isCancel);                              //save to db
 
         if(!StringUtils.isBlank(serverip)){                     //send to server
             sendToServer(serverip);
         }
-        
-        if (manageDishesIntoMapAndWaitingForPrint(isCancel)) { //send to printer
+
+        if (manageDishesIntoMapAndWaitingForPrint(isCancel, priceOfBill)) { //send to printer
             return SUCCESS;
         }else {
             return ERROR;
         }
     }
 
-    private boolean manageDishesIntoMapAndWaitingForPrint(boolean isCancel) {
+    private boolean manageDishesIntoMapAndWaitingForPrint(boolean isCancel, Double priceOfBill) {
         //1、遍历每个选中的菜，并分别遍历加在其上的打印机。并在ipSelectionsMap上对应IP后面增加菜品
         for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
             List<M2M_MenuPrint> printerList = selectionDetail.getDish().getM2M_MenuPrintList();
@@ -255,22 +255,22 @@ public class WifiPrintService implements Runnable{
                             } else if(currentCategory.equals(c1.getCname())){    //if same with previous, then add into the list.
                                 tlist.add(selectionDetail);
                             } else {                    //if not same, then add current list into ipContent map, and start a new list.
-                                ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx, isCancel) + "\n\n");
+                                ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx, isCancel, priceOfBill) + "\n\n");
                                 currentCategory = c1.getCname();
                                 tlist = new ArrayList<SelectionDetail>();
                                 tlist.add(selectionDetail);
                             }
                         }
                         //put the last list into ipContent map.
-                        ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx, isCancel) + "\n\n");
+                        ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx, isCancel, priceOfBill) + "\n\n");
                     }else{
-                        ipContentMap.get(printerIP).add(formatContentForPrint(dishList, kitchenBillIdx, isCancel) + "\n\n\n\n\n");
+                        ipContentMap.get(printerIP).add(formatContentForPrint(dishList, kitchenBillIdx, isCancel, priceOfBill) + "\n\n\n\n\n");
                     }
                 }else{                                          //分单封装---following each key(printer ip), there will be a list of formatted string.
                     for(SelectionDetail selectionDetail : dishList){
                         List<SelectionDetail> tlist = new ArrayList<SelectionDetail>();     //use list to fullfill the parameter format of the format method,
                         tlist.add(selectionDetail);                                         //only one dish will be added into this list.
-                        ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx, isCancel) + "\n\n");
+                        ipContentMap.get(printerIP).add(formatContentForPrint(tlist, kitchenBillIdx, isCancel, priceOfBill) + "\n\n");
                     }
                 }
             }
@@ -291,7 +291,8 @@ public class WifiPrintService implements Runnable{
         AppData.putCustomData("kitchenBillIdx", String.valueOf(Integer.valueOf(AppData.curBillIdx) + 1));   //update thee kbi into higer value.
     }
 
-    private static void saveSaleRecToDB(boolean isCancel) {
+    private static Double saveSaleRecToDB(boolean isCancel) {
+        Double priceFR = 0.0;
         //save the menu into database.
         SaleRecordDao saleRecordDao = Applic.app.getDaoMaster().newSession().getSaleRecordDao();
         for(SelectionDetail selectionDetail : CustomerSelection.getInstance().getSelectedDishes()){
@@ -313,11 +314,14 @@ public class WifiPrintService implements Runnable{
             if(isCancel){
                 price *= -1;
             }
+
             SaleRecord saleRecord = new SaleRecord();
             saleRecord.setMname(menu.getID() + " " + name);
             saleRecord.setNumber(Double.valueOf(number));
             saleRecord.setPrice(price);
             saleRecordDao.insertOrReplace(saleRecord);
+
+            priceFR += price;
 
             if (!"true".equals(AppData.getCustomData("combineMarkPrice"))) {  //by defalut mark price is not added into salesrecord, so, generate saleRecord for the marks.
                 List<Mark> marks = selectionDetail.getMarkList();
@@ -333,11 +337,14 @@ public class WifiPrintService implements Runnable{
                             }
                             saleRecordForMark.setPrice(markPrice);
                             saleRecordDao.insertOrReplace(saleRecordForMark);
+
+                            priceFR += markPrice;
                         }
                     }
                 }
             }
         }
+        return priceFR;
     }
 
     //The start time and end time are long format, need to be translate for print.
@@ -993,7 +1000,7 @@ public class WifiPrintService implements Runnable{
         }
     }
 
-    private String formatContentForPrint(List<SelectionDetail> list, String kitchenBillIdx, boolean isCancel) {
+    private String formatContentForPrint(List<SelectionDetail> list, String kitchenBillIdx, boolean isCancel, Double priceOfBill) {
         L.d(TAG, "formatContentForPrint");
 
         determinTheWidth();
@@ -1098,7 +1105,11 @@ public class WifiPrintService implements Runnable{
             }
             content.append(generateString(width, sep_str2)).append("\n");
         }
-        return content.substring(0, content.length() - (width + 1));
+        if("true".equals(AppData.getCustomData("showprice"))) {
+            return content.append(priceOfBill).append("\n").toString();
+        }else {
+            return content.substring(0, content.length() - (width + 1));
+        }
     }
 
     private int getLengthOfString(String content){
