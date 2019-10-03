@@ -207,7 +207,7 @@ public class AppData extends Thread{
     }
 
     public static boolean isMode2() {
-        return "2".equals(getCustomData("appmode"));
+        return getCustomData("appmode") == null || "".equals(getCustomData("appmode")) || "2".equals(getCustomData("appmode"));
     }
 
     @Override

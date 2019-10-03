@@ -4,6 +4,9 @@ import android.util.Base64;
 
 import com.just.print.app.AppData;
 import com.just.print.app.Applic;
+import com.just.print.sys.model.SelectionDetail;
+import com.just.print.sys.server.ConfigurationsSyncService;
+import com.just.print.sys.server.CustomerSelection;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -21,6 +24,7 @@ import java.net.URL;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.sql.Date;
+import java.util.ArrayList;
 
 public class DatabaseUtil extends Thread{
 
@@ -54,6 +58,13 @@ public class DatabaseUtil extends Thread{
         }
     }
 
+    public static void syncConfigOntoServer(String license, String shopName, boolean isUpload) {
+        ConfigurationsSyncService instance = new ConfigurationsSyncService();
+        instance.serverip = AppData.getSERVER_URL();
+        instance.configurationStr = "abc";
+        instance.start();
+    }
+
     public static void main(String args[]){
         new DatabaseUtil().run();
     }
@@ -61,8 +72,7 @@ public class DatabaseUtil extends Thread{
     @Override
     public void run() {
         super.run();
-        boolean debug = true;
-        if(debug && AppUtils.hasInternet(Applic.app.getApplicationContext())){
+        if(AppUtils.hasInternet(Applic.app.getApplicationContext())){
 
             HttpURLConnection urlConnection = null;
             URL url = null;

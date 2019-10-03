@@ -13,13 +13,13 @@ import com.stupid.method.reflect.annotation.XClick;
 import java.util.HashMap;
 import java.util.List;
 
-public class UploadingConfirmFragment extends BaseFragment{
+public class UploadingConfigConfirmFragment extends BaseFragment{
 
     private HashMap<String,List<String>> contentForPrintMap;
 
     @Override
     protected int getLayoutId() {
-        return R.layout.uploading_confirm_fragment;
+        return R.layout.uploading_config_confirm_fragment;
     }
 
     @SuppressLint("NewApi")
@@ -35,7 +35,7 @@ public class UploadingConfirmFragment extends BaseFragment{
 
     @XClick({R.id.btnConfirmUploadOK})
     private void onButtonOK(){
-        DatabaseUtil.syncDbOntoServer(AppData.getLicense(), AppData.getShopName(),true);
+        DatabaseUtil.syncConfigOntoServer(AppData.getLicense(), AppData.getShopName(),true);
         getActivity().finish();
     }
 

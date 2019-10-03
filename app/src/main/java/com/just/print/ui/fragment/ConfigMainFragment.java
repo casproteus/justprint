@@ -52,7 +52,7 @@ public class ConfigMainFragment extends BaseFragment {
     }
 
     @XClick({R.id.configMenuManager, R.id.configPrintManager, R.id.configTagManager,
-            R.id.configUserManager, R.id.configPrintReport, R.id.uploadDB, R.id.downloadDB, R.id.reactivate})
+            R.id.configUserManager, R.id.configPrintReport, R.id.uploadDB, R.id.downloadDB, R.id.uploadConfig, R.id.downloadConfig, R.id.reactivate})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.configMenuManager:
@@ -75,6 +75,12 @@ public class ConfigMainFragment extends BaseFragment {
                 break;
             case R.id.downloadDB:
                 getEventBus().post(ConfigActivity.CHANGE_PAGE, DownloadingConfirmFragment.class);
+                break;
+            case R.id.uploadConfig:
+                getEventBus().post(ConfigActivity.CHANGE_PAGE, UploadingConfigConfirmFragment.class);
+                break;
+            case R.id.downloadConfig:
+                getEventBus().post(ConfigActivity.CHANGE_PAGE, DownloadingConfigConfirmFragment.class);
                 break;
             case R.id.reactivate:
                 getEventBus().post(ConfigActivity.CHANGE_PAGE, ReActivateFragment.class);

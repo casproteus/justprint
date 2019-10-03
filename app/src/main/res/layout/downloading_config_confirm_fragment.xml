@@ -19,7 +19,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="You are about to download menus from server (relevant content will be replaced by content on server), are you sure to proceed?" />
+            android:text="You are about to download configurations from server (relevant content will be replaced by content on server), are you sure to proceed?" />
 
     </LinearLayout>
 

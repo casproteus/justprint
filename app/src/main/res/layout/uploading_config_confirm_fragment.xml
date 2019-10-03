@@ -19,7 +19,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="You are about to UPLOAD menus onto server (relevant data on server will BE REPLACED BY LOCAL DATA!!!), are you sure to proceed?" />
+            android:text="You are about to UPLOAD configrations onto server (relevant data on server will BE REPLACED BY LOCAL DATA!!!), are you sure to proceed?" />
     </LinearLayout>
 
     <LinearLayout

@@ -14,12 +14,11 @@ import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
 import com.stupid.method.reflect.annotation.XViewByID;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 
-import java.text.SimpleDateFormat;
-
-public class DownloadingConfirmFragment extends BaseFragment{
+public class DownloadingConfigConfirmFragment extends BaseFragment{
 
     private HashMap<String,List<String>> contentForPrintMap;
 
@@ -32,7 +31,7 @@ public class DownloadingConfirmFragment extends BaseFragment{
 
     @Override
     protected int getLayoutId() {
-        return R.layout.downloading_confirm_fragment;
+        return R.layout.downloading_config_confirm_fragment;
     }
 
     @SuppressLint("NewApi")
@@ -60,7 +59,7 @@ public class DownloadingConfirmFragment extends BaseFragment{
         if(license.length() < 6){
             license = AppData.getLicense();
         }
-        DatabaseUtil.syncDbOntoServer(license, store_name.getText().toString(),false);
+        DatabaseUtil.syncConfigOntoServer(license, store_name.getText().toString(),false);
         getActivity().finish();
     }
 
