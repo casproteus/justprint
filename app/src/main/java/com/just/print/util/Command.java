@@ -38,7 +38,7 @@ public class Command {
     public static byte[] ESC_ExclamationMark = new byte[] {0x1b, 0x21, 0x00 };
 
     //设置字体倍高倍宽
-    public static byte[] GS_ExclamationMark = new byte[] {0x1b, 0x21, 0x33 };
+    public final static byte[] GS_ExclamationMark = new byte[] {0x1b, 0x21, 0x33 };
 
     //设置反显打印
     public static byte[] GS_B = new byte[] {0x1d, 0x42, 0x00 };

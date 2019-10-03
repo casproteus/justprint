@@ -689,7 +689,7 @@ public class WifiPrintService implements Runnable{
         }
 
         if (StringUtils.isBlank(font)) {
-            wifiCommunication.sndByte(Command.GS_ExclamationMark);
+            wifiCommunication.sndByte(new byte[] {0x1b, 0x21, 0x33 });// commentted out because variable id not chaged, while the content is modified to 27,33,0 (should be 27,33,51)Command.GS_ExclamationMark);
         } else {
             //default: "27, 33, 48" because it works for both thermal and non-thermal
             String[] pieces = font.split(",");
@@ -988,6 +988,8 @@ public class WifiPrintService implements Runnable{
             }catch(Exception e){
 
             }
+        }else{
+            width = 24;
         }
     }
 
