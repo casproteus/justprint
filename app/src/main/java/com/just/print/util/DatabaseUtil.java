@@ -24,6 +24,7 @@ import java.net.URLEncoder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.sql.Date;
+import java.util.ArrayList;
 
 public class DatabaseUtil extends Thread{
 
@@ -58,18 +59,24 @@ public class DatabaseUtil extends Thread{
     }
 
     public static void syncConfigOntoServer(String license, String shopName, boolean isUpload) {
-        String configurationStr = "abc";
-        //TODO: prepare the configstring.
         AppData.schema = AppData.getSERVER_URL() + (isUpload ? "/uploadConfig" : "/downloadCofig");
         JSONObject json = new JSONObject();//创建json对象
         try {
             json.put("filepath", URLEncoder.encode(license + shopName, "UTF-8"));//使用URLEncoder.encode对特殊和不可见字符进行编码
-            json.put("billIndex", URLEncoder.encode(configurationStr, "UTF-8"));//把数据put进json对象中
+            json.put("configuration", URLEncoder.encode(getConfigurations(), "UTF-8"));//把数据put进json对象中
         }catch(Exception e){
-            L.e("DatabaseUtil", "Exception when encoding content into json: license+shopName:" + license + shopName + " cofigrationStr:" + configurationStr, e);
+            L.e("DatabaseUtil", "Exception when encoding content into json: license+shopName:" + license + shopName + " cofigrationStr:" + getConfigurations(), e);
         }
         AppData.contentToSend = json.toString();
         new AppData().start();
+    }
+
+    private static String getConfigurations() {
+        StringBuilder configurations = new StringBuilder();
+        for(int i = 0; i < AppData.keysToSync.length; i++) {
+            configurations.append(",").append(AppData.keysToSync[i]).append(":").append(AppData.getCustomData(AppData.keysToSync[i]));
+        }
+        return configurations.substring(1);
     }
 
     public static void main(String args[]){
