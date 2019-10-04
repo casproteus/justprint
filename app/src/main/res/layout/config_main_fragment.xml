@@ -89,6 +89,13 @@
             android:text="Download Menus" />
 
         <TextView
+            android:id="@+id/reactivate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Re-Activate" />
+
+        <TextView
             android:id="@+id/uploadConfig"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -102,12 +109,6 @@
             android:padding="8dp"
             android:text="Download Configuration" />
 
-        <TextView
-            android:id="@+id/reactivate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="Re-Activate" />
     </LinearLayout>
 
 

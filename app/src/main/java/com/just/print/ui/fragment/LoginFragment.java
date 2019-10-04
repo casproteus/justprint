@@ -150,8 +150,7 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
         AppData.createPrinter("192.168.8.40","40",1,1, "");
 
         //initialize the days left and the stated days on cloud.
-        new AppData().start();
-
+        AppData.startActivate();
         startActivity(new Intent(getContext(), OrderActivity.class));
         getActivity().finish();
     }

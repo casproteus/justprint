@@ -683,7 +683,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 sortedMarks.add(mark);
             }
         }
-        for(int i = 0; i < 23 - sortedMarks.size(); i++){
+        for(int i = 0; i < 36 - sortedMarks.size(); i++){
             sortedMarks.add(new Mark());
         }
         return sortedMarks;

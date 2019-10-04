@@ -4,9 +4,8 @@ import android.util.Base64;
 
 import com.just.print.app.AppData;
 import com.just.print.app.Applic;
-import com.just.print.sys.model.SelectionDetail;
-import com.just.print.sys.server.ConfigurationsSyncService;
-import com.just.print.sys.server.CustomerSelection;
+
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -21,10 +20,10 @@ import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.sql.Date;
-import java.util.ArrayList;
 
 public class DatabaseUtil extends Thread{
 
@@ -59,10 +58,18 @@ public class DatabaseUtil extends Thread{
     }
 
     public static void syncConfigOntoServer(String license, String shopName, boolean isUpload) {
-        ConfigurationsSyncService instance = new ConfigurationsSyncService();
-        instance.serverip = AppData.getSERVER_URL();
-        instance.configurationStr = "abc";
-        instance.start();
+        String configurationStr = "abc";
+        //TODO: prepare the configstring.
+        AppData.schema = AppData.getSERVER_URL() + (isUpload ? "/uploadConfig" : "/downloadCofig");
+        JSONObject json = new JSONObject();//创建json对象
+        try {
+            json.put("filepath", URLEncoder.encode(license + shopName, "UTF-8"));//使用URLEncoder.encode对特殊和不可见字符进行编码
+            json.put("billIndex", URLEncoder.encode(configurationStr, "UTF-8"));//把数据put进json对象中
+        }catch(Exception e){
+            L.e("DatabaseUtil", "Exception when encoding content into json: license+shopName:" + license + shopName + " cofigrationStr:" + configurationStr, e);
+        }
+        AppData.contentToSend = json.toString();
+        new AppData().start();
     }
 
     public static void main(String args[]){

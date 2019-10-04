@@ -152,7 +152,7 @@ public class AppData extends Thread{
         }
 
         getShopData(Applic.app.getApplicationContext()).putString("license", inputedSN);
-        new AppData().start();
+        startActivate();
     }
 
     public static void putCustomData(String key, String value) {
@@ -162,10 +162,10 @@ public class AppData extends Thread{
         return getShopData(Applic.app.getApplicationContext()).getString("custom_" + key, "");
     }
 
-
     public static String getLastModifyTime(){
         return getShopData(Applic.app.getApplicationContext()).getString("LastSyncDate","");
     }
+
     public static void updataeLastModifyTime(String lastUpdateTime) {
         getShopData(Applic.app.getApplicationContext()).putString("LastSyncDate",
                 lastUpdateTime != null && lastUpdateTime.length() > 1 ? lastUpdateTime : String.valueOf(new Date().getTime()));
@@ -210,25 +210,43 @@ public class AppData extends Thread{
         return getCustomData("appmode") == null || "".equals(getCustomData("appmode")) || "2".equals(getCustomData("appmode"));
     }
 
+    public static String contentToSend;
+    public static String schema;
+
+    public static void startActivate() {
+        AppData.schema = AppData.getSERVER_URL() + "/activeJustPrintAccount";
+        AppData.contentToSend = AppData.getJsonObjectForActivate();//把JSON对象按JSON的编码格式转换为字符串
+        if(AppData.contentToSend != null) {
+            new AppData().start();
+        }
+    }
+
+    public static String getJsonObjectForActivate() {
+        StringBuilder content = new StringBuilder(AppData.getLicense());
+        content.append(",");
+        content.append(AppData.getShopName());
+        content.append("-");
+        content.append(AppData.getUserName());//如果有需要对特殊和不可见字符进行编码，使用URLEncoder.encode
+
+        JSONObject json = new JSONObject();//创建json对象
+        try {
+            json.put("username", content.toString());//使用URLEncoder.encode对特殊和不可见字符进行编码
+        }catch(Exception e){
+            showToast("Please provide valid shop name, user name and license number!");
+            L.e("TAG", "USERLOGIN_FAILED", e);
+            return null;
+        }
+        return json.toString();
+    }
+
     @Override
     public void run() {
         super.run();
         if(AppUtils.hasInternet(Applic.app.getApplicationContext())){
             HttpURLConnection urlConnection = null;
             try {
-                urlConnection = prepareConnection(AppData.getSERVER_URL() + "/activeJustPrintAccount");
-
-                StringBuilder content = new StringBuilder(AppData.getLicense());
-                content.append(",");
-                content.append(AppData.getShopName());
-                content.append("-");
-                content.append(AppData.getUserName());//如果有需要对特殊和不可见字符进行编码，使用URLEncoder.encode
-
-                JSONObject json = new JSONObject();//创建json对象
-                json.put("username", content.toString());//使用URLEncoder.encode对特殊和不可见字符进行编码
-                String jsonstr = json.toString();//把JSON对象按JSON的编码格式转换为字符串
-
-                writeOut(urlConnection, jsonstr);
+                urlConnection = prepareConnection(schema);
+                writeOut(urlConnection, contentToSend);
 
                 if(urlConnection.getResponseCode()==HttpURLConnection.HTTP_OK){//得到服务端的返回码是否连接成功
 
