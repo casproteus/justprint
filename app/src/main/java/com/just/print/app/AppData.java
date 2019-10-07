@@ -27,7 +27,6 @@ import java.util.Date;
 import static com.just.print.util.ToastUtil.showToast;
 
 public class AppData extends Thread{
-    public static String hideCancelItem;
     private static String SERVER_URL = "http://www.sharethegoodones.com";
 
     public static final String KEY_SHOP_XML = "KEY_SHOP_XML";
@@ -77,12 +76,13 @@ public class AppData extends Thread{
     public static final String title_position = "title_position";
     public static final String priceonkitchenbill = "priceonkitchenbill";
     public static final String KEY_CUST_LAST_CHAR = "KEY_CUST_LAST_CHAR";
+    public static final String hideCancelItem = "hidecancelitem";
 
     public static String[] keysToSync = new String[]{server_url, appmode, ShowMarkPirce, userPassword, adminPassword , custChars,
             column, serverip, reportPrinter, waitTime, conbineMarkPrice,
             reportFont, reportWidth, sep_str1, sep_str2, menuNameLength,
             width, kitchentitle, format_style, title_position, priceonkitchenbill,
-            KEY_CUST_LAST_CHAR};
+            KEY_CUST_LAST_CHAR, hideCancelItem};
     public static String curBillIdx;
 
     private static SharedPreferencesHelper getShopData(Context context) {
