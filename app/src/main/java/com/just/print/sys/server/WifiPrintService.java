@@ -916,12 +916,14 @@ public class WifiPrintService implements Runnable{
         content.append(generateString(width, SEP_STR1)).append("\n");
         content.append(" ITEMS SENT:    ").append(qtTotal).append("\n");
         content.append(" TOTAL SENT:    $").append(String.format("%.2f", total)).append("\n\n");
-        content.append(" ITEMS CANCEL:  ").append(qtCancel).append("\n");
-        content.append(" TOTAL CANCEL:  $").append(String.format("%.2f", cancTotal)).append("\n");
-        content.append(generateString(width, SEP_STR1)).append("\n");
-        content.append(" NET:           $").append(String.format("%.2f", total + cancTotal));
-        //categorizedContent.append(generateSpaceString(5)).append("* ").append(str.getName()).append(" *\n");
-        content.append("\n\n\n\n\n");
+        if(!"true".equals(AppData.getCustomData(AppData.hideCancelItem))) {
+            content.append(" ITEMS CANCEL:  ").append(qtCancel).append("\n");
+            content.append(" TOTAL CANCEL:  $").append(String.format("%.2f", cancTotal)).append("\n");
+            content.append(generateString(width, SEP_STR1)).append("\n");
+            content.append(" NET:           $").append(String.format("%.2f", total + cancTotal));
+            //categorizedContent.append(generateSpaceString(5)).append("* ").append(str.getName()).append(" *\n");
+            content.append("\n\n\n\n\n");
+        }
         return content.toString();
     }
 

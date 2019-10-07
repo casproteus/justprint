@@ -64,7 +64,7 @@ public class DatabaseUtil extends Thread{
         JSONObject json = new JSONObject();//创建json对象
         try {
             json.put("filepath", URLEncoder.encode(license + shopName, "UTF-8"));//使用URLEncoder.encode对特殊和不可见字符进行编码
-            json.put("billIndex", URLEncoder.encode(configurationStr, "UTF-8"));//把数据put进json对象中
+            json.put("configuration", URLEncoder.encode(configurationStr, "UTF-8"));//把数据put进json对象中
         }catch(Exception e){
             L.e("DatabaseUtil", "Exception when encoding content into json: license+shopName:" + license + shopName + " cofigrationStr:" + configurationStr, e);
         }

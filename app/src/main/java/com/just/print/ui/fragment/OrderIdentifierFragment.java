@@ -426,7 +426,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             L.d(TAG, String.valueOf(view.getId()) + String.valueOf(i));
             switch (view.getId()) {
                 case R.id.buttonholder: //number buttons.
-                    if ("2".equals(AppData.getCustomData("appmode"))) {
+                    if (AppData.isMode2()) {
                         storedMenu = SearchMenuFromDB(items[i]);
                         addDish();
                         if (dishesXAdapter != null) {
