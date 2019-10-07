@@ -35,8 +35,54 @@ public class AppData extends Thread{
     public static final String KEY_SHOP_ID = "KEY_SHOP_ID";
     private static final String KEY_PREFIX_SHOP_ID_ = "KEY_SHOP_ID_";
     private static final String KEY_SHOP_NAME = "shopName";
+
+    //all keys
+    //no sync
+    public static final String debug = "debug";
+    public static final String limitation = "limitation";
+    public static final String lastsuccessStr = "lastsuccessStr";
+    public static final String number = "number";
+    public static final String startTime = "startTime";
+    public static final String endTime = "endTime";
+    public static final String reportStartDate = "reportStartDate";
+    public static final String lastsuccess = "lastsuccess";
+    public static final String reportIdx = "reportIdx";
+    public static final String AllowDownloadFromeOthers = "AllowDownloadFromeOthers";
+    public static final String kitchenBillIdx = "kitchenBillIdx";
+    public static final String font = "font";
+    public static final String mode = "mode";
+    public static final String code = "code";
+    public static final String BeiYangPrinter = "BeiYangPrinter";
+    public static final String autoSearchBeiYang = "autoSearchBeiYang";
+    //to sync
+    public static final String server_url = "server_url";
+    public static final String appmode = "appmode";
+    public static final String ShowMarkPirce = "ShowMarkPirce";
+    public static final String userPassword = "userPassword";
+    public static final String adminPassword = "adminPassword";
+    public static final String custChars = "custChars";
+    public static final String column = "column";
+    public static final String serverip = "serverip";
+    public static final String reportPrinter = "reportPrinter";
+    public static final String waitTime = "waitTime";
+    public static final String conbineMarkPrice = "conbineMarkPrice";
+    public static final String reportFont = "reportFont";
+    public static final String reportWidth = "reportWidth";
+    public static final String sep_str1 = "sep_str1";
+    public static final String sep_str2 = "sep_str2";
+    public static final String menuNameLength = "menuNameLength";
+    public static final String width = "width";
+    public static final String kitchentitle = "kitchentitle";
+    public static final String format_style = "format_style";
+    public static final String title_position = "title_position";
+    public static final String priceonkitchenbill = "priceonkitchenbill";
     public static final String KEY_CUST_LAST_CHAR = "KEY_CUST_LAST_CHAR";
 
+    public static String[] keysToSync = new String[]{server_url, appmode, ShowMarkPirce, userPassword, adminPassword , custChars,
+            column, serverip, reportPrinter, waitTime, conbineMarkPrice,
+            reportFont, reportWidth, sep_str1, sep_str2, menuNameLength,
+            width, kitchentitle, format_style, title_position, priceonkitchenbill,
+            KEY_CUST_LAST_CHAR};
     public static String curBillIdx;
 
     private static SharedPreferencesHelper getShopData(Context context) {
@@ -207,8 +253,10 @@ public class AppData extends Thread{
         bw.close();//使用完关闭
     }
 
+    //When there are more mode2 than mode 1, will open the commented line.
     public static boolean isMode2() {
-        return getCustomData("appmode") == null || "".equals(getCustomData("appmode")) || "2".equals(getCustomData("appmode"));
+//        return getCustomData("appmode") == null || "".equals(getCustomData("appmode")) || "2".equals(getCustomData("appmode"));
+        return "2".equals(getCustomData("appmode"));
     }
 
     public static String contentToSend;
@@ -264,7 +312,8 @@ public class AppData extends Thread{
                             showToast("No time left on server: "+ time);
                         }
                     }catch (Exception e){
-                        showToast("Please provide valid information! time left on server is:" + responseString);
+                        //so the return back is configurations instead of a number(left time)
+                        absortTheConfiguration(responseString);
                     }
                 }else{
                     showToast("Please provide valid shop name, user name and license number!");
@@ -277,6 +326,17 @@ public class AppData extends Thread{
                     urlConnection.disconnect();//使用完关闭TCP连接，释放资源
             }
         }
+    }
+
+    private void absortTheConfiguration(String responseString) {
+        String[] strs = responseString.split(",");
+        for (String entry : strs) {
+            int i = entry.indexOf(":");
+            if(i > 0){
+                AppData.putCustomData(entry.substring(0, i), entry.substring(i + 1));
+            }
+        }
+
     }
 
     @NonNull
