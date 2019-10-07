@@ -24,7 +24,6 @@ import java.net.URLEncoder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.sql.Date;
-import java.util.ArrayList;
 
 public class DatabaseUtil extends Thread{
 

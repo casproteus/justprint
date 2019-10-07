@@ -252,8 +252,10 @@ public class AppData extends Thread{
         bw.close();//使用完关闭
     }
 
+    //When there are more mode2 than mode 1, will open the commented line.
     public static boolean isMode2() {
-        return getCustomData("appmode") == null || "".equals(getCustomData("appmode")) || "2".equals(getCustomData("appmode"));
+//        return getCustomData("appmode") == null || "".equals(getCustomData("appmode")) || "2".equals(getCustomData("appmode"));
+        return "2".equals(getCustomData("appmode"));
     }
 
     public static String contentToSend;
