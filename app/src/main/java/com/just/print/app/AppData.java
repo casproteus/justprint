@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Date;
 
 import static com.just.print.util.ToastUtil.showToast;
@@ -53,6 +54,7 @@ public class AppData extends Thread{
     public static final String code = "code";
     public static final String BeiYangPrinter = "BeiYangPrinter";
     public static final String autoSearchBeiYang = "autoSearchBeiYang";
+
     //to sync
     public static final String server_url = "server_url";
     public static final String appmode = "appmode";
@@ -77,6 +79,7 @@ public class AppData extends Thread{
     public static final String priceonkitchenbill = "priceonkitchenbill";
     public static final String KEY_CUST_LAST_CHAR = "KEY_CUST_LAST_CHAR";
     public static final String hideCancelItem = "hidecancelitem";
+    public static final String sendEmail = "sendemail";
 
     public static String[] keysToSync = new String[]{server_url, appmode, ShowMarkPirce, userPassword, adminPassword , custChars,
             column, serverip, reportPrinter, waitTime, conbineMarkPrice,
@@ -286,6 +289,23 @@ public class AppData extends Thread{
             return null;
         }
         return json.toString();
+    }
+
+    public static void notifyCheck(int idx, String reportContent) {
+        String email = AppData.getCustomData(AppData.sendEmail);
+        if(email != null && email.indexOf("@") > 0) {
+            AppData.schema = AppData.getSERVER_URL() + "/sendEmail";
+            JSONObject json = new JSONObject();//创建json对象
+            try {
+                json.put("idx", idx);
+                json.put("email", URLEncoder.encode(email, "UTF-8"));//使用URLEncoder.encode对特殊和不可见字符进行编码
+                json.put("content", URLEncoder.encode(reportContent, "UTF-8"));//把数据put进json对象中
+            } catch (Exception e) {
+                L.e("DatabaseUtil", "Exception when encoding content into json: email:" + email + " reportContent:" + reportContent, e);
+            }
+            AppData.contentToSend = json.toString();
+            new AppData().start();
+        }
     }
 
     @Override

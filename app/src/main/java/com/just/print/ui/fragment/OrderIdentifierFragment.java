@@ -38,6 +38,9 @@ import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
 import com.stupid.method.reflect.annotation.XViewByID;
 
+import org.json.JSONObject;
+
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -56,6 +59,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     private List<Mark> allMarks;
     private List<Mark> marksOfCurDish;
     private int curmarkitem;
+    private String reportContent;
 
     public static OrderIdentifierFragment getInstance(){
         if(instance == null){
@@ -273,12 +277,10 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         }
 
                         //print code:
-                        String result = WifiPrintService.getInstance().exePrintReportCommand(orders, reportStartDate, String.valueOf(new Date().getTime()));
-                        if ("0".equals(result)) {
-                            findViewById(R.id.viewSwitcher).setVisibility(View.INVISIBLE);
-                            findViewById(R.id.topButtons).setVisibility(View.INVISIBLE);
-                            findViewById(R.id.alertDlg).setVisibility(View.VISIBLE);
-                        }
+                        reportContent = WifiPrintService.getInstance().exePrintReportCommand(orders, reportStartDate, String.valueOf(new Date().getTime()));
+                        findViewById(R.id.viewSwitcher).setVisibility(View.INVISIBLE);
+                        findViewById(R.id.topButtons).setVisibility(View.INVISIBLE);
+                        findViewById(R.id.alertDlg).setVisibility(View.VISIBLE);
                     }
                     odIdTableTbtn.setText("");
                     odIdInput.setText("");
@@ -342,6 +344,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         }catch(Exception e){
             //report error.
         }
+        AppData.notifyCheck(reportIdx, reportContent);
         AppData.putCustomData("reportIdx", String.valueOf(reportIdx + 1));
 
         findViewById(R.id.alertDlg).setVisibility(View.INVISIBLE);
@@ -350,6 +353,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         findViewById(R.id.topButtons).setVisibility(View.VISIBLE);
         findViewById(R.id.viewSwitcher).setVisibility(View.VISIBLE);
         findViewById(R.id.topButtons).invalidate();
+
     }
 
     private void updateSelectionOfCurrentDish() {

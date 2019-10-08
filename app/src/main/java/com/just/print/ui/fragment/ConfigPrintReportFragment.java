@@ -34,6 +34,7 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
 
     private SaleRecordDao saleRecordDao;
     private long now;
+    private String reportContent;
 
     @Override
     protected int getLayoutId() {
@@ -73,11 +74,9 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
         now = new Date().getTime();
 
         //print code:
-        String result = WifiPrintService.getInstance().exePrintReportCommand(orders, reportStartDate, String.valueOf(now));
-        if("0".equals(result)) {
-            findViewById(R.id.confirmPassword).setVisibility(View.INVISIBLE);
-            findViewById(R.id.alertDlg).setVisibility(View.VISIBLE);
-        }
+        reportContent = WifiPrintService.getInstance().exePrintReportCommand(orders, reportStartDate, String.valueOf(now));
+        findViewById(R.id.confirmPassword).setVisibility(View.INVISIBLE);
+        findViewById(R.id.alertDlg).setVisibility(View.VISIBLE);
     }
 
     @XClick({R.id.buttonCancel})
@@ -98,8 +97,8 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
         }catch(Exception e){
             //report error.
         }
+        AppData.notifyCheck(reportIdx, reportContent);
         AppData.putCustomData("reportIdx", String.valueOf(reportIdx + 1));
-
         getActivity().finish();
     }
 
