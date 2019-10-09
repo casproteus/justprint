@@ -171,7 +171,9 @@ public class WifiPrintService implements Runnable{
             L.d(TAG,"ipContent not empty, means last print job not finished yet! returning not success flag.");
             return ip;                     //未打印完毕
         }
-
+        if(checkErrorPrinterList()){
+            ToastUtil.showToast("PRINTING...");
+        }
         popKitchenBillIdx();
 
         Double priceOfBill = saveSaleRecToDB(isCancel);                              //save to db
@@ -279,7 +281,6 @@ public class WifiPrintService implements Runnable{
         }
 
         L.d(TAG, "Order is translated into ipContentMap map and ready for print.");
-        ToastUtil.showToast("PRINTING...");
         return true;
     }
 
@@ -349,6 +350,7 @@ public class WifiPrintService implements Runnable{
 
     //The start time and end time are long format, need to be translate for print.
     public String exePrintReportCommand(List<SaleRecord> saleRecords, String startTime, String endTime){
+        checkErrorPrinterList();
         L.d("ConfigPrintReportFragment","exePrintCommand");
         List<Printer> printers = Applic.app.getDaoMaster().newSession().getPrinterDao().loadAll();
         String printerIP = AppData.getCustomData("reportPrinter");
@@ -384,15 +386,28 @@ public class WifiPrintService implements Runnable{
             combinedSaleRecords.add(entry.getValue());
         }
         String contentFR = formatContentForPrintReport(combinedSaleRecords, startTime, endTime);
-        if(!"true".equals(AppData.getCustomData(AppData.hideCancelItem))) {
+        if("true".equals(AppData.getCustomData(AppData.hideCancelItem))) {
             int p = contentFR.indexOf(" ITEMS CANCEL:  ");
-            ipContentMap.get(printerIP).add(contentFR.substring(0, p));
+            ipContentMap.get(printerIP).add(contentFR.substring(0, p) + "\n\n\n");
         }else {
             ipContentMap.get(printerIP).add(contentFR);
         }
 
         ToastUtil.showToast("PRINTING REPORT ON " + printerIP);
         return contentFR;
+    }
+
+    private boolean checkErrorPrinterList() {
+        StringBuilder ipStr = new StringBuilder();
+        for(String ip : errorPrinterList){
+            ipStr.append(",");
+            ipStr.append(ip);
+        }
+        if(ipStr.length() > 1) {
+            ToastUtil.showToast("PRINTER ERROR, restart printer " + ipStr.substring(1) + ", and restart this app");
+            return false;
+        }
+        return true;
     }
 
     private List<String> errorPrinterList = new ArrayList<String>();
@@ -464,11 +479,11 @@ public class WifiPrintService implements Runnable{
                     ToastUtil.showToast("Unexpected empty Content found! when printing to printer: " + curPrintIp);
                 }
             } else { //if there's onely 1 flag are false, that flag must be printerConnectedFlag.
-                L.d(TAG, "printerConnectedFlag:" + printerConnectedFlag);
                 timeCounter++;
                 if (timeCounter == 8) {
                     timeCounter = 0;
-                    ToastUtil.showToast("Printer Error! Check " + curPrintIp);
+                    L.d(TAG, "printerConnectedFlag:" + printerConnectedFlag);
+                    ToastUtil.showToast("Printer Error! try restart printer:" + curPrintIp + ", and restart this app when the printer issue fixed");
                 }
             }
 
