@@ -483,7 +483,7 @@ public class WifiPrintService implements Runnable{
                 if (timeCounter == 8) {
                     timeCounter = 0;
                     L.d(TAG, "printerConnectedFlag:" + printerConnectedFlag);
-                    ToastUtil.showToast("Printer Error! try restart printer:" + curPrintIp + ", and restart this app when the printer issue fixed");
+                    ToastUtil.showToast("PRINTER ERROR, try restart printer " + curPrintIp + ", and restart this app");
                 }
             }
 

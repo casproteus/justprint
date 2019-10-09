@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import com.just.print.db.bean.Printer;
 import com.just.print.ui.activity.MainActivity;
+import com.just.print.ui.fragment.LoginFragment;
 import com.just.print.util.AppUtils;
 import com.just.print.util.L;
 import com.just.print.util.SharedPreferencesHelper;
@@ -297,7 +298,8 @@ public class AppData extends Thread{
             AppData.schema = AppData.getSERVER_URL() + "/sendReport";
             JSONObject json = new JSONObject();//创建json对象
             try {
-                json.put("idx", String.valueOf(idx));
+                String mobileMark = LoginFragment.getUserName();
+                json.put("idx", mobileMark + " " + idx);
                 json.put("email", email);//使用URLEncoder.encode对特殊和不可见字符进行编码
                 json.put("content", URLEncoder.encode(reportContent, "UTF-8"));//把数据put进json对象中
             } catch (Exception e) {
