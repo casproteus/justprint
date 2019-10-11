@@ -296,11 +296,17 @@
                             android:id="@+id/odIdTools"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:background="@android:color/black"
+                            android:paddingBottom="0dp"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="2dp"
+                            android:paddingTop="5dp"
+                            android:radius="2dp"
                             android:layout_alignParentBottom="true">
                             <ToggleButton
                                 android:id="@+id/odIdTable2"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
+                                android:layout_height="55dp"
                                 android:background="@drawable/tag_bg"
                                 android:layout_marginBottom="2dp"
                                 android:button="@null"
@@ -313,22 +319,22 @@
                             <ImageButton
                                 android:id="@+id/odIdCancel"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
+                                android:layout_height="60dp"
                                 android:layout_weight="1"
                                 android:src="@drawable/erase"/>
                             <ImageButton
                                 android:id="@+id/odIdConfigBtn2"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
+                                android:layout_height="60dp"
                                 android:layout_weight="1"
                                 android:src="@drawable/setting"/>
                             <ImageButton
                                 android:id="@+id/odIdSndBtn2"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
+                                android:layout_height="60dp"
                                 android:layout_marginBottom="2dp"
                                 android:layout_weight="1"
-                                android:src="@drawable/ok" />
+                                android:src="@drawable/send" />
                         </LinearLayout>
                     </LinearLayout>
 

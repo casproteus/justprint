@@ -81,6 +81,14 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
 
     @XClick({R.id.buttonCancel})
     private void notResetReport(){
+        //check if need to send email
+        try{
+            int reportIdx = 1;
+            reportIdx = Integer.valueOf(AppData.getCustomData("reportIdx"));
+            AppData.notifyCheck(reportIdx, reportContent, false);
+        }catch(Exception e){
+            //It's OK if reportIdx is null
+        }
         getActivity().finish();
     }
 
@@ -97,7 +105,7 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
         }catch(Exception e){
             //report error.
         }
-        AppData.notifyCheck(reportIdx, reportContent);
+        AppData.notifyCheck(reportIdx, reportContent, true);
         AppData.putCustomData("reportIdx", String.valueOf(reportIdx + 1));
         getActivity().finish();
     }

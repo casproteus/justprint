@@ -1105,11 +1105,17 @@ public class WifiPrintService implements Runnable{
         content.append(generateString(width, sep_str1)).append("\n\n");
 
         //Main contents starts here.........................................................
+        boolean showID = !"true".equals(AppData.getCustomData(AppData.HideKitchenBillId));
+        boolean showName = !"true".equals(AppData.getCustomData(AppData.HideKitchenBillName));
         for(SelectionDetail dd:list){
             StringBuilder sb = new StringBuilder();
-            sb.append(dd.getDish().getID());                //dish id
-            sb.append(generateString(5 - dd.getDish().getID().length(), SEPRATOR));
-            sb.append(dd.getDish().getMname());             //dish name
+            if(showID) {
+                sb.append(dd.getDish().getID());                //dish id
+                sb.append(generateString(5 - dd.getDish().getID().length(), SEPRATOR));
+            }
+            if(showName) {
+                sb.append(dd.getDish().getMname());             //dish name
+            }
             if(dd.getDishNum() > 1){                        //dish number
                 String space = SEPRATOR;
                 int occupiedLength = getLengthOfString(sb.toString());

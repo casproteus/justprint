@@ -81,12 +81,16 @@ public class AppData extends Thread{
     public static final String KEY_CUST_LAST_CHAR = "KEY_CUST_LAST_CHAR";
     public static final String hideCancelItem = "hidecancelitem";
     public static final String sendReport = "sendreport";
+    public static final String sendOnlyWhenReset = "sendonlywhenreset";
+    public static final String HideKitchenBillId = "hikiid";
+    public static final String HideKitchenBillName = "hikina";
 
     public static String[] keysToSync = new String[]{server_url, appmode, ShowMarkPirce, userPassword, adminPassword , custChars,
             column, serverip, reportPrinter, waitTime, conbineMarkPrice,
             reportFont, reportWidth, sep_str1, sep_str2, menuNameLength,
             width, kitchentitle, format_style, title_position, priceonkitchenbill,
-            KEY_CUST_LAST_CHAR, hideCancelItem};
+            KEY_CUST_LAST_CHAR, hideCancelItem,sendReport,sendOnlyWhenReset, HideKitchenBillId,
+            HideKitchenBillId};
     public static String curBillIdx;
 
     private static SharedPreferencesHelper getShopData(Context context) {
@@ -207,10 +211,10 @@ public class AppData extends Thread{
     }
 
     public static void putCustomData(String key, String value) {
-        getShopData(Applic.app.getApplicationContext()).putString("custom_" + key, value);
+        getShopData(Applic.app.getApplicationContext()).putString("custom_" + key.toLowerCase(), value);
     }
     public static String getCustomData(String key) {
-        return getShopData(Applic.app.getApplicationContext()).getString("custom_" + key, "");
+        return getShopData(Applic.app.getApplicationContext()).getString("custom_" + key.toLowerCase(), "");
     }
 
     public static String getLastModifyTime(){
@@ -292,14 +296,18 @@ public class AppData extends Thread{
         return json.toString();
     }
 
-    public static void notifyCheck(int idx, String reportContent) {
+    public static void notifyCheck(int idx, String reportContent, boolean isReset) {
         String email = AppData.getCustomData(AppData.sendReport);
         if(email != null && email.indexOf("@") > 0) {
+            boolean  sendOnlyWhenResetFlag = "true".equals(AppData.getCustomData(AppData.sendOnlyWhenReset));
+            if(sendOnlyWhenResetFlag && !isReset){
+                return;
+            }
             AppData.schema = AppData.getSERVER_URL() + "/sendReport";
             JSONObject json = new JSONObject();//创建json对象
             try {
-                String mobileMark = LoginFragment.getUserName();
-                json.put("idx", mobileMark + " " + idx);
+                String mobileMark = isReset && !sendOnlyWhenResetFlag ? "(RESET)" + LoginFragment.getUserName() : LoginFragment.getUserName();
+                json.put("idx", mobileMark + "-" + idx);
                 json.put("email", email);//使用URLEncoder.encode对特殊和不可见字符进行编码
                 json.put("content", URLEncoder.encode(reportContent, "UTF-8"));//把数据put进json对象中
             } catch (Exception e) {

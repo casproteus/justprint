@@ -2,6 +2,7 @@ package com.just.print.ui.fragment;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.GridView;
@@ -330,6 +331,14 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         findViewById(R.id.topButtons).setVisibility(View.VISIBLE);
         findViewById(R.id.viewSwitcher).setVisibility(View.VISIBLE);
         findViewById(R.id.topButtons).invalidate();
+        //check if need to send email
+        try{
+            int reportIdx = 1;
+            reportIdx = Integer.valueOf(AppData.getCustomData("reportIdx"));
+            AppData.notifyCheck(reportIdx, reportContent, false);
+        }catch(Exception e){
+            //It's OK if reportIdx is null
+        }
     }
 
     @XClick({R.id.btnConfirmResetReportOK})
@@ -339,12 +348,13 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         AppData.putCustomData("reportStartDate", String.valueOf(new Date().getTime()));
         AppData.putCustomData("kitchenBillIdx", "1");        //reset kitchenbillIndex
         int reportIdx = 1;
+        //check if need to send email
         try{
             reportIdx = Integer.valueOf(AppData.getCustomData("reportIdx"));
+            AppData.notifyCheck(reportIdx, reportContent, true);
         }catch(Exception e){
-            //report error.
+            //It's OK if reportIdx is null
         }
-        AppData.notifyCheck(reportIdx, reportContent);
         AppData.putCustomData("reportIdx", String.valueOf(reportIdx + 1));
 
         findViewById(R.id.alertDlg).setVisibility(View.INVISIBLE);
@@ -506,15 +516,19 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     //currently it's used by number buttons and the note tag buttons. both types are buttons in holder.
     IXOnItemClickListener categoryXAdapterClick = new IXOnItemClickListener() {
         @Override
-        public void onClickItem(View view, int i) {
-            L.d(TAG, "onClickCategory" + view.getId() + String.valueOf(i));
+        public void onClickItem(View view, int idx) {
+            L.d(TAG, "onClickCategory" + view.getId() + String.valueOf(idx));
 
-            List<Menu> menus = OrderCategoryFragment.getCategorizedContent().get(OrderCategoryFragment.getCategoryList().get(i));
+            List<Menu> menus = OrderCategoryFragment.getCategorizedContent().get(OrderCategoryFragment.getCategoryList().get(idx));
             items = new String[menus.size()];
-            for (i = 0; i < menus.size(); i++) {
+            for (int i = 0; i < menus.size(); i++) {
                 items[i] = menus.get(i).getID();
             }
             itemXAdapter.setData(Arrays.asList(items));
+            for(int i = 0; i < categoryXAdapter.getCount(); i++) {
+                odIdCategoryGrid.getChildAt(i).setBackground(null);
+            }
+            odIdCategoryGrid.getChildAt(idx).setBackgroundColor(Color.rgb(100, 100, 100));
         }
     };
 
