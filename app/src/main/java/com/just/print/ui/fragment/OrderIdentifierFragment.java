@@ -143,6 +143,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             findViewById(R.id.odIdInfo).setVisibility(View.GONE);
             findViewById(R.id.odIdSndBtn).setVisibility(View.GONE);
             findViewById(R.id.topButtons).setVisibility(View.GONE);
+            findViewById(R.id.odIdTools).setBackgroundColor(AppData.getThemColor());
+
             if(categories.size() > 1) {
                 ((GridView)findViewById(R.id.odIdCategoryGrid)).setNumColumns(categories.size());
                 menus = OrderCategoryFragment.getCategorizedContent().get(categories.get(0));
@@ -533,11 +535,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             for(int i = 0; i < categoryXAdapter.getCount(); i++) {
                 odIdCategoryGrid.getChildAt(i).setBackground(null);
             }
-            String color = AppData.getCustomData(AppData.ColorOnSelect);
-            if(color == null || color.length() != 6){
-                color = "111111";
-            }
-            odIdCategoryGrid.getChildAt(idx).setBackgroundColor(Color.parseColor("#" + color));
+
+            odIdCategoryGrid.getChildAt(idx).setBackgroundColor(AppData.getThemColor());
         }
     };
 

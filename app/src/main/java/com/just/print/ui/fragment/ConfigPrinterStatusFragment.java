@@ -52,8 +52,8 @@ public class ConfigPrinterStatusFragment extends BaseFragment implements OnClick
         markXAdapter.notifyDataSetChanged();
     }
 
-    @XClick({R.id.addMark})
-    private void addMark(@XGetValueByView(fromId = R.id.etMark) String mark) {
+    @XClick({R.id.addPrinter})
+    private void addPrinter(@XGetValueByView(fromId = R.id.etMark) String mark) {
 
         Mark mark1 = new Mark();
         mark1.setState(State.def);
