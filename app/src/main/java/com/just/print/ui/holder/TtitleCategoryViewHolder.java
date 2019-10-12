@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.just.print.R;
+import com.just.print.app.AppData;
 import com.just.print.db.bean.Category;
 import com.stupid.method.adapter.expand.XExpadnViewHolder;
 import com.stupid.method.reflect.StupidReflect;
@@ -43,7 +44,7 @@ public class TtitleCategoryViewHolder extends XExpadnViewHolder<Category> {
         code.setVisibility(View.GONE);
         button.setVisibility(View.GONE);
         title.setGravity(Gravity.CENTER);
-        title.setTextColor(Color.rgb(000, 145,213));
+        title.setTextColor(AppData.getThemColor());
         int size = (int) title.getTextSize();
         title.setTextSize(TypedValue.COMPLEX_UNIT_PX,size + 20);
     }

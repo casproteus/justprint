@@ -284,7 +284,7 @@
                         <Button
                             android:id="@+id/odIdSndBtn"
                             android:layout_width="match_parent"
-                            android:layout_height="60dp"
+                            android:layout_height="80dp"
                             android:layout_weight="1"
                             android:background="@android:color/background_dark"
                             android:text="SEND"
@@ -296,7 +296,6 @@
                             android:id="@+id/odIdTools"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@android:color/black"
                             android:paddingBottom="0dp"
                             android:paddingLeft="5dp"
                             android:paddingRight="2dp"

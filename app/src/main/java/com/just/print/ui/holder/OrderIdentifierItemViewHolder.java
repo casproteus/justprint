@@ -30,7 +30,7 @@ public class OrderIdentifierItemViewHolder extends XViewHolder<String>{
 //        try {
 //            Integer.valueOf(s);
 //        }catch(Exception e){
-//            textView.setBackgroundColor(Color.rgb(100, 100, 100));
+//            textView.setBackgroundColor(AppDate.getThemColor());
 //
 //            //textView.setShadowLayer(5f, 3f, 3f, 0xFFFF00FF);
 //        }

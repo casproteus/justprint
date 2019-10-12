@@ -1,6 +1,7 @@
 package com.just.print.app;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.widget.TextView;
 
@@ -327,6 +328,14 @@ public class AppData extends Thread{
             return true;
         }
         return true;
+    }
+
+    public static int getThemColor() {
+        String color = AppData.getCustomData(AppData.ColorOnSelect);
+        if(color == null || color.length() != 6){
+            color = "0091D5";
+        }
+        return Color.parseColor("#" + color);
     }
 
     @Override
