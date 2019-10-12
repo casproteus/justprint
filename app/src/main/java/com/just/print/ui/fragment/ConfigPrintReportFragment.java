@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.just.print.util.ToastUtil.showToast;
+
 public class ConfigPrintReportFragment extends BaseFragment implements OnClickItemListener {
 
     private HashMap<String,List<String>> contentForPrintMap;
@@ -81,31 +83,34 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
 
     @XClick({R.id.buttonCancel})
     private void notResetReport(){
+        int reportIdx = 1;
         //check if need to send email
         try{
-            int reportIdx = 1;
             reportIdx = Integer.valueOf(AppData.getCustomData("reportIdx"));
-            AppData.notifyCheck(reportIdx, reportContent, false);
         }catch(Exception e){
             //It's OK if reportIdx is null
         }
-        getActivity().finish();
+        if(AppData.notifyCheck(reportIdx, reportContent, false)) {
+            getActivity().finish();
+        }
     }
 
     @XClick({R.id.btnConfirmResetReportOK})
     private void resetReport(){
-        //when printed succcesfully, clean all records, and update now as the next reportStartDate
-        saleRecordDao.deleteAll();
-        AppData.putCustomData("reportStartDate", String.valueOf(now));
-        AppData.putCustomData("kitchenBillIdx", "1");        //reset kitchenbillIndex
-
         int reportIdx = 1;
         try{
             reportIdx = Integer.valueOf(AppData.getCustomData("reportIdx"));
         }catch(Exception e){
             //report error.
         }
-        AppData.notifyCheck(reportIdx, reportContent, true);
+        if(!AppData.notifyCheck(reportIdx, reportContent, true)){
+            return;
+        }
+        //when printed succcesfully, clean all records, and update now as the next reportStartDate
+        saleRecordDao.deleteAll();
+        AppData.putCustomData("reportStartDate", String.valueOf(now));
+        AppData.putCustomData("kitchenBillIdx", "1");        //reset kitchenbillIndex
+
         AppData.putCustomData("reportIdx", String.valueOf(reportIdx + 1));
         getActivity().finish();
     }

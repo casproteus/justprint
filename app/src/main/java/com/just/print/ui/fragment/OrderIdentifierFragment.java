@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -82,7 +83,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     private ListView odIdDelBtn;
 
     @XViewByID(R.id.odIdOkBtn)
-    private ListView odIdOkBtn;
+    private ImageButton odIdOkBtn;
 
     @XViewByID(R.id.odIdInput)
     private TextView odIdInput;
@@ -343,18 +344,22 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
     @XClick({R.id.btnConfirmResetReportOK})
     private void resetReport(){
-        //when printed succcesfully, clean all records, and update now as the next reportStartDate
-        Applic.app.getDaoMaster().newSession().getSaleRecordDao().deleteAll();
-        AppData.putCustomData("reportStartDate", String.valueOf(new Date().getTime()));
-        AppData.putCustomData("kitchenBillIdx", "1");        //reset kitchenbillIndex
         int reportIdx = 1;
         //check if need to send email
         try{
             reportIdx = Integer.valueOf(AppData.getCustomData("reportIdx"));
-            AppData.notifyCheck(reportIdx, reportContent, true);
         }catch(Exception e){
             //It's OK if reportIdx is null
         }
+        if(!AppData.notifyCheck(reportIdx, reportContent, true)){
+            return;
+        }
+
+        //when printed succcesfully, clean all records, and update now as the next reportStartDate
+        Applic.app.getDaoMaster().newSession().getSaleRecordDao().deleteAll();
+        AppData.putCustomData("reportStartDate", String.valueOf(new Date().getTime()));
+        AppData.putCustomData("kitchenBillIdx", "1");        //reset kitchenbillIndex
+
         AppData.putCustomData("reportIdx", String.valueOf(reportIdx + 1));
 
         findViewById(R.id.alertDlg).setVisibility(View.INVISIBLE);
@@ -528,7 +533,11 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             for(int i = 0; i < categoryXAdapter.getCount(); i++) {
                 odIdCategoryGrid.getChildAt(i).setBackground(null);
             }
-            odIdCategoryGrid.getChildAt(idx).setBackgroundColor(Color.rgb(100, 100, 100));
+            String color = AppData.getCustomData(AppData.ColorOnSelect);
+            if(color == null || color.length() != 6){
+                color = "111111";
+            }
+            odIdCategoryGrid.getChildAt(idx).setBackgroundColor(Color.parseColor("#" + color));
         }
     };
 

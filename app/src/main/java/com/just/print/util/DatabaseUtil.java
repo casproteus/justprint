@@ -66,7 +66,7 @@ public class DatabaseUtil extends Thread{
         }catch(Exception e){
             L.e("DatabaseUtil", "Exception when encoding content into json: license+shopName:" + license + shopName + " cofigrationStr:" + getConfigurations(), e);
         }
-        AppData.contentToSend = json.toString();
+        AppData.putCustomData(AppData.ContentToSend, json.toString());
         new AppData().start();
     }
 

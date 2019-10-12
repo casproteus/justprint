@@ -55,6 +55,7 @@ public class AppData extends Thread{
     public static final String code = "code";
     public static final String BeiYangPrinter = "BeiYangPrinter";
     public static final String autoSearchBeiYang = "autoSearchBeiYang";
+    public static final String ContentToSend = "ContentToSend";
 
     //to sync
     public static final String server_url = "server_url";
@@ -84,13 +85,14 @@ public class AppData extends Thread{
     public static final String sendOnlyWhenReset = "sendonlywhenreset";
     public static final String HideKitchenBillId = "hikiid";
     public static final String HideKitchenBillName = "hikina";
+    public static final String ColorOnSelect = "cos";
 
     public static String[] keysToSync = new String[]{server_url, appmode, ShowMarkPirce, userPassword, adminPassword , custChars,
             column, serverip, reportPrinter, waitTime, conbineMarkPrice,
             reportFont, reportWidth, sep_str1, sep_str2, menuNameLength,
             width, kitchentitle, format_style, title_position, priceonkitchenbill,
             KEY_CUST_LAST_CHAR, hideCancelItem,sendReport,sendOnlyWhenReset, HideKitchenBillId,
-            HideKitchenBillId};
+            HideKitchenBillId, ColorOnSelect};
     public static String curBillIdx;
 
     private static SharedPreferencesHelper getShopData(Context context) {
@@ -267,18 +269,18 @@ public class AppData extends Thread{
         return "2".equals(getCustomData("appmode"));
     }
 
-    public static String contentToSend;
     public static String schema;
 
     public static void startActivate() {
         AppData.schema = AppData.getSERVER_URL() + "/activeJustPrintAccount";
-        AppData.contentToSend = AppData.getJsonObjectForActivate();//把JSON对象按JSON的编码格式转换为字符串
-        if(AppData.contentToSend != null) {
+        String accountInfo = AppData.getJsonObjectForActivate();
+        if(accountInfo != null){
+            AppData.putCustomData(AppData.ContentToSend, accountInfo);//把JSON对象按JSON的编码格式转换为字符串
             new AppData().start();
         }
     }
 
-    public static String getJsonObjectForActivate() {
+    private static String getJsonObjectForActivate() {
         StringBuilder content = new StringBuilder(AppData.getLicense());
         content.append(",");
         content.append(AppData.getShopName());
@@ -296,14 +298,21 @@ public class AppData extends Thread{
         return json.toString();
     }
 
-    public static void notifyCheck(int idx, String reportContent, boolean isReset) {
+    public static boolean notifyCheck(int idx, String reportContent, boolean isReset) {
         String email = AppData.getCustomData(AppData.sendReport);
         if(email != null && email.indexOf("@") > 0) {
+            AppData.schema = AppData.getSERVER_URL() + "/sendReport";
+            //if there's already a content, means it's email of last time. then send it out first.
+            String unSendcontent = AppData.getCustomData(AppData.ContentToSend);
+            if(unSendcontent != null && unSendcontent.length() > 0){
+                showToast("Found uncompleted task!");
+                new AppData().start();
+                return false;
+            }
             boolean  sendOnlyWhenResetFlag = "true".equals(AppData.getCustomData(AppData.sendOnlyWhenReset));
             if(sendOnlyWhenResetFlag && !isReset){
-                return;
+                return true;
             }
-            AppData.schema = AppData.getSERVER_URL() + "/sendReport";
             JSONObject json = new JSONObject();//创建json对象
             try {
                 String mobileMark = isReset && !sendOnlyWhenResetFlag ? "(RESET)" + LoginFragment.getUserName() : LoginFragment.getUserName();
@@ -313,15 +322,18 @@ public class AppData extends Thread{
             } catch (Exception e) {
                 L.e("DatabaseUtil", "Exception when encoding content into json: email:" + email + " reportContent:" + reportContent, e);
             }
-            AppData.contentToSend = json.toString();
+            AppData.putCustomData(AppData.ContentToSend,json.toString());
             new AppData().start();
+            return true;
         }
+        return true;
     }
 
     @Override
     public void run() {
         super.run();
-        if(AppUtils.hasInternet(Applic.app.getApplicationContext())){
+        String contentToSend = AppData.getCustomData(AppData.ContentToSend);
+        if(contentToSend != null && contentToSend.length() > 0 && AppUtils.hasInternet(Applic.app.getApplicationContext())){
             HttpURLConnection urlConnection = null;
             try {
                 urlConnection = prepareConnection(schema);
@@ -330,6 +342,7 @@ public class AppData extends Thread{
                 if(urlConnection.getResponseCode()==HttpURLConnection.HTTP_OK){//得到服务端的返回码是否连接成功
 
                     String responseString = readBackFromConnection(urlConnection);
+                    AppData.putCustomData(AppData.ContentToSend, null);
                     long time = 0;
                     try{
                         time = Long.valueOf(responseString);

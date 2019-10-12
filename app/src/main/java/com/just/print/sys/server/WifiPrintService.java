@@ -1092,7 +1092,8 @@ public class WifiPrintService implements Runnable{
                     .append(generateString(width - kitchenBillIdx.length() - dateStr.length(), SEPRATOR))
                     .append(dateStr).append("\n");
         }
-        //Seperator================================================
+        //Seperator
+
         String sep_str1 = AppData.getCustomData("sep_str1");
         if(sep_str1 == null || sep_str1.length() == 0){
             sep_str1 = SEP_STR1;
