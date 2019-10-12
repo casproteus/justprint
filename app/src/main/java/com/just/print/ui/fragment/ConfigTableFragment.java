@@ -46,9 +46,6 @@ public class ConfigTableFragment extends BaseFragment implements OnClickItemList
     @XViewByID(R.id.dspIdx)
     private TextView dspIdx = null;
 
-    @XViewByID(R.id.desc)
-    private TextView desc = null;
-
     @XViewByID(R.id.viewSwitcher)
     private ViewSwitcher modifyViewSwitch = null;
 
@@ -81,12 +78,10 @@ public class ConfigTableFragment extends BaseFragment implements OnClickItemList
     }
 
     @XClick({R.id.addTable})
-    private void addMark(@XGetValueByView(fromId = R.id.etMark) String mark,
-                         @XGetValueByView(fromId = R.id.dspIdxTable) String dspIdx,
-                         @XGetValueByView(fromId = R.id.priceMark) String price) {
+    private void addMark(@XGetValueByView(fromId = R.id.etTable) String mark,
+                         @XGetValueByView(fromId = R.id.dspIdxTable) String dspIdx) {
 
-        Mark mark1 = new Mark();
-
+        Mark mark1 = new Mark();        //currently we are using Mark to save table( when deleted flag is set, then it's table.
         mark1.setName(mark);
 
         try{
@@ -94,13 +89,7 @@ public class ConfigTableFragment extends BaseFragment implements OnClickItemList
         }catch(NumberFormatException e){
             mark1.setState(0);
         }
-
-        try{
-            mark1.setVersion((long) (Float.valueOf(price) * 100));
-        }catch(NumberFormatException e){
-            mark1.setVersion(0l);
-        }
-
+        mark1.setVersion(-1l);
         Applic.app.getDaoMaster().newSession().getMarkDao().insertOrReplace(mark1);
         mark1.updateAndUpgrade();
         AppData.updataeLastModifyTime(null);
@@ -116,7 +105,6 @@ public class ConfigTableFragment extends BaseFragment implements OnClickItemList
 
         name.setText(mark.getName());
         dspIdx.setText(String.valueOf(((float) mark.getState()) / 100.00));
-        desc.setText(String.valueOf(((float) mark.getVersion()) / 100.00));
 
         if (modifyViewSwitch.getDisplayedChild() == 0){
             modifyViewSwitch.setDisplayedChild(1);
@@ -135,12 +123,6 @@ public class ConfigTableFragment extends BaseFragment implements OnClickItemList
 
             try{
                 onEditMark.setState((int)(Float.valueOf(dspIdx.getText().toString()) * 100));
-            }catch(NumberFormatException e){
-                //do nothing.
-            }
-
-            try{
-                onEditMark.setVersion((long) (Float.valueOf(desc.getText().toString()) * 100));
             }catch(NumberFormatException e){
                 //do nothing.
             }

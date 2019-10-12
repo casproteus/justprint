@@ -21,21 +21,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="idx"/>
+                android:hint="dsp Idx"/>
 
             <EditText
-                android:id="@+id/etMark"
+                android:id="@+id/etTable"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
-                android:hint="name"/>
-
-            <EditText
-                android:id="@+id/descMark"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:hint="desc"/>
+                android:hint="table name"/>
 
             <ImageButton
                 android:id="@+id/addTable"
@@ -65,12 +58,6 @@
 
             <TextView
                 android:id="@+id/name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2" />
-
-            <EditText
-                android:id="@+id/desc"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2" />

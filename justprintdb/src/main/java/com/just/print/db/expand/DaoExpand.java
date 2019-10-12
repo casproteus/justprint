@@ -14,13 +14,11 @@ import de.greenrobot.dao.AbstractDao;
 import de.greenrobot.dao.query.QueryBuilder;
 
 public final class DaoExpand {
-    /**
-     * 根据类id查询menu
-     *
-     * @param menuDao
-     * @param category
-     * @return
-     */
+
+    static public <T, K> List<T> queryNotDeletedAll(AbstractDao<T, K> dao) {
+        return queryAllNotDeleted(dao).list();
+    }
+
     static public List<Menu> queryMenuByCategory(MenuDao menuDao, Category category) {
         return addQueryBuilderNotDelete(menuDao.queryBuilder().where(MenuDao.Properties.Cid.eq(category.getId()))).list();
     }
@@ -29,9 +27,6 @@ public final class DaoExpand {
         return builder.where(MenuDao.Properties.State.notEq(State.delete));
     }
 
-    static public <T, K> List<T> queryNotDeletedAll(AbstractDao<T, K> dao) {
-        return queryAllNotDeleted(dao).list();
-    }
     static public <T, K> QueryBuilder<T> queryAllNotDeleted(AbstractDao<T, K> dao) {
         return dao.queryBuilder().where(MenuDao.Properties.State.notEq(State.delete));
     }
@@ -48,9 +43,6 @@ public final class DaoExpand {
         return dao.queryBuilder().where(MenuDao.Properties.Version.eq(State.delete)).list();
     }
 
-    /**
-     * 模糊查询
-     */
     static public List<Menu> queryFuzzyMenu(MenuDao menuDao, String ID) {
         List<Menu> lists = menuDao.queryBuilder().where(MenuDao.Properties.ID.eq(ID)).list();
         if(lists == null || lists.size() == 0){
