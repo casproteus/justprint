@@ -2,7 +2,6 @@ package com.just.print.ui.fragment;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.GridView;
@@ -31,6 +30,7 @@ import com.just.print.ui.holder.OrderMarksSelectionViewHolder;
 import com.just.print.ui.holder.OrderIdentifierItemViewHolder;
 import com.just.print.ui.holder.OrderIdentifierMarkViewHolder;
 import com.just.print.ui.holder.OrderMenuViewHolder;
+import com.just.print.ui.holder.TableIdentifierViewHolder;
 import com.just.print.util.L;
 import com.just.print.util.StringUtils;
 import com.stupid.method.adapter.IXOnItemClickListener;
@@ -40,9 +40,6 @@ import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
 import com.stupid.method.reflect.annotation.XViewByID;
 
-import org.json.JSONObject;
-
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -70,8 +67,11 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         return instance;
     }
 
-    @XViewByID(R.id.viewSwitcher)
-    private ViewSwitcher viewSwitcher;
+    @XViewByID(R.id.menuMarkSwitcher)
+    private ViewSwitcher menuMarkSwitcher;
+
+    @XViewByID(R.id.menuTableSwitcher)
+    private ViewSwitcher menuTableSwitcher;
 
     @XViewByID(R.id.odIdFrLoutMenuList)
     private ListView odIdFrLoutMenuList;
@@ -94,8 +94,11 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     @XViewByID(R.id.odIdCategoryGrid)
     private GridView odIdCategoryGrid;
 
-    @XViewByID(R.id.odIdLoutItemsGv)
-    private GridView odIdLoutItemsGv;
+    @XViewByID(R.id.odMenuGv)
+    private GridView odMenuGv;
+
+    @XViewByID(R.id.odTableGrid)
+    private GridView odTableGrid;
 
     @XViewByID(R.id.odIdMarksGrid)
     private GridView odIdMarksGrid;
@@ -113,6 +116,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     XAdapter2<SelectionDetail> dishesXAdapter;
     XAdapter2<String> categoryXAdapter;
     XAdapter2<String> itemXAdapter;
+    XAdapter2<Mark> tableXAdapter;
     XAdapter2<Mark> markAllXAdapter;
 
     private List<Mark> shortCutMarks;
@@ -123,11 +127,14 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     String[] categoryNames = {""};
     String[] items;// = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "H", "S", "U", "+", "togo", "canc"};
 
+    public static List<Mark> tables = new ArrayList<Mark>();
+
     @Override
     public void onCreated(Bundle savedInstanceState) {
         getEventBus().register(EVENT_ADD_MENU, this);
         new StupidReflect(this, getView()).init();
         //设置餐桌号用
+        loadTables();
         //CustomerSelection.getInstance().setTableName(odIdTableNumEt.getText().toString());
         storedMenu = null;
         //the model of the menus.
@@ -160,7 +167,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             //might need more col for menu.
             String col = AppData.getCustomData("column");
             try {
-                ((GridView) findViewById(R.id.odIdLoutItemsGv)).setNumColumns(Integer.valueOf(col));
+                ((GridView) findViewById(R.id.odMenuGv)).setNumColumns(Integer.valueOf(col));
+                ((GridView) findViewById(R.id.odTableGrid)).setNumColumns(Integer.valueOf(col));
             }catch(Exception e){
                 //ignore, it's normal user didn't change the setting. then leave it to be 2.
             }
@@ -171,7 +179,11 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 items[i] = menus.get(i).getID();
             }
 
-            odIdTable2.setText(AppData.getCustomData("kitchenBillIdx"));
+            if(tables.size() == 0) {
+                odIdTable2.setText(AppData.getCustomData("kitchenBillIdx"));
+            }else{
+                odIdTable2.setText("");
+            }
         }else{
             findViewById(R.id.odIdCategoryGrid).setVisibility(View.GONE);
             findViewById(R.id.odIdTools).setVisibility(View.GONE);
@@ -213,13 +225,14 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
         itemXAdapter = new XAdapter2<String>(getActivity(), Arrays.asList(items), OrderIdentifierItemViewHolder.class);
         itemXAdapter.setClickItemListener(this.itemXAdapterClick);
-        odIdLoutItemsGv.setAdapter(itemXAdapter);
+        odMenuGv.setAdapter(itemXAdapter);
 
         odIdTableTbtn.setTextOn(null);
         odIdTableTbtn.setTextOff(null);
         odIdTableTbtn.setText("");
         odIdTableTbtn.setChecked(true);
         odIdTableTbtn.setOnClickListener(this);
+        odIdTable2.setOnClickListener(this);
 
         //initSelected dishes part.
         dishesXAdapter = new XAdapter2<SelectionDetail>(getContext(), OrderMenuViewHolder.class);
@@ -229,14 +242,31 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
         //add Marks
         allMarks = sortMarks(DaoExpand.queryNotDeletedAll(Applic.getMarkDao()));
+        allMarks = sortMarks(DaoExpand.queryAllMarks(Applic.getMarkDao()));
         //add shortcut Marks.
         initShortCutMarks();
+
+
+        tableXAdapter = new XAdapter2<Mark>(getActivity(), tables, TableIdentifierViewHolder.class);
+        tableXAdapter.setClickItemListener(this.tableXAdapterClick);
+        odTableGrid.setAdapter(tableXAdapter);
+
 
         //init MarkSelection panel
         markAllXAdapter = new XAdapter2<Mark>(getContext(), OrderMarksSelectionViewHolder.class);
         markAllXAdapter.setClickItemListener(this);
         markAllXAdapter.setData(allMarks);
         markAllList.setAdapter(markAllXAdapter);
+    }
+
+    public static void loadTables() {
+        tables = DaoExpand.queryAllTables(Applic.app.getDaoMaster().newSession().getMarkDao());
+        Collections.sort(tables, new Comparator<Mark>() {
+            @Override
+            public int compare(Mark mark, Mark t1) {
+                return mark.getState() - t1.getState();
+            }
+        });
     }
 
     @XClick({R.id.odIdConfigBtn,R.id.odIdConfigBtn2, R.id.odIdSndBtn, R.id.odIdSndBtn2, R.id.odIdDelBtn, R.id.odIdOkBtn, R.id.odIdCancel})
@@ -254,10 +284,10 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 printCurrentSelection(false);
                 break;
             case R.id.odIdDelBtn:
-                if( viewSwitcher.getDisplayedChild() == 0) {
+                if( menuMarkSwitcher.getDisplayedChild() == 0) {
                     DelOneText();
                 }else{
-                    viewSwitcher.setDisplayedChild(0);
+                    menuMarkSwitcher.setDisplayedChild(0);
                 }
                 break;
             case R.id.odIdOkBtn:
@@ -282,13 +312,13 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
                         //print code:
                         reportContent = WifiPrintService.getInstance().exePrintReportCommand(orders, reportStartDate, String.valueOf(new Date().getTime()));
-                        findViewById(R.id.viewSwitcher).setVisibility(View.INVISIBLE);
+                        findViewById(R.id.menuMarkSwitcher).setVisibility(View.INVISIBLE);
                         findViewById(R.id.topButtons).setVisibility(View.INVISIBLE);
                         findViewById(R.id.alertDlg).setVisibility(View.VISIBLE);
                     }
                     odIdTableTbtn.setText("");
                     odIdInput.setText("");
-                }else if( viewSwitcher.getDisplayedChild() == 0) {
+                }else if( menuMarkSwitcher.getDisplayedChild() == 0) {
                     if (odIdTableTbtn.isChecked()) {    //waiting for input table num status. always allowed!
                         odIdTableTbtn.setChecked(false);
                         CustomerSelection.getInstance().setTableName(odIdTableTbtn.getText().toString());
@@ -316,7 +346,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 break;
 
 //            case R.id.odMarkSelectionCancel:
-//                viewSwitcher.setDisplayedChild(0);
+//                menuMarkSwitcher.setDisplayedChild(0);
 //                break;
 //
 //            case R.id.odMarkSelectionOK:
@@ -332,7 +362,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         findViewById(R.id.alertDlg).setMinimumHeight(0);
         findViewById(R.id.topButtons).setY(0);
         findViewById(R.id.topButtons).setVisibility(View.VISIBLE);
-        findViewById(R.id.viewSwitcher).setVisibility(View.VISIBLE);
+        findViewById(R.id.menuMarkSwitcher).setVisibility(View.VISIBLE);
         findViewById(R.id.topButtons).invalidate();
         //check if need to send email
         try{
@@ -368,7 +398,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         findViewById(R.id.alertDlg).setMinimumHeight(0);
         findViewById(R.id.topButtons).setY(0);
         findViewById(R.id.topButtons).setVisibility(View.VISIBLE);
-        findViewById(R.id.viewSwitcher).setVisibility(View.VISIBLE);
+        findViewById(R.id.menuMarkSwitcher).setVisibility(View.VISIBLE);
         findViewById(R.id.topButtons).invalidate();
 
     }
@@ -392,7 +422,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 marksOfCurDish.add(mark.clone());
             }
         }
-        viewSwitcher.setDisplayedChild(0);
+        menuMarkSwitcher.setDisplayedChild(0);
         //menuXAdapter.notifyDataSetChanged();
         dishesXAdapter.get(curmarkitem).setMarkList(marksOfCurDish);
 
@@ -514,9 +544,24 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                         }
                         loadOrderMenu();
                     }
+                    break;
+//                case R.id.tableID:
+//                    odIdTable2.setText("BLAH");
+//                    break;
             }
 
             //odIdfrName.setText(menuXAdapter.get(i).getMname());
+        }
+    };
+
+    IXOnItemClickListener tableXAdapterClick = new IXOnItemClickListener() {
+        @Override
+        public void onClickItem(View view, int idx) {
+            L.d(TAG, "onClickTable" + view.getId() + String.valueOf(idx));
+            String table = OrderIdentifierFragment.tables.get(idx).getName();
+            odIdTable2.setText(table);
+            CustomerSelection.getInstance().setTableName(table);
+            menuTableSwitcher.setDisplayedChild(0);
         }
     };
 
@@ -560,6 +605,14 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 L.d(TAG, "ClickTableButton");
                 if (odIdTableTbtn.isChecked()) {
                     odIdTableTbtn.setText("");
+                }
+                break;
+            case R.id.odIdTable2:
+                L.d(TAG, "ClickedTableButton");
+                if(tables.size() > 0) {
+                    if (menuTableSwitcher.getDisplayedChild() == 0){
+                        menuTableSwitcher.setDisplayedChild(1);
+                    }
                 }
                 break;
         }
@@ -637,6 +690,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             boolean matched = false;
             for(int i = 0; i < marksOfCurDish.size(); i++){
                 String markName = marksOfCurDish.get(i).getName();
+                if(mark == null || mark.getName() == null){
+                    continue;
+                }
                 if(mark.getName().equals(markName)){
                     matched = true;
                     mark.setQt(marksOfCurDish.get(i).getQt());
@@ -654,8 +710,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         markAllList.setAdapter(markAllXAdapter);
         markAllList.setSelection(0);
 
-        if (viewSwitcher.getDisplayedChild() == 0){
-            viewSwitcher.setDisplayedChild(1);
+        if (menuMarkSwitcher.getDisplayedChild() == 0){
+            menuMarkSwitcher.setDisplayedChild(1);
         }
 //        new AlertDialog.Builder(this.getActivity()).setMultiChoiceItems(markNames, selectedQT, new DialogInterface.OnMultiChoiceClickListener() {
 //            @Override
@@ -740,8 +796,11 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         odIdTableTbtn.setText("");
         odIdTableTbtn.setChecked(true);
         loadOrderMenu();
-
-        odIdTable2.setText(AppData.getCustomData("kitchenBillIdx"));
+        if(tables.size() == 0) {
+            odIdTable2.setText(AppData.getCustomData("kitchenBillIdx"));
+        }else{
+            odIdTable2.setText("");
+        }
     }
 
     /**no one is calling this mehtod now, because we not response feels like app goes wrong. and user might input again.

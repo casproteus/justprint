@@ -163,7 +163,7 @@ public class ConfigMarkFragment extends BaseFragment implements OnClickItemListe
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                mark.logicDelete();
+                mark.delete();
                 loadMark();
 
                 modifyViewSwitch.setDisplayedChild(0);

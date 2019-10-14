@@ -3,8 +3,10 @@ package com.just.print.db.expand;
 import android.database.Cursor;
 
 import com.just.print.db.bean.Category;
+import com.just.print.db.bean.Mark;
 import com.just.print.db.bean.Menu;
 import com.just.print.db.bean.Printer;
+import com.just.print.db.dao.MarkDao;
 import com.just.print.db.dao.MenuDao;
 import com.just.print.db.dao.PrinterDao;
 
@@ -39,8 +41,12 @@ public final class DaoExpand {
         return dao.queryBuilder().where(MenuDao.Properties.State.notEq(State.delete)).list();
     }
 
-    static public <T, K> List<T> queryDeleteAll(AbstractDao<T, K> dao) {
+    static public <T, K> List<T> queryAllTables(AbstractDao<T, K> dao) {
         return dao.queryBuilder().where(MenuDao.Properties.Version.eq(State.delete)).list();
+    }
+
+    public static List<Mark> queryAllMarks(MarkDao markDao) {
+        return markDao.queryBuilder().where(MenuDao.Properties.Version.notEq(State.delete)).list();
     }
 
     static public List<Menu> queryFuzzyMenu(MenuDao menuDao, String ID) {
@@ -72,6 +78,7 @@ public final class DaoExpand {
         List<Printer> list = printerDao.queryBuilder().where(PrinterDao.Properties.FirstPrint.eq(1)).limit(1).list();
         return list.size() > 0 ? list.get(0) : null;
     }
+
 
 //    public static void updateAllPrintTo0(PrinterDao printerDao) {
 //        List<Printer> list = printerDao.queryBuilder().where(PrinterDao.Properties.FirstPrint.eq(1)).list();

@@ -164,11 +164,12 @@
         <!--android:background="#8A2BE2"-->
 
         <ViewSwitcher
-            android:id="@+id/viewSwitcher"
+            android:id="@+id/menuMarkSwitcher"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:inAnimation="@android:anim/slide_in_left"
             android:outAnimation="@android:anim/slide_out_right">
+
             <!--categories and menu-->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -244,102 +245,122 @@
                         </ListView>
                     </LinearLayout>
 
-                    <!--menu area-->
-                    <LinearLayout
+
+                    <ViewSwitcher
+                        android:id="@+id/menuTableSwitcher"
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
-                        android:orientation="vertical"
+                        android:inAnimation="@android:anim/slide_in_left"
+                        android:outAnimation="@android:anim/slide_out_right"
                         android:layout_weight="1">
-                        <!--input content-->
+
+                        <!--menu area-->
                         <LinearLayout
-                            android:id="@+id/odIdInfo"
                             android:layout_width="fill_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-                            <TextView
-                                android:id="@+id/odIdInput"
+                            android:layout_height="fill_parent"
+                            android:orientation="vertical"
+                            android:layout_weight="1">
+                            <!--input content-->
+                            <LinearLayout
+                                android:id="@+id/odIdInfo"
                                 android:layout_width="fill_parent"
                                 android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+                                <TextView
+                                    android:id="@+id/odIdInput"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:hint="ID"
+                                    />
+                                <TextView
+                                    android:id="@+id/odIdfrName"
+                                    android:layout_width="fill_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"/>
+                            </LinearLayout>
+
+                            <!--key board-->
+                            <GridView
+                                android:id="@+id/odMenuGv"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="4"
+                                android:numColumns="2"
+                                android:textSize="24sp"
+                                android:textStyle="bold"></GridView>
+
+                            <!-- send button @NOTE:seems must give it a height, and have to give it a weight-->
+                            <Button
+                                android:id="@+id/odIdSndBtn"
+                                android:layout_width="match_parent"
+                                android:layout_height="80dp"
                                 android:layout_weight="1"
-                                android:hint="ID"
-                                />
-                            <TextView
-                                android:id="@+id/odIdfrName"
-                                android:layout_width="fill_parent"
+                                android:background="@android:color/background_dark"
+                                android:text="SEND"
+                                android:textColor="@android:color/holo_red_dark"
+                                android:textSize="24sp"
+                                android:textStyle="bold" />
+                            <!--ToolBar-->
+                            <LinearLayout
+                                android:id="@+id/odIdTools"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"/>
+                                android:paddingBottom="0dp"
+                                android:paddingLeft="5dp"
+                                android:paddingRight="2dp"
+                                android:paddingTop="5dp"
+                                android:radius="2dp"
+                                android:layout_alignParentBottom="true">
+                                <ToggleButton
+                                    android:id="@+id/odIdTable2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="55dp"
+                                    android:background="@drawable/tag_bg"
+                                    android:layout_marginBottom="2dp"
+                                    android:button="@null"
+                                    android:paddingBottom="5dp"
+                                    android:paddingLeft="10dp"
+                                    android:paddingRight="10dp"
+                                    android:textOff=""
+                                    android:textOn=""
+                                    android:layout_weight="1" />
+                                <ImageButton
+                                    android:id="@+id/odIdCancel"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="60dp"
+                                    android:layout_weight="1"
+                                    android:src="@drawable/erase"/>
+                                <ImageButton
+                                    android:id="@+id/odIdConfigBtn2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="60dp"
+                                    android:layout_weight="1"
+                                    android:src="@drawable/setting"/>
+                                <ImageButton
+                                    android:id="@+id/odIdSndBtn2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="60dp"
+                                    android:layout_marginBottom="2dp"
+                                    android:layout_weight="1"
+                                    android:src="@drawable/send" />
+                            </LinearLayout>
                         </LinearLayout>
 
-                        <!--key board-->
+                        <!--tables-->
                         <GridView
-                            android:id="@+id/odIdLoutItemsGv"
+                            android:id="@+id/odTableGrid"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_weight="4"
                             android:numColumns="2"
                             android:textSize="24sp"
                             android:textStyle="bold"></GridView>
-
-                        <!-- send button @NOTE:seems must give it a height, and have to give it a weight-->
-                        <Button
-                            android:id="@+id/odIdSndBtn"
-                            android:layout_width="match_parent"
-                            android:layout_height="80dp"
-                            android:layout_weight="1"
-                            android:background="@android:color/background_dark"
-                            android:text="SEND"
-                            android:textColor="@android:color/holo_red_dark"
-                            android:textSize="24sp"
-                            android:textStyle="bold" />
-                        <!--ToolBar-->
-                        <LinearLayout
-                            android:id="@+id/odIdTools"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:paddingBottom="0dp"
-                            android:paddingLeft="5dp"
-                            android:paddingRight="2dp"
-                            android:paddingTop="5dp"
-                            android:radius="2dp"
-                            android:layout_alignParentBottom="true">
-                            <ToggleButton
-                                android:id="@+id/odIdTable2"
-                                android:layout_width="match_parent"
-                                android:layout_height="55dp"
-                                android:background="@drawable/tag_bg"
-                                android:layout_marginBottom="2dp"
-                                android:button="@null"
-                                android:paddingBottom="5dp"
-                                android:paddingLeft="10dp"
-                                android:paddingRight="10dp"
-                                android:textOff=""
-                                android:textOn=""
-                                android:layout_weight="1" />
-                            <ImageButton
-                                android:id="@+id/odIdCancel"
-                                android:layout_width="match_parent"
-                                android:layout_height="60dp"
-                                android:layout_weight="1"
-                                android:src="@drawable/erase"/>
-                            <ImageButton
-                                android:id="@+id/odIdConfigBtn2"
-                                android:layout_width="match_parent"
-                                android:layout_height="60dp"
-                                android:layout_weight="1"
-                                android:src="@drawable/setting"/>
-                            <ImageButton
-                                android:id="@+id/odIdSndBtn2"
-                                android:layout_width="match_parent"
-                                android:layout_height="60dp"
-                                android:layout_marginBottom="2dp"
-                                android:layout_weight="1"
-                                android:src="@drawable/send" />
-                        </LinearLayout>
-                    </LinearLayout>
-
+                    </ViewSwitcher>
                 </LinearLayout>
             </LinearLayout>
-            <!--marks menu-->
+
+            <!--marks-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -373,6 +394,7 @@
 
                 </LinearLayout-->
             </LinearLayout>
+
         </ViewSwitcher>
     </LinearLayout>
 

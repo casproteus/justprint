@@ -22,6 +22,8 @@ import com.stupid.method.reflect.annotation.XGetValueByView;
 import com.stupid.method.reflect.annotation.XViewByID;
 import com.stupid.method.widget.flowlayout.FlowListView;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -66,14 +68,8 @@ public class ConfigTableFragment extends BaseFragment implements OnClickItemList
     }
 
     private void loadTables() {
-        List<Mark> list = DaoExpand.queryDeleteAll(Applic.app.getDaoMaster().newSession().getMarkDao());
-        Collections.sort(list, new Comparator<Mark>() {
-            @Override
-            public int compare(Mark mark, Mark t1) {
-                return mark.getState() - t1.getState();
-            }
-        });
-        markXAdapter.setData(list);
+        OrderIdentifierFragment.loadTables();
+        markXAdapter.setData(OrderIdentifierFragment.tables);
         markXAdapter.notifyDataSetChanged();
     }
 
@@ -145,7 +141,7 @@ public class ConfigTableFragment extends BaseFragment implements OnClickItemList
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
-                mark.logicDelete();
+                mark.delete();
                 loadTables();
 
                 modifyViewSwitch.setDisplayedChild(0);

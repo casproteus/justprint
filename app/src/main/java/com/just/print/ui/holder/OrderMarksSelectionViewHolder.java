@@ -49,6 +49,9 @@ public class OrderMarksSelectionViewHolder extends XViewHolder<Mark> {
 
     @Override
     public void onClick(View v) {
+        if(mark.getName() == null || mark.getName().length() == 0){
+            return;
+        }
         switch (v.getId()) {
             case R.id.markQtAdd:
                 mark.setQt(mark.getQt() + 1);
