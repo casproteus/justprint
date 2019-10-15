@@ -572,7 +572,7 @@ public class AppData extends Thread{
                 showToast("App has set ShowMarkPirce to: " + inputedSN);
                 return;
             case "star":
-                AppData.putCustomData(AppData.userPassword, inputedSN);
+                AppData.putCustomData(AppData.startTime, inputedSN);
                 showToast("userPassword is set to: " + inputedSN);
                 return;
             case "tpos":
@@ -580,7 +580,7 @@ public class AppData extends Thread{
                 showToast("title_position is set to: " + inputedSN);
                 return;
             case "up":
-                AppData.putCustomData(AppData.startTime, inputedSN);
+                AppData.putCustomData(AppData.userPassword, inputedSN);
                 showToast("startTime is set to: " + inputedSN);
                 return;
             case "wt":
