@@ -1,16 +1,11 @@
 package com.just.print.ui.holder;
 
 import android.content.Context;
-import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.just.print.R;
-import com.just.print.app.AppData;
 import com.just.print.db.bean.Mark;
 import com.stupid.method.adapter.XViewHolder;
-import com.stupid.method.reflect.StupidReflect;
-import com.stupid.method.reflect.annotation.XViewByID;
 
 /**
  * Created by caspr on 6/12/2019.

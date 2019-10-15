@@ -1,7 +1,6 @@
 package com.just.print.ui.holder;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
