@@ -143,7 +143,7 @@ public class WifiPrintService implements Runnable{
     private WifiPrintService(){
         wifiCommunication = new WifiCommunication(handler);
         reInitPrintRelatedMaps();
-        serverip = AppData.getCustomData("serverip");
+        serverip = AppData.getCustomData(AppData.serverip);
         executorService.execute(this);
         L.d(TAG,"Create Service Successful");
     }
@@ -285,11 +285,11 @@ public class WifiPrintService implements Runnable{
     }
 
     private void popKitchenBillIdx() {
-        AppData.curBillIdx = AppData.getCustomData("kitchenBillIdx");  //and it can also be used to know which order come in first.
+        AppData.curBillIdx = AppData.getCustomData(AppData.kitchenBillIdx);  //and it can also be used to know which order come in first.
         if(StringUtils.isBlank(AppData.curBillIdx)){
             AppData.curBillIdx = "1";
         }
-        AppData.putCustomData("kitchenBillIdx", String.valueOf(Integer.valueOf(AppData.curBillIdx) + 1));   //update thee kbi into higer value.
+        AppData.putCustomData(AppData.kitchenBillIdx, String.valueOf(Integer.valueOf(AppData.curBillIdx) + 1));   //update thee kbi into higer value.
     }
 
     private static Double saveSaleRecToDB(boolean isCancel) {
@@ -303,7 +303,7 @@ public class WifiPrintService implements Runnable{
             Double price = menu.getPrice() * number;
 
             //if set as conbine mark price into dish price.
-            if("true".equals(AppData.getCustomData("conbineMarkPrice"))) {
+            if("true".equals(AppData.getCustomData(AppData.conbineMarkPrice))) {
                 List<Mark> marks = selectionDetail.getMarkList();
                 if (marks != null) {
                     for (Mark mark : marks) {
@@ -353,7 +353,7 @@ public class WifiPrintService implements Runnable{
         checkErrorPrinterList();
         L.d("ConfigPrintReportFragment","exePrintCommand");
         List<Printer> printers = Applic.app.getDaoMaster().newSession().getPrinterDao().loadAll();
-        String printerIP = AppData.getCustomData("reportPrinter");
+        String printerIP = AppData.getCustomData(AppData.reportPrinter);
         if(printerIP == null || printerIP.length() < 8 || printerIP.indexOf(".") < 1 || printerIP.indexOf(".") > 3) {
             printerIP = printers.get(0).getIp();
         }
@@ -489,7 +489,7 @@ public class WifiPrintService implements Runnable{
 
             //did any work or didn't do any work, each round should rest for at least 50.
             int time = 50;
-            String waitTime = AppData.getCustomData("waitTime");
+            String waitTime = AppData.getCustomData(AppData.waitTime);
             if (waitTime != null && waitTime.trim().length() > 0) {
                 try {
                     time = Integer.valueOf(waitTime);
@@ -544,12 +544,12 @@ public class WifiPrintService implements Runnable{
 
     private void printContents(List<String> contents){
         //get out customized font
-        String font = AppData.getCustomData(curPrintIp + "font");
+        String font = AppData.getCustomData(curPrintIp + AppData.font);
         if (StringUtils.isBlank(font)) {
-            font = AppData.getCustomData("font");
+            font = AppData.getCustomData(AppData.font);
         }
         if(isPrintingReport(contents)){
-            font = AppData.getCustomData("reportFont");
+            font = AppData.getCustomData(AppData.reportFont);
             if(font == null || font.length() < 6) {
                 font = "27,33,0";
             }
@@ -577,7 +577,7 @@ public class WifiPrintService implements Runnable{
     private StringBuilder getReportFirstLineContent() {
         String mobileMark = LoginFragment.getUserName();
         StringBuilder content = new StringBuilder(mobileMark == null ? "" : mobileMark);
-        String idx = AppData.getCustomData("reportIdx");
+        String idx = AppData.getCustomData(AppData.reportIdx);
         return content.append(idx == null || idx.length() == 0 ? "1" : idx);
     }
 
@@ -711,7 +711,7 @@ public class WifiPrintService implements Runnable{
     }
 
     private void doZiJiangPrint(String font, String content){
-        if (!"silent".equals(AppData.getCustomData("mode"))) {
+        if (!"silent".equals(AppData.getCustomData(AppData.mode))) {
             wifiCommunication.sndByte(Command.BEEP);
         }
 
@@ -732,7 +732,7 @@ public class WifiPrintService implements Runnable{
         }
 
         //code can be customzed
-        String tCode = AppData.getCustomData("code");
+        String tCode = AppData.getCustomData(AppData.code);
         if (tCode != null && tCode.length() > 2) {
             code = tCode;
         }
@@ -744,13 +744,13 @@ public class WifiPrintService implements Runnable{
     }
 
     private String prepareBeiYangPrinterStr(){
-        String beiYangPrinter = AppData.getCustomData("BeiYangPrinter");
+        String beiYangPrinter = AppData.getCustomData(AppData.BeiYangPrinter);
         if(beiYangPrinter != null && beiYangPrinter.length() > 7){
             return beiYangPrinter;
         }
 
         beiYangPrinter = "";    //@note: we don't want to return a null back to cause any null pointer.
-        if( "true".equalsIgnoreCase(AppData.getCustomData("autoSearchBeiYang"))) {
+        if( "true".equalsIgnoreCase(AppData.getCustomData(AppData.autoSearchBeiYang))) {
             for (int i = 0; i < SearchPortMAX; i++) {
                 port_info[i] = new SearchPortInfo();
             }
@@ -766,7 +766,7 @@ public class WifiPrintService implements Runnable{
                 }
             }
 
-            AppData.putCustomData("BeiYangPrinter", beiYangPrinter);
+            AppData.putCustomData(AppData.BeiYangPrinter, beiYangPrinter);
             L.d(TAG, "beiyang printers : " + beiYangPrinter);
         }
         return beiYangPrinter;
@@ -807,7 +807,7 @@ public class WifiPrintService implements Runnable{
 
         //determin the width of paper.
         width = 42;
-        String reportWidth = AppData.getCustomData("reportWidth");
+        String reportWidth = AppData.getCustomData(AppData.reportWidth);
         try{
             width = Integer.valueOf(reportWidth);
         }catch(Exception e){
@@ -826,13 +826,13 @@ public class WifiPrintService implements Runnable{
         content.append("\n");
         int lastBillNo = 0;
         try {
-            lastBillNo = Integer.valueOf(AppData.getCustomData("kitchenBillIdx")) - 1;
+            lastBillNo = Integer.valueOf(AppData.getCustomData(AppData.kitchenBillIdx)) - 1;
         }catch (Exception e){
             L.e("WifiPrintService ", "Exception when getting kitchenBillIdx for report, the last bill was found to be:" + lastBillNo, e);
         }
         content.append("last bill : #").append(lastBillNo);
         content.append("\n");
-        String sep_str1 = AppData.getCustomData("sep_str1");
+        String sep_str1 = AppData.getCustomData(AppData.sep_str1);
         if(sep_str1 == null || sep_str1.length() == 0){
             sep_str1 = SEP_STR1;
         }
@@ -889,7 +889,7 @@ public class WifiPrintService implements Runnable{
             int lengthOfName = getLengthOfString(name);
             int maxLength = 30;
             try {
-                maxLength = Integer.valueOf(AppData.getCustomData("menuNameLength"));
+                maxLength = Integer.valueOf(AppData.getCustomData(AppData.menuNameLength));
             }catch(Exception e){
             }
             if(lengthOfName >= maxLength){
@@ -1001,14 +1001,14 @@ public class WifiPrintService implements Runnable{
     }
 
     private void determinTheWidth() {
-        String font = AppData.getCustomData(curPrintIp + "font");
+        String font = AppData.getCustomData(curPrintIp + AppData.font);
         if(StringUtils.isBlank(font)) {
-            font = AppData.getCustomData("font");
+            font = AppData.getCustomData(AppData.font);
         }
         if(!StringUtils.isBlank(font)){
-            String w = AppData.getCustomData(curPrintIp + "width");
+            String w = AppData.getCustomData(curPrintIp + AppData.width);
             if(StringUtils.isBlank(w)) {
-                w = AppData.getCustomData("width");
+                w = AppData.getCustomData(AppData.width);
             }
             try {
                 width = Integer.valueOf(w);
@@ -1030,7 +1030,7 @@ public class WifiPrintService implements Runnable{
 
         StringBuilder content = new StringBuilder();
         //tiltle---could be used for kithch name, empty lines.......
-        String title = AppData.getCustomData("kitchentitle");
+        String title = AppData.getCustomData(AppData.kitchentitle);
         if (title.length() > 0) {
             if (title.endsWith("lines")) {
                 title = title.substring(0, title.length() - 5).trim();
@@ -1058,8 +1058,8 @@ public class WifiPrintService implements Runnable{
         String tableName = CustomerSelection.getInstance().getTableName();
         String dateStr = df.format(new Date());
 
-        if("1".equals(AppData.getCustomData("format_style"))){
-            String billIdx_Position = AppData.getCustomData("title_position");
+        if("1".equals(AppData.getCustomData(AppData.format_style))){
+            String billIdx_Position = AppData.getCustomData(AppData.title_position);
             if ("left".equals(billIdx_Position)) {
                 //add no space.
             } else if ("right".equals(billIdx_Position)) {
@@ -1077,7 +1077,7 @@ public class WifiPrintService implements Runnable{
         }else {
             //table name
             if(tableName != null && tableName.length() > 0) {
-                String tablename_position = AppData.getCustomData("title_position");
+                String tablename_position = AppData.getCustomData(AppData.title_position);
                 if ("left".equals(tablename_position)) {
                     //add nothing
                 } else if ("right".equals(tablename_position)) {
@@ -1094,11 +1094,11 @@ public class WifiPrintService implements Runnable{
         }
         //Seperator
 
-        String sep_str1 = AppData.getCustomData("sep_str1");
+        String sep_str1 = AppData.getCustomData(AppData.sep_str1);
         if(sep_str1 == null || sep_str1.length() == 0){
             sep_str1 = SEP_STR1;
         }
-        String sep_str2 = AppData.getCustomData("sep_str2");
+        String sep_str2 = AppData.getCustomData(AppData.sep_str2);
         if(sep_str2 == null || sep_str2.length() == 0){
             sep_str2 = SEP_STR2;
         }
@@ -1132,7 +1132,7 @@ public class WifiPrintService implements Runnable{
             }
             content.append(generateString(width, sep_str2)).append("\n");
         }
-        if("true".equals(AppData.getCustomData("priceonkitchenbill"))) {
+        if("true".equals(AppData.getCustomData(AppData.priceonkitchenbill))) {
             return content.append(priceOfBill).append("\n").toString();
         }else {
             return content.substring(0, content.length() - (width + 1));

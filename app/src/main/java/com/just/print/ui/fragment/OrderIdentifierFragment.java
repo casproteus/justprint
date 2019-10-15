@@ -165,7 +165,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             }
 
             //might need more col for menu.
-            String col = AppData.getCustomData("column");
+            String col = AppData.getCustomData(AppData.column);
             try {
                 ((GridView) findViewById(R.id.odMenuGv)).setNumColumns(Integer.valueOf(col));
                 ((GridView) findViewById(R.id.odTableGrid)).setNumColumns(Integer.valueOf(col));
@@ -180,7 +180,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             }
 
             if(tables.size() == 0) {
-                odIdTable2.setText(AppData.getCustomData("kitchenBillIdx"));
+                odIdTable2.setText(AppData.getCustomData(AppData.kitchenBillIdx));
             }else{
                 odIdTable2.setText("");
             }
@@ -204,7 +204,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 }
             }
             //add the custChars, if not defined, then add an s and a u.
-            String custChars = AppData.getCustomData("custChars");
+            String custChars = AppData.getCustomData(AppData.custChars);
             if (custChars.length() == 0) {
                 custChars = "SU";
             }
@@ -294,7 +294,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 if(AppData.isMode2()){
                     findViewById(R.id.topButtons).setVisibility(View.GONE);
                 }
-                String adminPassword = AppData.getCustomData("adminPassword");
+                String adminPassword = AppData.getCustomData(AppData.adminPassword);
                 if(adminPassword == null || adminPassword.length() < 6){
                     adminPassword = "AA88AA";
                 }
@@ -305,9 +305,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                     if(orders == null || orders.size() == 0){
                         showToast("No report to print! The sales record has been cleaned!");
                     }else {
-                        String reportStartDate = AppData.getCustomData("reportStartDate");
+                        String reportStartDate = AppData.getCustomData(AppData.reportStartDate);
                         if (reportStartDate == null || reportStartDate.length() < 1) {
-                            reportStartDate = AppData.getCustomData("lastsuccess");
+                            reportStartDate = AppData.getCustomData(AppData.lastsuccess);
                         }
 
                         //print code:
@@ -367,7 +367,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         //check if need to send email
         try{
             int reportIdx = 1;
-            reportIdx = Integer.valueOf(AppData.getCustomData("reportIdx"));
+            reportIdx = Integer.valueOf(AppData.getCustomData(AppData.reportIdx));
             AppData.notifyCheck(reportIdx, reportContent, false);
         }catch(Exception e){
             //It's OK if reportIdx is null
@@ -379,7 +379,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         int reportIdx = 1;
         //check if need to send email
         try{
-            reportIdx = Integer.valueOf(AppData.getCustomData("reportIdx"));
+            reportIdx = Integer.valueOf(AppData.getCustomData(AppData.reportIdx));
         }catch(Exception e){
             //It's OK if reportIdx is null
         }
@@ -389,10 +389,10 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
 
         //when printed succcesfully, clean all records, and update now as the next reportStartDate
         Applic.app.getDaoMaster().newSession().getSaleRecordDao().deleteAll();
-        AppData.putCustomData("reportStartDate", String.valueOf(new Date().getTime()));
+        AppData.putCustomData(AppData.reportStartDate, String.valueOf(new Date().getTime()));
         AppData.putCustomData("kitchenBillIdx", "1");        //reset kitchenbillIndex
 
-        AppData.putCustomData("reportIdx", String.valueOf(reportIdx + 1));
+        AppData.putCustomData(AppData.reportIdx, String.valueOf(reportIdx + 1));
 
         findViewById(R.id.alertDlg).setVisibility(View.INVISIBLE);
         findViewById(R.id.alertDlg).setMinimumHeight(0);
@@ -498,7 +498,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                                 isCancel = true;
                             }
                         } else {
-                            String custChars = AppData.getCustomData("custChars");
+                            String custChars = AppData.getCustomData(AppData.custChars);
                             if (custChars.length() == 0) {
                                 custChars = "SU";
                             }

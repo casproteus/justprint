@@ -36,7 +36,7 @@ public class ConfigMainFragment extends BaseFragment {
         if (StringUtils.isEmpty(inputContent) || inputContent.length() < 2) {
             showToast("Please input the right password");
         } else {
-            String userPassword = AppData.getCustomData("userPassword");
+            String userPassword = AppData.getCustomData(AppData.userPassword);
             if(userPassword == null || userPassword.length() == 0){
                 userPassword = "88882288";
             }

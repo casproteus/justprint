@@ -39,7 +39,7 @@ public class DownloadingConfigConfirmFragment extends BaseFragment{
     public void onCreated(Bundle savedInstanceState) {
         new StupidReflect(this, getView()).init();
 
-        if(!"true".equals(AppData.getCustomData("AllowDownloadFromeOthers"))) {
+        if(!"true".equals(AppData.getCustomData(AppData.AllowDownloadFromeOthers))) {
             findViewById(R.id.notice2).setVisibility(View.GONE);
             findViewById(R.id.inputArea).setVisibility(View.GONE);
         }

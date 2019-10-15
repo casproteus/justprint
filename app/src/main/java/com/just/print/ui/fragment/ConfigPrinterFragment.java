@@ -68,7 +68,7 @@ public class ConfigPrinterFragment extends BaseFragment implements
     @XClick({R.id.verifyPassword})
     private void onVerifyPassword(View view) {
         String inputContent = this.password.getText().toString().trim();
-        String adminPassword = AppData.getCustomData("adminPassword");
+        String adminPassword = AppData.getCustomData(AppData.adminPassword);
         if(adminPassword == null || adminPassword.length() == 0){
             adminPassword = AppData.getLicense();
         }

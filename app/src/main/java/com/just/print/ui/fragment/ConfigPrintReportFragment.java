@@ -54,7 +54,7 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
     @XClick({R.id.verifyPassword})
     private void verifyPassword(@XGetValueByView(fromId = R.id.etMark) String mark) {
         //maybe we should hide the functions into a "more..." button.
-        String adminPassword = AppData.getCustomData("adminPassword");
+        String adminPassword = AppData.getCustomData(AppData.adminPassword);
         if(adminPassword != null && !adminPassword.equals(mark)){
             showToast("Please input correct password!");
             return;
@@ -68,9 +68,9 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
             return;
         }
 
-        String reportStartDate = AppData.getCustomData("reportStartDate");
+        String reportStartDate = AppData.getCustomData(AppData.reportStartDate);
         if(reportStartDate == null || reportStartDate.length() < 1){
-            reportStartDate = AppData.getCustomData("lastsuccess");
+            reportStartDate = AppData.getCustomData(AppData.lastsuccess);
         }
 
         now = new Date().getTime();
@@ -86,7 +86,7 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
         int reportIdx = 1;
         //check if need to send email
         try{
-            reportIdx = Integer.valueOf(AppData.getCustomData("reportIdx"));
+            reportIdx = Integer.valueOf(AppData.getCustomData(AppData.reportIdx));
         }catch(Exception e){
             //It's OK if reportIdx is null
         }
@@ -99,7 +99,7 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
     private void resetReport(){
         int reportIdx = 1;
         try{
-            reportIdx = Integer.valueOf(AppData.getCustomData("reportIdx"));
+            reportIdx = Integer.valueOf(AppData.getCustomData(AppData.reportIdx));
         }catch(Exception e){
             //report error.
         }
@@ -108,10 +108,10 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
         }
         //when printed succcesfully, clean all records, and update now as the next reportStartDate
         saleRecordDao.deleteAll();
-        AppData.putCustomData("reportStartDate", String.valueOf(now));
-        AppData.putCustomData("kitchenBillIdx", "1");        //reset kitchenbillIndex
+        AppData.putCustomData(AppData.reportStartDate, String.valueOf(now));
+        AppData.putCustomData(AppData.kitchenBillIdx, "1");        //reset kitchenbillIndex
 
-        AppData.putCustomData("reportIdx", String.valueOf(reportIdx + 1));
+        AppData.putCustomData(AppData.reportIdx, String.valueOf(reportIdx + 1));
         getActivity().finish();
     }
 

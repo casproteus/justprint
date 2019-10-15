@@ -118,7 +118,7 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
             int p = userName.indexOf("-p:");
             if(p > -1){// means theres parameters
                 String password = userName.substring(p+3).trim();
-                AppData.putCustomData("userPassword", password);
+                AppData.putCustomData(AppData.userPassword, password);
                 userName = userName.substring(0, p).trim();
             }
 
@@ -137,7 +137,7 @@ public class LoginFragment extends BaseFragment implements UDPService.UDPCallbac
         int p = shopName.indexOf("-p:");
         if(p > -1){// means theres parameters
             String password = shopName.substring(p+3).trim();
-            AppData.putCustomData("adminPassword", password);
+            AppData.putCustomData(AppData.adminPassword, password);
             shopName = shopName.substring(0, p).trim();
         }
 

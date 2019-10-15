@@ -151,7 +151,7 @@ public class AppData extends Thread{
     }
 
     public static String getSERVER_URL(){
-        String serverURL = AppData.getCustomData("server_url");
+        String serverURL = AppData.getCustomData(AppData.server_url);
         if(serverURL == null || serverURL.length() < 10) {
             serverURL = AppData.SERVER_URL;
         }
@@ -266,8 +266,8 @@ public class AppData extends Thread{
 
     //When there are more mode2 than mode 1, will open the commented line.
     public static boolean isMode2() {
-//        return getCustomData("appmode") == null || "".equals(getCustomData("appmode")) || "2".equals(getCustomData("appmode"));
-        return "2".equals(getCustomData("appmode"));
+//        return getCustomData(AppData.appmode) == null || "".equals(getCustomData(AppData.appmode)) || "2".equals(getCustomData(AppData.appmode));
+        return "2".equals(getCustomData(AppData.appmode));
     }
 
     public static String schema;
@@ -356,8 +356,8 @@ public class AppData extends Thread{
                     try{
                         time = Long.valueOf(responseString);
                         if(time > 0){//if success
-                            AppData.putCustomData("number",responseString);
-                            AppData.putCustomData("lastsuccess", String.valueOf(new Date().getTime()));
+                            AppData.putCustomData(AppData.number,responseString);
+                            AppData.putCustomData(AppData.lastsuccess, String.valueOf(new Date().getTime()));
 
                             showToast("Application is activated successfully!");
                         }else{
@@ -437,76 +437,164 @@ public class AppData extends Thread{
         inputedSN = inputedSN.substring(p + 1);
         switch (SettingType.toLowerCase()) {
             case "ap":   // means theres parameters
-                AppData.putCustomData("adminPassword", inputedSN);
+                AppData.putCustomData(AppData.adminPassword, inputedSN);
                 showToast("App has set adminPassword to: " + inputedSN);
                 return;
+            case "am":   // means theres parameters
+                AppData.putCustomData(AppData.appmode, inputedSN);
+                showToast("App has set appmode to: " + inputedSN);
+                return;
             case "c":
-                AppData.putCustomData("code", inputedSN);
+                AppData.putCustomData(AppData.code, inputedSN);
                 showToast("App has set code to: " + inputedSN);
                 return;
-            case "debug":
+            case "cos":
+                AppData.putCustomData(AppData.ColorOnSelect, inputedSN);
+                showToast("App has set ColorOnSelect to: " + inputedSN);
+                return;
+            case "cn":
+                AppData.putCustomData(AppData.column, inputedSN);
+                showToast("App has set column to: " + inputedSN);
+                return;
+            case "cmp":
+                AppData.putCustomData(AppData.conbineMarkPrice, inputedSN);
+                showToast("App has set conbineMarkPrice to: " + inputedSN);
+                return;
+            case AppData.debug:
                 MainActivity.debug = Boolean.valueOf(inputedSN);
-                AppData.putCustomData("debug", String.valueOf(MainActivity.debug));
+                AppData.putCustomData(AppData.debug, String.valueOf(MainActivity.debug));
                 if(MainActivity.debug) {
                     showToast("App is in debug mode, when bug appears again, please write down the system time and report.");
 
                     StringBuilder sb = new StringBuilder();
-                    sb.append("adminPassword:").append(AppData.getCustomData("adminPassword")).append("\n");
-                    sb.append("lastsuccess:").append(AppData.getCustomData("lastsuccess")).append("\n");
-                    sb.append("limitation:").append(AppData.getCustomData("limitation")).append("\n");
-                    sb.append("mode:").append(AppData.getCustomData("mode")).append("\n");
-                    sb.append("number:").append(AppData.getCustomData("number")).append("\n");
-                    sb.append("reportStartDate:").append(AppData.getCustomData("reportStartDate")).append("\n");
-                    sb.append("userPassword:").append(AppData.getCustomData("userPassword")).append("\n");
-                    sb.append("version:").append(AppData.getCustomData("version")).append("\n");
+                    sb.append("adminPassword:").append(AppData.getCustomData(AppData.adminPassword)).append("\n");
+                    sb.append("lastsuccess:").append(AppData.getCustomData(AppData.lastsuccess)).append("\n");
+                    sb.append("limitation:").append(AppData.getCustomData(AppData.limitation)).append("\n");
+                    sb.append("mode:").append(AppData.getCustomData(AppData.mode)).append("\n");
+                    sb.append("number:").append(AppData.getCustomData(AppData.number)).append("\n");
+                    sb.append("reportStartDate:").append(AppData.getCustomData(AppData.reportStartDate)).append("\n");
+                    sb.append("userPassword:").append(AppData.getCustomData(AppData.userPassword)).append("\n");
                     textView.setText(sb.toString());
                 }else{
                     showToast("debug mode turned off!");
                 }
                 return;
+            case "endt":
+                AppData.putCustomData(AppData.endTime, inputedSN);
+                showToast("App has set endTime to: " + inputedSN);
+                return;
             case "f":
-                AppData.putCustomData("font", inputedSN);
+                AppData.putCustomData(AppData.font, inputedSN);
                 showToast("App has set font to: " + inputedSN);
+                return;
+            case "fsty":
+                AppData.putCustomData(AppData.format_style, inputedSN);
+                showToast("App has set format_style to: " + inputedSN);
+                return;
+            case "hci":
+                AppData.putCustomData(AppData.hideCancelItem, inputedSN);
+                showToast("App has set hideCancelItem to: " + inputedSN);
+                return;
+            case "hiid":
+                AppData.putCustomData(AppData.HideKitchenBillId, inputedSN);
+                showToast("App has set HideKitchenBillId to: " + inputedSN);
+                return;
+            case "hina":
+                AppData.putCustomData(AppData.HideKitchenBillName, inputedSN);
+                showToast("App has set HideKitchenBillName to: " + inputedSN);
+                return;
+            case "kitt":
+                AppData.putCustomData(AppData.kitchentitle, inputedSN);
+                showToast("App has switched kitchentitle to: " + inputedSN);
+                return;
+            case "l":
+                AppData.putCustomData(AppData.limitation, inputedSN);
+                showToast("App has switched limitation to: " + inputedSN);
                 return;
             case "lastchar":
                 AppData.putCustomData(AppData.KEY_CUST_LAST_CHAR, inputedSN);
                 showToast("Please restart app to apply new layout.");
                 return;
-            case "l":
-                AppData.putCustomData("limitation", inputedSN);
-                showToast("App has switched limitation to: " + inputedSN);
+            case "layo":
+                AppData.putCustomData(AppData.custChars, inputedSN);
+                showToast("App has switched custChars to: " + inputedSN);
                 return;
             case "m":
-                AppData.putCustomData("mode", inputedSN);
+                AppData.putCustomData(AppData.mode, inputedSN);
                 showToast("App is in switched to mode : " + inputedSN);
                 return;
+            case "ml":
+                AppData.putCustomData(AppData.menuNameLength, inputedSN);
+                showToast("App has set menuNameLength to: " + inputedSN);
+                return;
+            case "pric":
+                AppData.putCustomData(AppData.priceonkitchenbill, inputedSN);
+                showToast("App has set priceonkitchenbill to: " + inputedSN);
+                return;
             case "r":
-                AppData.putCustomData("reportPrinter", inputedSN);
+                AppData.putCustomData(AppData.reportPrinter, inputedSN);
                 showToast("reportPrinter is set to : " + inputedSN);
                 return;
+            case "rf":
+                AppData.putCustomData(AppData.reportFont, inputedSN);
+                showToast("reportFont is set to : " + inputedSN);
+                return;
+            case "rw":
+                AppData.putCustomData(AppData.reportWidth, inputedSN);
+                showToast("reportWidth is set to : " + inputedSN);
+                return;
+            case "s":
+                AppData.putCustomData(AppData.sendReport, inputedSN);
+                showToast("App has set sendReport to: " + inputedSN);
+                return;
             case "s1":
-                AppData.putCustomData("sep_str1", inputedSN);
+                AppData.putCustomData(AppData.sep_str1, inputedSN);
                 showToast("App has set sep_str1 to: " + inputedSN);
                 return;
             case "s2":
-                AppData.putCustomData("sep_str2", inputedSN);
+                AppData.putCustomData(AppData.sep_str2, inputedSN);
                 showToast("App has set sep_str2 to: " + inputedSN);
                 return;
-            case "up":
-                AppData.putCustomData("userPassword", inputedSN);
+            case "sset":
+                AppData.putCustomData(AppData.sendOnlyWhenReset, inputedSN);
+                showToast("App has set sendOnlyWhenReset to: " + inputedSN);
+                return;
+            case "surl":
+                AppData.putCustomData(AppData.server_url, inputedSN);
+                showToast("App has set server_url to: " + inputedSN);
+                return;
+            case "sip":
+                AppData.putCustomData(AppData.serverip, inputedSN);
+                showToast("App has set serverip to: " + inputedSN);
+                return;
+            case "smp":
+                AppData.putCustomData(AppData.ShowMarkPirce, inputedSN);
+                showToast("App has set ShowMarkPirce to: " + inputedSN);
+                return;
+            case "star":
+                AppData.putCustomData(AppData.userPassword, inputedSN);
                 showToast("userPassword is set to: " + inputedSN);
                 return;
-            case "v":
-                AppData.putCustomData("version", inputedSN);
-                showToast("App is in switched to version : " + inputedSN);
+            case "tpos":
+                AppData.putCustomData(AppData.title_position, inputedSN);
+                showToast("title_position is set to: " + inputedSN);
+                return;
+            case "up":
+                AppData.putCustomData(AppData.startTime, inputedSN);
+                showToast("startTime is set to: " + inputedSN);
+                return;
+            case "wt":
+                AppData.putCustomData(AppData.waitTime, inputedSN);
+                showToast("waitTime is set to: " + inputedSN);
                 return;
             case "w":
-                AppData.putCustomData("width", inputedSN);
+                AppData.putCustomData(AppData.width, inputedSN);
                 if("16".equals(inputedSN)){
                     AppData.putCustomData("font", "29, 33, 34");
                 }
                 showToast("App has set width to: " + inputedSN);
                 return;
+
             default:
                 AppData.putCustomData(SettingType, inputedSN);
                 showToast(SettingType + " is set to " + inputedSN);

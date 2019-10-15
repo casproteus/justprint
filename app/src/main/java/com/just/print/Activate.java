@@ -40,7 +40,7 @@ public class Activate extends BaseActivity {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            String number = AppData.getCustomData("number");
+            String number = AppData.getCustomData(AppData.number);
             if(Long.valueOf(number) > 0){
                 startActivity(new Intent(this, LoginActivity.class));
                 break;

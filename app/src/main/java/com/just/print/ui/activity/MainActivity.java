@@ -20,7 +20,7 @@ public class MainActivity extends BaseActivity {
 
     //    ServiceConnection serviceConnection;
 //    UDPService udp;
-    private static String isDebug = AppData.getCustomData("debug");
+    private static String isDebug = AppData.getCustomData(AppData.debug);
     public static boolean debug = isDebug == null ? false : Boolean.valueOf(isDebug);
 
     @Override
@@ -92,13 +92,13 @@ public class MainActivity extends BaseActivity {
     //@in some device, it always return a negative value and cause reactive dlg displayed.
     private long checkDaysleft() {
         //none limitation check
-        if("none".equals(AppData.getCustomData("limitation"))){             L.d("limitationMode", "none");
+        if("none".equals(AppData.getCustomData(AppData.limitation))){             L.d("limitationMode", "none");
             return 3024000000l + 1;
         }
 
         //time of last open, @note:if existing last open time is not valid, then use lastSuccess will not be set.
         long timepassed = 0l;
-        String lastsuccessStr = AppData.getCustomData("lastsuccessStr");    L.d("lastSuccessStr:",lastsuccessStr);
+        String lastsuccessStr = AppData.getCustomData(AppData.lastsuccessStr);    L.d("lastSuccessStr:",lastsuccessStr);
         try{
             Long lastSuccess= Long.valueOf(lastsuccessStr);
             timepassed = new Date().getTime() - lastSuccess;L.d("timePassed:",timepassed);        //time passed since last open.
@@ -108,7 +108,7 @@ public class MainActivity extends BaseActivity {
 
         //if timeLeftStr is valid, then it has a chance to turn the timeLeft to be a number bigger than 0.
         long timeLeft = 0;
-        String lastTimeLeft = AppData.getCustomData("number");               L.d("timeLeft(before deduct:", lastTimeLeft);
+        String lastTimeLeft = AppData.getCustomData(AppData.number);               L.d("timeLeft(before deduct:", lastTimeLeft);
         if(StringUtils.isBlank(lastTimeLeft)){
             lastTimeLeft = "1";
         }
@@ -117,8 +117,8 @@ public class MainActivity extends BaseActivity {
             timeLeft = Long.valueOf(lastTimeLeft) - Math.abs(timepassed);    L.d("timeLeft - timePassed:", timeLeft);
 
             //update the number and lastsuccess into local cache.
-            AppData.putCustomData("lastsuccessStr", String.valueOf(new Date().getTime()));
-            AppData.putCustomData("number", String.valueOf(timeLeft));              L.d("update new number with:", timeLeft);
+            AppData.putCustomData(AppData.lastsuccessStr, String.valueOf(new Date().getTime()));
+            AppData.putCustomData(AppData.number, String.valueOf(timeLeft));              L.d("update new number with:", timeLeft);
         }catch(Exception e){
             L.e("MainActivity", "the left time number can not be pasered into a long", e);
         }
@@ -128,8 +128,8 @@ public class MainActivity extends BaseActivity {
 
     private boolean isOutOfWorkingTime(){
 
-        String startTime = AppData.getCustomData("startTime");
-        String endTime = AppData.getCustomData("endTime");
+        String startTime = AppData.getCustomData(AppData.startTime);
+        String endTime = AppData.getCustomData(AppData.endTime);
         String curTime = "";
 
         DateFormat df = new SimpleDateFormat("HHmm");
