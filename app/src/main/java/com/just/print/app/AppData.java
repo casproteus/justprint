@@ -96,6 +96,9 @@ public class AppData extends Thread{
             HideKitchenBillId, ColorOnSelect};
     public static String curBillIdx;
 
+    public static boolean showID = !"true".equals(AppData.getCustomData(AppData.HideKitchenBillId));
+    public static boolean showName = !"true".equals(AppData.getCustomData(AppData.HideKitchenBillName));
+
     private static SharedPreferencesHelper getShopData(Context context) {
         return SharedPreferencesHelper.getCache(context, KEY_SHOP_XML);
     }

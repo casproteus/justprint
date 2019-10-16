@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.just.print.R;
+import com.just.print.app.AppData;
 import com.just.print.db.bean.Mark;
 import com.just.print.sys.model.SelectionDetail;
 import com.stupid.method.adapter.XViewHolder;
@@ -67,8 +68,9 @@ public class OrderMenuViewHolder extends XViewHolder<SelectionDetail> {
     @Override
     public void onResetView(SelectionDetail menu, int i) {
         this.menu = menu;
-        odMId.setText(menu.getDish().getID());
-        odMName.setText(menu.getDish().getMname());
+
+        odMId.setText(AppData.showID ? menu.getDish().getID() : "");
+        odMName.setText(AppData.showName ? menu.getDish().getMname() : "");
 //        L.d(TAG, Integer.toString(menu.getDishNum()));
         odMNNum.setText(Integer.toString(menu.getDishNum()));
         odMnLoutMarkTv.setText("");
