@@ -67,16 +67,10 @@ public class ConfigPrintReportFragment extends BaseFragment implements OnClickIt
             showToast("No report to print! The sales record has been cleaned!");
             return;
         }
-
-        String reportStartDate = AppData.getCustomData(AppData.reportStartDate);
-        if(reportStartDate == null || reportStartDate.length() < 1){
-            reportStartDate = AppData.getCustomData(AppData.lastsuccess);
-        }
-
+        //remem the now for later use.
         now = new Date().getTime();
-
         //print code:
-        reportContent = WifiPrintService.getInstance().exePrintReportCommand(orders, reportStartDate, String.valueOf(now));
+        reportContent = WifiPrintService.getInstance().exePrintReportCommand(orders, String.valueOf(now));
         findViewById(R.id.confirmPassword).setVisibility(View.INVISIBLE);
         findViewById(R.id.alertDlg).setVisibility(View.VISIBLE);
     }

@@ -305,13 +305,8 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                     if(orders == null || orders.size() == 0){
                         showToast("No report to print! The sales record has been cleaned!");
                     }else {
-                        String reportStartDate = AppData.getCustomData(AppData.reportStartDate);
-                        if (reportStartDate == null || reportStartDate.length() < 1) {
-                            reportStartDate = AppData.getCustomData(AppData.lastsuccess);
-                        }
-
                         //print code:
-                        reportContent = WifiPrintService.getInstance().exePrintReportCommand(orders, reportStartDate, String.valueOf(new Date().getTime()));
+                        reportContent = WifiPrintService.getInstance().exePrintReportCommand(orders, String.valueOf(new Date().getTime()));
                         findViewById(R.id.menuMarkSwitcher).setVisibility(View.INVISIBLE);
                         findViewById(R.id.topButtons).setVisibility(View.INVISIBLE);
                         findViewById(R.id.alertDlg).setVisibility(View.VISIBLE);

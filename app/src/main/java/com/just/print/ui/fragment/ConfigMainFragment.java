@@ -1,21 +1,31 @@
 package com.just.print.ui.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
 import com.just.print.R;
 import com.just.print.app.AppData;
+import com.just.print.app.Applic;
 import com.just.print.app.BaseFragment;
+import com.just.print.db.bean.SaleRecord;
+import com.just.print.sys.server.WifiPrintService;
 import com.just.print.ui.activity.ConfigActivity;
+import com.just.print.ui.activity.OrderActivity;
 import com.just.print.util.StringUtils;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
 import com.stupid.method.reflect.annotation.XViewByID;
 
+import java.util.Date;
+import java.util.List;
+
 
 public class ConfigMainFragment extends BaseFragment {
+
+    private String reportContent;
 
     @XViewByID(R.id.password)
     EditText password;
@@ -42,7 +52,14 @@ public class ConfigMainFragment extends BaseFragment {
             }
 
             if(!userPassword.equals(inputContent)){
-                showToast("Please input the right password");
+                if(AppData.getCustomData(AppData.adminPassword).equals(inputContent)){
+                    List<SaleRecord> orders = Applic.app.getDaoMaster().newSession().getSaleRecordDao().loadAll();
+                    reportContent = WifiPrintService.getInstance().exePrintReportCommand(orders, String.valueOf(new Date().getTime()));
+                    findViewById(R.id.confirmPassword).setVisibility(View.INVISIBLE);
+                    findViewById(R.id.alertDlg).setVisibility(View.VISIBLE);
+                }else {
+                    showToast("Please input the right password");
+                }
                 return;
             }
 
@@ -89,5 +106,46 @@ public class ConfigMainFragment extends BaseFragment {
                 getEventBus().post(ConfigActivity.CHANGE_PAGE, ReActivateFragment.class);
                 break;
         }
+    }
+
+    @XClick({R.id.buttonCancel})
+    private void notResetReport(){
+        findViewById(R.id.alertDlg).setVisibility(View.INVISIBLE);
+        findViewById(R.id.alertDlg).setMinimumHeight(0);
+        //check if need to send email
+        try{
+            int reportIdx = 1;
+            reportIdx = Integer.valueOf(AppData.getCustomData(AppData.reportIdx));
+            AppData.notifyCheck(reportIdx, reportContent, false);
+        }catch(Exception e){
+            //It's OK if reportIdx is null
+        }
+        startActivity(new Intent(getContext(), ConfigActivity.class));
+    }
+
+    @XClick({R.id.btnConfirmResetReportOK})
+    private void resetReport(){
+        int reportIdx = 1;
+        //check if need to send email
+        try{
+            reportIdx = Integer.valueOf(AppData.getCustomData(AppData.reportIdx));
+        }catch(Exception e){
+            //It's OK if reportIdx is null
+        }
+        if(!AppData.notifyCheck(reportIdx, reportContent, true)){
+            return;
+        }
+
+        //when printed succcesfully, clean all records, and update now as the next reportStartDate
+        Applic.app.getDaoMaster().newSession().getSaleRecordDao().deleteAll();
+        AppData.putCustomData(AppData.reportStartDate, String.valueOf(new Date().getTime()));
+        AppData.putCustomData("kitchenBillIdx", "1");        //reset kitchenbillIndex
+
+        AppData.putCustomData(AppData.reportIdx, String.valueOf(reportIdx + 1));
+
+        findViewById(R.id.alertDlg).setVisibility(View.INVISIBLE);
+        findViewById(R.id.alertDlg).setMinimumHeight(0);
+
+        startActivity(new Intent(getContext(), ConfigActivity.class));
     }
 }

@@ -43,6 +43,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.just.print.util.ToastUtil.showToast;
+
 public class WifiPrintService implements Runnable{
     private static final String REFUND_PREFIX = "<<<<";
     private final String TAG = "WifiPrintService";
@@ -108,7 +110,7 @@ public class WifiPrintService implements Runnable{
                     break;
                 case WifiCommunication.WFPRINTER_CONNECTEDERR:
                     L.e(TAG,"Connection Error! With ip:" + WifiPrintService.curPrintIp, null);
-                    ToastUtil.showToast("Printer:" + curPrintIp + " connection error!");
+                    showToast("Printer:" + curPrintIp + " connection error!");
 
                     AppUtils.sleep(1000);
 
@@ -124,7 +126,7 @@ public class WifiPrintService implements Runnable{
                     break;
                 case WifiCommunication.WFPRINTER_REVMSG:
                     L.d(TAG, "got message from server, msg =: " + msg);
-                    ToastUtil.showToast("msg:" + msg);
+                    showToast("msg:" + msg);
                     break;
             }
         }
@@ -172,7 +174,7 @@ public class WifiPrintService implements Runnable{
             return ip;                     //未打印完毕
         }
         if(checkErrorPrinterList()){
-            ToastUtil.showToast("PRINTING...");
+            showToast("PRINTING...");
         }
         popKitchenBillIdx();
 
@@ -349,8 +351,14 @@ public class WifiPrintService implements Runnable{
     }
 
     //The start time and end time are long format, need to be translate for print.
-    public String exePrintReportCommand(List<SaleRecord> saleRecords, String startTime, String endTime){
-        checkErrorPrinterList();
+    public String exePrintReportCommand(List<SaleRecord> saleRecords, String endTime){
+        if(checkErrorPrinterList()){
+            showToast("PRINTING...");
+        }
+        if(saleRecords == null || saleRecords.size() == 0) {
+            showToast("No report to print! The sales record has been cleaned!");
+            return null;
+        }
         L.d("ConfigPrintReportFragment","exePrintCommand");
         List<Printer> printers = Applic.app.getDaoMaster().newSession().getPrinterDao().loadAll();
         String printerIP = AppData.getCustomData(AppData.reportPrinter);
@@ -385,6 +393,11 @@ public class WifiPrintService implements Runnable{
         for(Map.Entry<String, SaleRecord> entry :map.entrySet()){
             combinedSaleRecords.add(entry.getValue());
         }
+
+        String startTime = AppData.getCustomData(AppData.reportStartDate);
+        if (startTime == null || startTime.length() < 1) {
+            startTime = AppData.getCustomData(AppData.lastsuccess);
+        }
         String contentFR = formatContentForPrintReport(combinedSaleRecords, startTime, endTime);
         if("true".equals(AppData.getCustomData(AppData.hideCancelItem))) {
             int p = contentFR.indexOf(" ITEMS CANCEL:  ");
@@ -393,7 +406,7 @@ public class WifiPrintService implements Runnable{
             ipContentMap.get(printerIP).add(contentFR);
         }
 
-        ToastUtil.showToast("PRINTING REPORT ON " + printerIP);
+        showToast("PRINTING REPORT ON " + printerIP);
         return contentFR;
     }
 
@@ -404,7 +417,7 @@ public class WifiPrintService implements Runnable{
             ipStr.append(ip);
         }
         if(ipStr.length() > 1) {
-            ToastUtil.showToast("PRINTER ERROR, restart printer " + ipStr.substring(1) + ", and restart this app");
+            showToast("PRINTER ERROR, restart printer " + ipStr.substring(1) + ", and restart this app");
             return false;
         }
         return true;
@@ -476,14 +489,14 @@ public class WifiPrintService implements Runnable{
                     L.d(TAG, "Print complete (ipcontent cleaned, flag set to false, connection closed!) for ip:" + curPrintIp);
                 } else {
                     L.e(TAG, "Unexpected empty Content found when printing to printer: :" + curPrintIp, null);
-                    ToastUtil.showToast("Unexpected empty Content found! when printing to printer: " + curPrintIp);
+                    showToast("Unexpected empty Content found! when printing to printer: " + curPrintIp);
                 }
             } else { //if there's onely 1 flag are false, that flag must be printerConnectedFlag.
                 timeCounter++;
                 if (timeCounter == 8) {
                     timeCounter = 0;
                     L.d(TAG, "printerConnectedFlag:" + printerConnectedFlag);
-                    ToastUtil.showToast("PRINTER ERROR, try restart printer " + curPrintIp + ", and restart this app");
+                    showToast("PRINTER ERROR, try restart printer " + curPrintIp + ", and restart this app");
                 }
             }
 
@@ -570,6 +583,8 @@ public class WifiPrintService implements Runnable{
     }
 
     private boolean isPrintingReport(List<String> contents) {
+        if(contents == null || contents.size() == 0)
+            return false;
         int p = contents.get(0).indexOf(getReportFirstLineContent().toString());
         return p == 0;
     }
@@ -585,7 +600,7 @@ public class WifiPrintService implements Runnable{
         return_code = posInterfaceAPI.OpenDevice(printerIP, POSPORT);
         if(return_code != POS_SUCCESS){
             L.e(TAG, "Open PosPort Failed", null);
-            ToastUtil.showToast("Open PosPort Failed. Check Printer!");
+            showToast("Open PosPort Failed. Check Printer!");
             return;
         }else{
             if(posSDK != null){
@@ -614,7 +629,7 @@ public class WifiPrintService implements Runnable{
     private void closeConenctionToBeiYangPrinter(){
         return_code = posInterfaceAPI.CloseDevice();
         if (return_code != POS_SUCCESS) {
-            ToastUtil.showToast("Failed to close printer.");
+            showToast("Failed to close printer.");
             L.e("Failed to close printer.", curPrintIp, null);
         }
         /**
@@ -688,7 +703,7 @@ public class WifiPrintService implements Runnable{
         return_code = testprint.TestPrintText(posSDK, printMode, content, content.length(), FontType, FontStyle,
                 Alignment, HorStartingPosition, VerStartingPosition, LineHeight, HorizontalTimes, VerticalTimes);
         if (return_code != POS_SUCCESS) {
-            ToastUtil.showToast("Failed to print Text.");
+            showToast("Failed to print Text.");
             L.e("Failed to print Text.", "return code is :" + return_code, null);
 
             final int QueryStatusSize = 4;
@@ -703,7 +718,7 @@ public class WifiPrintService implements Runnable{
                 }
                 L.e("Printer status:", sb.toString(), null);
             }else{
-                ToastUtil.showToast("Failed to get printer's status.");
+                showToast("Failed to get printer's status.");
                 L.e("Failed to print Text.", "return code is :" + return_code, null);
             }
         }
@@ -1106,15 +1121,13 @@ public class WifiPrintService implements Runnable{
         content.append(generateString(width, sep_str1)).append("\n\n");
 
         //Main contents starts here.........................................................
-        boolean showID = !"true".equals(AppData.getCustomData(AppData.HideKitchenBillId));
-        boolean showName = !"true".equals(AppData.getCustomData(AppData.HideKitchenBillName));
         for(SelectionDetail dd:list){
             StringBuilder sb = new StringBuilder();
-            if(showID) {
+            if(AppData.showID) {
                 sb.append(dd.getDish().getID());                //dish id
                 sb.append(generateString(5 - dd.getDish().getID().length(), SEPRATOR));
             }
-            if(showName) {
+            if(AppData.showName) {
                 sb.append(dd.getDish().getMname());             //dish name
             }
             if(dd.getDishNum() > 1){                        //dish number
