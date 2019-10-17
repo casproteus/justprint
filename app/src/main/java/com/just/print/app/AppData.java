@@ -269,8 +269,8 @@ public class AppData extends Thread{
 
     //When there are more mode2 than mode 1, will open the commented line.
     public static boolean isMode2() {
-//        return getCustomData(AppData.appmode) == null || "".equals(getCustomData(AppData.appmode)) || "2".equals(getCustomData(AppData.appmode));
-        return "2".equals(getCustomData(AppData.appmode));
+        return getCustomData(AppData.appmode) == null || "".equals(getCustomData(AppData.appmode)) || "2".equals(getCustomData(AppData.appmode));
+//        return "2".equals(getCustomData(AppData.appmode));
     }
 
     public static String schema;
