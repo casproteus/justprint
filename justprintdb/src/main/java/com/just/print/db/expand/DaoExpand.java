@@ -21,6 +21,10 @@ public final class DaoExpand {
         return queryAllNotDeleted(dao).list();
     }
 
+    static public <T, K> List<T> queryAllNotDeletedMark(AbstractDao<T, K> dao) {
+        return dao.queryBuilder().where(MenuDao.Properties.Version.notEq(State.delete)).list();
+    }
+
     static public List<Menu> queryMenuByCategory(MenuDao menuDao, Category category) {
         return addQueryBuilderNotDelete(menuDao.queryBuilder().where(MenuDao.Properties.Cid.eq(category.getId()))).list();
     }

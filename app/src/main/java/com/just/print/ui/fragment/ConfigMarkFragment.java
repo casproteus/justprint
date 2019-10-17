@@ -69,7 +69,7 @@ public class ConfigMarkFragment extends BaseFragment implements OnClickItemListe
     }
 
     private void loadMark() {
-        List<Mark> list = DaoExpand.queryNotDeletedAll(Applic.app.getDaoMaster().newSession().getMarkDao());
+        List<Mark> list = DaoExpand.queryAllNotDeletedMark(Applic.app.getDaoMaster().newSession().getMarkDao());
         Collections.sort(list, new Comparator<Mark>() {
             @Override
             public int compare(Mark mark, Mark t1) {
