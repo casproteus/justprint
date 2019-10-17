@@ -28,7 +28,6 @@ import com.just.print.util.AppUtils;
 import com.just.print.util.Command;
 import com.just.print.util.L;
 import com.just.print.util.StringUtils;
-import com.just.print.util.ToastUtil;
 import com.zj.wfsdk.WifiCommunication;
 
 import java.text.DateFormat;
