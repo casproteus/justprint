@@ -4,6 +4,7 @@
     android:layout_height="fill_parent"
     android:padding="2dp"
     android:orientation="vertical"
+    android:background="#E2E8C2"
     tools:context="com.just.print.ui.fragment.OrderIdentifierFragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -187,7 +188,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
-                    <!--area of tables and selected dishes-->
+                    <!--area of marks and selected dishes-->
                     <LinearLayout
                         android:layout_width="fill_parent"
                         android:layout_height="fill_parent"
@@ -243,6 +244,17 @@
                             android:transcriptMode="alwaysScroll">
 
                         </ListView>
+                        <!--logo-->
+                        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent">
+                            <ImageView
+                                android:layout_width="fill_parent"
+                                android:layout_height="fill_parent"
+                                android:src="@drawable/background_image"
+                                android:scaleType = "centerInside"
+                                />
+                        </FrameLayout>
                     </LinearLayout>
 
 
