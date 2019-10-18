@@ -87,13 +87,14 @@ public class AppData extends Thread{
     public static final String HideKitchenBillId = "hikiid";
     public static final String HideKitchenBillName = "hikina";
     public static final String ColorOnSelect = "cos";
+    public static final String TableSelectable = "tableselectable";
 
     public static String[] keysToSync = new String[]{server_url, appmode, ShowMarkPirce, userPassword, adminPassword , custChars,
             column, serverip, reportPrinter, waitTime, conbineMarkPrice,
             reportFont, reportWidth, sep_str1, sep_str2, menuNameLength,
             width, kitchentitle, format_style, title_position, priceonkitchenbill,
             KEY_CUST_LAST_CHAR, hideCancelItem,sendReport,sendOnlyWhenReset, HideKitchenBillId,
-            HideKitchenBillId, ColorOnSelect};
+            HideKitchenBillId, ColorOnSelect,TableSelectable};
     public static String curBillIdx;
 
     public static boolean showID = !"true".equals(AppData.getCustomData(AppData.HideKitchenBillId));
@@ -577,6 +578,10 @@ public class AppData extends Thread{
             case "star":
                 AppData.putCustomData(AppData.startTime, inputedSN);
                 showToast("userPassword is set to: " + inputedSN);
+                return;
+            case "ts":
+                AppData.putCustomData(AppData.TableSelectable, inputedSN);
+                showToast("TableSelectable is set to: " + inputedSN);
                 return;
             case "tpos":
                 AppData.putCustomData(AppData.title_position, inputedSN);

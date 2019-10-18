@@ -3,7 +3,9 @@ package com.just.print.ui.fragment;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -38,6 +40,7 @@ import com.stupid.method.adapter.OnClickItemListener;
 import com.stupid.method.adapter.XAdapter2;
 import com.stupid.method.reflect.StupidReflect;
 import com.stupid.method.reflect.annotation.XClick;
+import com.stupid.method.reflect.annotation.XGetValueByView;
 import com.stupid.method.reflect.annotation.XViewByID;
 
 import java.util.ArrayList;
@@ -179,10 +182,10 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
                 items[i] = menus.get(i).getID();
             }
 
-            if(tables.size() == 0) {
-                odIdTable2.setText(AppData.getCustomData(AppData.kitchenBillIdx));
-            }else{
+            if("true".equalsIgnoreCase(AppData.getCustomData(AppData.TableSelectable))) {
                 odIdTable2.setText("");
+            }else{
+                odIdTable2.setText(AppData.getCustomData(AppData.kitchenBillIdx));
             }
         }else{
             findViewById(R.id.odIdCategoryGrid).setVisibility(View.GONE);
@@ -232,8 +235,9 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         odIdTableTbtn.setText("");
         odIdTableTbtn.setChecked(true);
         odIdTableTbtn.setOnClickListener(this);
-        odIdTable2.setOnClickListener(this);
-
+        if("true".equalsIgnoreCase(AppData.getCustomData(AppData.TableSelectable))) {
+            odIdTable2.setOnClickListener(this);
+        }
         //initSelected dishes part.
         dishesXAdapter = new XAdapter2<SelectionDetail>(getContext(), OrderMenuViewHolder.class);
         dishesXAdapter.setClickItemListener(this);
@@ -554,11 +558,25 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
         public void onClickItem(View view, int idx) {
             L.d(TAG, "onClickTable" + view.getId() + String.valueOf(idx));
             String table = OrderIdentifierFragment.tables.get(idx).getName();
-            odIdTable2.setText(table);
+            if("桌".equals(table) || "号".equals(table) ||  "Table".equalsIgnoreCase(table.trim()) || "Number".equalsIgnoreCase(table)){
+                findViewById(R.id.mainDialog).setVisibility(View.INVISIBLE);
+                findViewById(R.id.inputTableName).setVisibility(View.VISIBLE);
+            }else {
+                odIdTable2.setText(table);
+            }
             CustomerSelection.getInstance().setTableName(table);
             menuTableSwitcher.setDisplayedChild(0);
         }
     };
+
+    @XClick({R.id.tableNameOK})
+    private void verifyPassword(@XGetValueByView(fromId = R.id.password) String mark) {
+        findViewById(R.id.alertDlg);
+        odIdTable2.setText(mark);
+        //print code:
+        findViewById(R.id.inputTableName).setVisibility(View.INVISIBLE);
+        findViewById(R.id.mainDialog).setVisibility(View.VISIBLE);
+    }
 
     //currently it's used by number buttons and the note tag buttons. both types are buttons in holder.
     IXOnItemClickListener categoryXAdapterClick = new IXOnItemClickListener() {
