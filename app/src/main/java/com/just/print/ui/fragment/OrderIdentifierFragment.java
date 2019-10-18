@@ -132,7 +132,6 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     String[] items;// = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "H", "S", "U", "+", "togo", "canc"};
 
     public static List<Mark> tables = new ArrayList<Mark>();
-    private static Context context;
     @Override
     public void onCreated(Bundle savedInstanceState) {
         getEventBus().register(EVENT_ADD_MENU, this);
@@ -579,6 +578,7 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
     private void verifyPassword(@XGetValueByView(fromId = R.id.password) String mark) {
         findViewById(R.id.alertDlg);
         odIdTable2.setText(mark);
+        CustomerSelection.getInstance().setTableName(mark);
         //print code:
         findViewById(R.id.inputTableName).setVisibility(View.INVISIBLE);
         findViewById(R.id.mainDialog).setVisibility(View.VISIBLE);
