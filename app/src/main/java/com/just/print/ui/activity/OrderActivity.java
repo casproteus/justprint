@@ -6,6 +6,7 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 
 import com.just.print.R;
+import com.just.print.app.AppData;
 import com.just.print.app.BaseActivity;
 import com.just.print.ui.adapter.MyPagerAdapter;
 import com.just.print.ui.fragment.OrderCategoryFragment;
@@ -29,7 +30,9 @@ public class OrderActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.order_activity);
         new StupidReflect(this).init();
-        fragmentList.add(new OrderCategoryFragment());
+        if(!AppData.isMode2()) {
+            fragmentList.add(new OrderCategoryFragment());
+        }
         //fragmentList.add(new OrderMenuFragment());
         fragmentList.add(OrderIdentifierFragment.getInstance());
         adapter = new MyPagerAdapter(getSupportFragmentManager(), fragmentList);

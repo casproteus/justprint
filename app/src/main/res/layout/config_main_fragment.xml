@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:background="#B3B1D1"
     tools:context="com.just.print.ui.fragment.ConfigMainFragment">
+    <!--pass word-->
     <LinearLayout
         android:id="@+id/confirmPassword"
         android:layout_width="match_parent"
@@ -32,93 +33,108 @@
             android:text="Continue" />
     </LinearLayout>
 
+    <!--main-->
     <LinearLayout
         android:id="@+id/configList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:visibility="gone">
 
-        <TextView
-            android:id="@+id/configMenuManager"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/configListLeft"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="Menu Management" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/configPrintManager"
-            android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/configMenuManager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Menu Management" />
+
+            <TextView
+                android:id="@+id/configPrintManager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Printer Management" />
+
+            <TextView
+                android:id="@+id/configUserManager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Employee Management"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/configTagManager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Label Management" />
+
+            <TextView
+                android:id="@+id/configTableManager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Table Management" />
+
+            <TextView
+                android:id="@+id/configPrintReport"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="STGO" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/configListRight"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="Printer Management" />
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/uploadDB"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Upload Menus" />
 
-        <TextView
-            android:id="@+id/configUserManager"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="Employee Management"
-            android:visibility="gone" />
+            <TextView
+                android:id="@+id/downloadDB"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Download Menus" />
 
-        <TextView
-            android:id="@+id/configTagManager"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="Label Management" />
+            <TextView
+                android:id="@+id/uploadConfig"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Upload Configuration" />
 
-        <TextView
-            android:id="@+id/configTableManager"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="Table Management" />
+            <TextView
+                android:id="@+id/downloadConfig"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Download Configuration" />
 
-        <TextView
-            android:id="@+id/configPrintReport"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="STGO" />
+            <TextView
+                android:id="@+id/reactivate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Re-Activate" />
 
-        <TextView
-            android:id="@+id/uploadDB"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="Upload Menus" />
-
-        <TextView
-            android:id="@+id/downloadDB"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="Download Menus" />
-
-        <TextView
-            android:id="@+id/uploadConfig"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="Upload Configuration" />
-
-        <TextView
-            android:id="@+id/downloadConfig"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="Download Configuration" />
-
-        <TextView
-            android:id="@+id/reactivate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="Re-Activate" />
-
+        </LinearLayout>
     </LinearLayout>
 
+    <!--reset report alert-->
     <LinearLayout
         android:id="@+id/alertDlg"
         android:layout_width="match_parent"

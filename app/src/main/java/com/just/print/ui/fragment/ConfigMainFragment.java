@@ -38,6 +38,9 @@ public class ConfigMainFragment extends BaseFragment {
     @Override
     public void onCreated(Bundle savedInstanceState) {
         new StupidReflect(this, getView()).init();
+        if(!"true".equalsIgnoreCase(AppData.getCustomData(AppData.TableSelectable))) {
+            findViewById(R.id.configTableManager).setVisibility(View.GONE);
+        }
     }
 
     @XClick({R.id.verifyPassword})

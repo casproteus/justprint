@@ -120,6 +120,7 @@
 
     <!--main dialog -->
     <LinearLayout
+        android:id="@+id/mainDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -324,6 +325,18 @@
                                 android:paddingTop="5dp"
                                 android:radius="2dp"
                                 android:layout_alignParentBottom="true">
+                                <ImageButton
+                                    android:id="@+id/odIdCancel"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="60dp"
+                                    android:layout_weight="1"
+                                    android:src="@drawable/erase"/>
+                                <ImageButton
+                                    android:id="@+id/odIdConfigBtn2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="60dp"
+                                    android:layout_weight="1"
+                                    android:src="@drawable/setting"/>
                                 <ToggleButton
                                     android:id="@+id/odIdTable2"
                                     android:layout_width="match_parent"
@@ -337,18 +350,6 @@
                                     android:textOff=""
                                     android:textOn=""
                                     android:layout_weight="1" />
-                                <ImageButton
-                                    android:id="@+id/odIdCancel"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="60dp"
-                                    android:layout_weight="1"
-                                    android:src="@drawable/erase"/>
-                                <ImageButton
-                                    android:id="@+id/odIdConfigBtn2"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="60dp"
-                                    android:layout_weight="1"
-                                    android:src="@drawable/setting"/>
                                 <ImageButton
                                     android:id="@+id/odIdSndBtn2"
                                     android:layout_width="match_parent"
@@ -410,4 +411,32 @@
         </ViewSwitcher>
     </LinearLayout>
 
+    <!--input dialog-->
+    <LinearLayout
+        android:id="@+id/inputTableName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/notice2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Please input table name:" />
+
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/tableNameOK"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Continue" />
+    </LinearLayout>
 </RelativeLayout>
