@@ -2,7 +2,6 @@ package com.just.print.app;
 
 import android.app.Application;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
@@ -24,7 +23,6 @@ public class Applic extends Application {
 
     private DaoMaster daoMaster;
 
-
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -36,7 +34,6 @@ public class Applic extends Application {
             L.i(TAG, "service disconnected!");
         }
     };
-    public static Context context;
 
     @Override
     public void onCreate() {
@@ -45,7 +42,6 @@ public class Applic extends Application {
         app = this;
         new XCrashHandler().init(this);// for unhanddle.
         bindService(new Intent(this, UDPService.class), mServiceConnection, BIND_AUTO_CREATE);
-        context = getApplicationContext();
     }
 
     public void initDaoMaster(String shopName) {
