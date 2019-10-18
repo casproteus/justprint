@@ -119,6 +119,7 @@
 
     <!--main dialog -->
     <LinearLayout
+        android:id="@+id/mainDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">

@@ -564,15 +564,16 @@ public class OrderIdentifierFragment extends BaseFragment implements View.OnClic
             }else {
                 odIdTable2.setText(table);
             }
-            CustomerSelection.getInstance().setTableName(table);
+            CustomerSelection.getInstance().setTableName(table);// can not use it for now, because if input dlg poped up, this line will excuted before input message return back.odIdTable2.getText().toString());
             menuTableSwitcher.setDisplayedChild(0);
         }
     };
 
     @XClick({R.id.tableNameOK})
     private void verifyPassword(@XGetValueByView(fromId = R.id.password) String mark) {
-        findViewById(R.id.alertDlg);
+
         odIdTable2.setText(mark);
+        CustomerSelection.getInstance().setTableName(mark);
         //print code:
         findViewById(R.id.inputTableName).setVisibility(View.INVISIBLE);
         findViewById(R.id.mainDialog).setVisibility(View.VISIBLE);
