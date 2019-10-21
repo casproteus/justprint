@@ -30,9 +30,7 @@ public class OrderActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.order_activity);
         new StupidReflect(this).init();
-        if(!AppData.isMode2()) {
-            fragmentList.add(new OrderCategoryFragment());
-        }
+        fragmentList.add(new OrderCategoryFragment());
         //fragmentList.add(new OrderMenuFragment());
         fragmentList.add(OrderIdentifierFragment.getInstance());
         adapter = new MyPagerAdapter(getSupportFragmentManager(), fragmentList);
