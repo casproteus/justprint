@@ -318,7 +318,15 @@ public class WifiPrintService implements Runnable{
             }
 
             SaleRecord saleRecord = new SaleRecord();
-            saleRecord.setMname(menu.getID() + " " + name);
+            String mName = "";
+            if(AppData.showID) {
+                mName = menu.getID() + " ";
+            }
+            if(AppData.showName) {
+                mName = mName + name;             //dish name
+            }
+
+            saleRecord.setMname(name.trim());
             saleRecord.setNumber(Double.valueOf(number));
             saleRecord.setPrice(price);
             saleRecordDao.insertOrReplace(saleRecord);
